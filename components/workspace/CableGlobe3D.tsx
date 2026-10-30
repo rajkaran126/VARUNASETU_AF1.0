@@ -39,7 +39,7 @@ export function CableGlobe3D({
   const globeGroupRef = useRef<THREE.Group | null>(null);
   const rerouteCurveRef = useRef<THREE.CatmullRomCurve3 | null>(null);
   const pulseMeshesRef = useRef<THREE.Mesh[]>([]);
-  const pulseRingsRef = useRef<THREE.Mesh[]>([]);
+  const faultGlowRef = useRef<THREE.Mesh | null>(null);
   const diamondPinRef = useRef<THREE.Mesh | null>(null);
 
   useEffect(() => {
@@ -161,46 +161,35 @@ export function CableGlobe3D({
           const normal = new THREE.Vector3(fx, fy, fz).normalize();
           markerGroup.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
 
-          // 1. Core Pulsating Glowing Red Dot (#FF0033)
-          const outerDot = new THREE.Mesh(
-            new THREE.SphereGeometry(48, 24, 24),
+          // 1. Sleek, Vibrant Red Dot Beacon Pin (Flush on Globe Surface, Zero Flat Planar Rings)
+          const coreDot = new THREE.Mesh(
+            new THREE.SphereGeometry(32, 24, 24),
             new THREE.MeshBasicMaterial({ color: 0xFF0033 })
           );
-          markerGroup.add(outerDot);
+          markerGroup.add(coreDot);
 
-          // White-hot inner core
-          const innerDot = new THREE.Mesh(
-            new THREE.SphereGeometry(22, 16, 16),
+          // White-hot inner core spark
+          const innerSpark = new THREE.Mesh(
+            new THREE.SphereGeometry(15, 16, 16),
             new THREE.MeshBasicMaterial({ color: 0xFFFFFF })
           );
-          innerDot.position.z = 10;
-          markerGroup.add(innerDot);
+          innerSpark.position.z = 8;
+          markerGroup.add(innerSpark);
 
-          // 2. Dynamic Expanding Concentric Radar Shockwave Rings
-          pulseRingsRef.current = [];
-          const ringConfigs = [
-            { inner: 55, outer: 95, color: 0xFF1744 },
-            { inner: 105, outer: 155, color: 0xFF5252 },
-            { inner: 165, outer: 225, color: 0xFF8A80 },
-          ];
+          // Pulsating 3D Glow Sphere (Pure 3D geometry eliminates all planar popping / z-fighting)
+          const glowSphere = new THREE.Mesh(
+            new THREE.SphereGeometry(44, 24, 24),
+            new THREE.MeshBasicMaterial({
+              color: 0xFF1744,
+              transparent: true,
+              opacity: 0.45,
+            })
+          );
+          markerGroup.add(glowSphere);
+          faultGlowRef.current = glowSphere;
 
-          ringConfigs.forEach((cfg, idx) => {
-            const rMesh = new THREE.Mesh(
-              new THREE.RingGeometry(cfg.inner, cfg.outer, 36),
-              new THREE.MeshBasicMaterial({
-                color: cfg.color,
-                side: THREE.DoubleSide,
-                transparent: true,
-                opacity: 0.85,
-              })
-            );
-            rMesh.position.z = 3 + idx * 2;
-            markerGroup.add(rMesh);
-            pulseRingsRef.current.push(rMesh);
-          });
-
-          // 3. Vertical Laser Beacon Cylinder (Pointing directly out of the Earth into space)
-          const laserGeo = new THREE.CylinderGeometry(6, 16, 450, 16);
+          // 2. Vertical Laser Pin Stem
+          const laserGeo = new THREE.CylinderGeometry(3, 4.5, 160, 16);
           const laserMat = new THREE.MeshBasicMaterial({
             color: 0xFF1744,
             transparent: true,
@@ -208,20 +197,20 @@ export function CableGlobe3D({
           });
           const laser = new THREE.Mesh(laserGeo, laserMat);
           laser.rotation.x = Math.PI / 2;
-          laser.position.z = 225; // Project outward
+          laser.position.z = 80;
           markerGroup.add(laser);
 
-          // 4. Floating Diamond / Pin on Top of Laser Beacon
-          const diamondGeo = new THREE.OctahedronGeometry(36, 0);
+          // 3. Floating Diamond Pin Head
+          const diamondGeo = new THREE.OctahedronGeometry(20, 0);
           const diamondMat = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
           const diamond = new THREE.Mesh(diamondGeo, diamondMat);
-          diamond.position.z = 460;
+          diamond.position.z = 165;
           markerGroup.add(diamond);
           diamondPinRef.current = diamond;
 
-          // 5. Intense Red PointLight illuminating the ocean and cable ribbons
-          const redLight = new THREE.PointLight(0xFF0033, 5.0, 2500, 1.2);
-          redLight.position.z = 80;
+          // 4. Soft Red PointLight
+          const redLight = new THREE.PointLight(0xFF0033, 4.0, 1500, 1.2);
+          redLight.position.z = 50;
           markerGroup.add(redLight);
 
           cableModel.add(markerGroup);
@@ -289,17 +278,15 @@ export function CableGlobe3D({
             );
             wpGroup.add(wpDot);
 
-            const wpRing = new THREE.Mesh(
-              new THREE.RingGeometry(26, 50, 24),
+            const wpGlow = new THREE.Mesh(
+              new THREE.SphereGeometry(26, 12, 12),
               new THREE.MeshBasicMaterial({
-                color: 0xA8B99A,
-                side: THREE.DoubleSide,
+                color: 0x83B9A9,
                 transparent: true,
-                opacity: 0.8,
+                opacity: 0.35,
               })
             );
-            wpRing.position.z = 2;
-            wpGroup.add(wpRing);
+            wpGroup.add(wpGlow);
 
             rerouteGroup.add(wpGroup);
           });
@@ -493,22 +480,10 @@ export function CableGlobe3D({
         starField.rotation.y += 0.00008;
       }
 
-      // Animate active fault marker pulse & radar shockwaves
-      if (faultMarker) {
-        const pulse = Math.sin(timeMs * 0.007) * 0.25 + 1.1;
-        faultMarker.scale.set(pulse, pulse, 1.0);
-      }
-
-      if (pulseRingsRef.current.length > 0) {
-        const timeSec = timeMs * 0.001;
-        pulseRingsRef.current.forEach((rMesh, i) => {
-          const t = (timeSec * 0.85 + i * 0.33) % 1;
-          const scale = 1.0 + t * 2.2;
-          rMesh.scale.set(scale, scale, 1);
-          if (rMesh.material && !Array.isArray(rMesh.material)) {
-            (rMesh.material as THREE.MeshBasicMaterial).opacity = Math.max(0, (1 - t) * 0.85);
-          }
-        });
+      // Animate active fault beacon pulse
+      if (faultGlowRef.current) {
+        const pulse = 1.0 + Math.sin(timeMs * 0.005) * 0.22;
+        faultGlowRef.current.scale.set(pulse, pulse, pulse);
       }
 
       if (diamondPinRef.current) {
