@@ -50,8 +50,8 @@ export function CableNetworkOverlay({
 
           {/* Fault Pulse Glow */}
           <radialGradient id="faultGlow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#DC2626" stopOpacity="0.9" />
-            <stop offset="70%" stopColor="#DC2626" stopOpacity="0.3" />
+            <stop offset="0%" stopColor="#DC2626" stopOpacity="0.85" />
+            <stop offset="70%" stopColor="#DC2626" stopOpacity="0.25" />
             <stop offset="100%" stopColor="#DC2626" stopOpacity="0.0" />
           </radialGradient>
         </defs>
@@ -146,64 +146,34 @@ export function CableNetworkOverlay({
           </g>
         )}
 
-        {/* 4. Active Fault Beacon */}
+        {/* 4. Active Fault Red Blip Marker (No flash cards, clean red blip) */}
         {faultPos.visible && (
           <g
             className="pointer-events-auto cursor-pointer"
             onClick={onInitiateRepairTransition}
           >
-            <title>Click to initiate Earth-to-Underwater Dive & Repair Simulation</title>
+            <title>Fault Location: {activeFault.cableName} ({activeFault.lat.toFixed(2)}°N, {activeFault.lon.toFixed(2)}°E) - Click to inspect</title>
+            {/* Outer pulsating radar pulse rings */}
             <circle cx={faultPos.x} cy={faultPos.y} r="28" fill="url(#faultGlow)" className="animate-pulse" />
-            <circle cx={faultPos.x} cy={faultPos.y} r="14" fill="none" stroke="#DC2626" strokeWidth="1.5" className="animate-ping" />
-            <circle cx={faultPos.x} cy={faultPos.y} r="6" fill="#DC2626" stroke="#FFFFFF" strokeWidth="2" />
+            <circle cx={faultPos.x} cy={faultPos.y} r="16" fill="none" stroke="#DC2626" strokeWidth="1.5" className="animate-ping" opacity="0.75" />
+            <circle cx={faultPos.x} cy={faultPos.y} r="9" fill="none" stroke="#EF4444" strokeWidth="1.5" opacity="0.9" />
+            {/* Central bright red blip */}
+            <circle cx={faultPos.x} cy={faultPos.y} r="5.5" fill="#DC2626" stroke="#FFFFFF" strokeWidth="2" className="drop-shadow" />
+            {/* Minimal red blip label */}
+            <text
+              x={faultPos.x + 9}
+              y={faultPos.y + 4}
+              fill="#EF4444"
+              fontSize="10"
+              fontFamily="monospace"
+              fontWeight="bold"
+              className="select-none drop-shadow"
+            >
+              FAULT
+            </text>
           </g>
         )}
       </svg>
-
-      {/* Floating Floating Fault Card Overlay */}
-      {faultPos.visible && (
-        <div
-          style={{
-            left: `${Math.min(window.innerWidth - 320, Math.max(20, faultPos.x + 18))}px`,
-            top: `${Math.min(window.innerHeight - 240, Math.max(20, faultPos.y - 40))}px`,
-          }}
-          className="absolute pointer-events-auto bg-[#0B1D33]/92 backdrop-blur-md p-3.5 rounded-xl border border-[#DC2626]/40 shadow-2xl w-64 text-white z-20 space-y-2 animate-in fade-in zoom-in-95"
-        >
-          <div className="flex items-center justify-between">
-            <span className="font-mono text-[9px] font-bold text-rose-300 bg-rose-950/80 px-2 py-0.5 rounded border border-rose-600/40">
-              ACTIVE SEVERANCE
-            </span>
-            <span className="font-mono text-[9px] text-cyan-300 animate-pulse">
-              DEPTH: -{activeFault.depthMeters}M
-            </span>
-          </div>
-
-          <div>
-            <h4 className="font-grotesk text-xs font-bold text-white tracking-wide">
-              {activeFault.cableName}
-            </h4>
-            <p className="font-mono text-[10px] text-[#91A1AF] mt-0.5">
-              {activeFault.nearestLandingStation} ({activeFault.lat.toFixed(2)}°N, {activeFault.lon.toFixed(2)}°E)
-            </p>
-          </div>
-
-          <div className="pt-1.5 border-t border-white/10 flex items-center justify-between font-mono text-[9px] text-white/70">
-            <span>Attenuation: <strong className="text-rose-400">{activeFault.opticalLossDb} dB</strong></span>
-            <span>Flow: <strong className="text-amber-400">{activeFault.affectedTrafficTbps} T</strong></span>
-          </div>
-
-          <button
-            onClick={onInitiateRepairTransition}
-            className="w-full py-1.5 px-3 rounded-lg bg-[#1677B8] hover:bg-[#075B91] text-white text-[11px] font-mono font-bold tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-md active:scale-95"
-          >
-            <span>DESCEND & REPAIR</span>
-            <svg className="w-3 h-3 text-cyan-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <polyline points="7 13 12 18 17 13" />
-              <polyline points="7 6 12 11 17 6" />
-            </svg>
-          </button>
-        </div>
-      )}
     </div>
   );
 }
