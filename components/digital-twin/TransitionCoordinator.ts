@@ -151,7 +151,7 @@ export class TransitionCoordinator {
           statusMessage: 'Benthic Station Kept · Physical Repair Enclave Active',
         });
 
-        if (this.underwater) {
+        if (this.underwater && this.underwater.setPerspective) {
           this.underwater.setPerspective('ROV Cam');
         }
 
