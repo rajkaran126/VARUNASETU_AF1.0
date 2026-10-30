@@ -35,9 +35,9 @@ export function Sidebar() {
     },
     {
       id: 'digital-twin',
-      name: 'Underwater Digital Twin',
+      name: 'Cable Break Simulation',
       path: '/workspace/digital-twin',
-      badge: '3D',
+      badge: 'SIM',
       icon: (active) => (
         <svg className={`w-5 h-5 transition-colors ${active ? 'text-[#C87954]' : 'text-[#6D6E66]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
           <path d="M2 17c3-3 6-3 9 0s6 3 9 0" />
