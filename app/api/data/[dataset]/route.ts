@@ -61,9 +61,9 @@ const ROUTE_MAP: Record<string, () => unknown> = {
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { dataset: string } }
+  { params }: { params: Promise<{ dataset: string }> }
 ) {
-  const { dataset } = params;
+  const { dataset } = await params;
   const loader = ROUTE_MAP[dataset];
   if (!loader) {
     return NextResponse.json(

@@ -270,7 +270,7 @@ export default function FalseRedundancyLabPage() {
           <div className="mt-2 p-3 rounded-xl bg-amber-50 border border-amber-200 max-w-2xl">
             <p className="text-xs font-semibold text-amber-900 mb-1">Hurdle Brief</p>
             <p className="text-xs text-amber-800 leading-relaxed italic">
-              "Two cables that share a corridor or landing station are not real backups: one earthquake or dragged anchor cuts both. Repairs depend on ships, weather and permits, and rerouted traffic congests the surviving routes."
+              &ldquo;Two cables that share a corridor or landing station are not real backups: one earthquake or dragged anchor cuts both. Repairs depend on ships, weather and permits, and rerouted traffic congests the surviving routes.&rdquo;
             </p>
           </div>
           <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-2 max-w-2xl">

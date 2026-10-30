@@ -23,7 +23,7 @@ import { ProvenanceType } from '../types';
 // Load manifest at module init — bundled statically by Next.js
 let _manifest: { datasets?: DatasetManifestEntry[] } = { datasets: [] };
 try {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  // eslint-disable-next-line
   _manifest = require('../../data/manifests/dataset_manifest.json') as { datasets?: DatasetManifestEntry[] };
 } catch {
   // manifest not available in browser bundle — graceful fallback
