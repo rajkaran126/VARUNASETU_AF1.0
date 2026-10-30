@@ -79,6 +79,10 @@ export default function CableBreakSim() {
       const { OrbitControls } = await import(
         'three/examples/jsm/controls/OrbitControls.js'
       );
+      const { GLTFLoader } = await import(
+        'three/examples/jsm/loaders/GLTFLoader.js'
+      );
+      const gltfLoader = new GLTFLoader();
 
       /* ─── RENDERER ─── */
       const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -378,46 +382,69 @@ export default function CableBreakSim() {
       ring.position.copy(breakPos);
       scene.add(ring);
 
-      /* ─── REPAIR SHIP ─── */
+      /* ─── REPAIR SHIP (cargo-ship.glb) ─── */
       const ship = new THREE.Group();
-      const shipHull   = new THREE.Mesh(new THREE.BoxGeometry(7, 1.6, 3), new THREE.MeshPhongMaterial({ color: 0x454640 }));
-      shipHull.position.y = 0.8; ship.add(shipHull);
-      const shipBridge = new THREE.Mesh(new THREE.BoxGeometry(2.2, 2.2, 2.4), new THREE.MeshPhongMaterial({ color: 0xa69b89 }));
-      shipBridge.position.set(-1.8, 2.3, 0); ship.add(shipBridge);
-      const shipCrane  = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 3.8, 8), new THREE.MeshPhongMaterial({ color: 0xc87954, emissive: 0x5a2d18 }));
-      shipCrane.position.set(1.8, 2.7, 0); ship.add(shipCrane);
-      const shipArm    = new THREE.Mesh(new THREE.BoxGeometry(3.5, 0.15, 0.15), new THREE.MeshPhongMaterial({ color: 0xc87954 }));
-      shipArm.position.set(2.0, 4.7, 0); ship.add(shipArm);
-      // Mast light
-      const mLight = new THREE.Mesh(new THREE.SphereGeometry(0.16, 8, 8), new THREE.MeshPhongMaterial({ color: 0xffffff, emissive: 0xfffbeb, emissiveIntensity: 2 }));
-      mLight.position.set(3.4, 2, 0); ship.add(mLight);
       ship.position.set(-55, 0.4, 0); // starts off-screen
       scene.add(ship);
 
-      /* ─── ROV ─── */
-      const rov = new THREE.Group();
-      const rovBody = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.65, 0.9), new THREE.MeshPhongMaterial({ color: 0xe99a65, emissive: 0x452010 }));
-      rov.add(rovBody);
-      // Thrusters
-      const thrMat = new THREE.MeshPhongMaterial({ color: 0x454640 });
-      [[0.75,0.3,0.35],[-0.75,0.3,0.35],[0.75,0.3,-0.35],[-0.75,0.3,-0.35]].forEach(([tx,ty,tz]) => {
-        const t = new THREE.Mesh(new THREE.CylinderGeometry(0.14,0.14,0.22,8), thrMat);
-        t.position.set(tx as number, ty as number, tz as number); t.rotation.z = Math.PI/2; rov.add(t);
-      });
-      // Front lights
-      const rovLightMat = new THREE.MeshPhongMaterial({ color: 0xffffff, emissive: 0xfffbeb, emissiveIntensity: 2.5 });
-      [-0.22, 0.22].forEach(lx => {
-        const rl = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 8), rovLightMat);
-        rl.position.set(lx, 0, 0.46); rov.add(rl);
-      });
-      // ROV spot
-      const rovSpot = new THREE.SpotLight(0xfffbeb, 0, 15, Math.PI/6, 0.5);
-      rovSpot.position.set(0, 0, 0.5);
-      rov.add(rovSpot);
+      gltfLoader.load(
+        '/models/cargo-ship.glb',
+        (gltf) => {
+          const shipModel = gltf.scene;
+          shipModel.scale.setScalar(0.18);
+          shipModel.rotation.y = Math.PI / 2;
+          shipModel.position.set(0, 0, 0);
+          shipModel.traverse((child) => {
+            if ((child as THREE.Mesh).isMesh) {
+              child.castShadow = true;
+              child.receiveShadow = true;
+            }
+          });
+          ship.add(shipModel);
+        },
+        undefined,
+        (err) => {
+          console.warn('Fallback: cargo-ship.glb', err);
+          const hull = new THREE.Mesh(new THREE.BoxGeometry(7, 1.6, 3), new THREE.MeshPhongMaterial({ color: 0x454640 }));
+          hull.position.y = 0.8;
+          ship.add(hull);
+        }
+      );
 
+      /* ─── ROV (one-person-submarine-0b9d14.glb) ─── */
+      const rov = new THREE.Group();
       rov.position.set(breakPos.x, 0.4, 0);
       rov.visible = false;
       scene.add(rov);
+
+      // ROV spot headlight attached to rov group
+      const rovSpot = new THREE.SpotLight(0xfffbeb, 0, 15, Math.PI / 6, 0.5);
+      rovSpot.position.set(0, 0.2, 0.9);
+      rovSpot.target.position.set(0, -0.4, 4.0);
+      rov.add(rovSpot);
+      rov.add(rovSpot.target);
+
+      gltfLoader.load(
+        '/models/one-person-submarine-0b9d14.glb',
+        (gltf) => {
+          const rovModel = gltf.scene;
+          rovModel.scale.setScalar(0.75);
+          rovModel.position.set(0, 0, 0);
+          rovModel.traverse((child) => {
+            if ((child as THREE.Mesh).isMesh) {
+              child.castShadow = true;
+              child.receiveShadow = true;
+            }
+          });
+          rov.add(rovModel);
+        },
+        undefined,
+        (err) => {
+          console.warn('Fallback: one-person-submarine-0b9d14.glb', err);
+          const fallback = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.65, 0.9), new THREE.MeshPhongMaterial({ color: 0xe99a65 }));
+          rov.add(fallback);
+        }
+      );
 
       // Tether
       const tetherBuf = new Float32Array(6);
