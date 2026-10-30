@@ -38,7 +38,7 @@ export function FaultNotificationTray({ onClose }: FaultNotificationTrayProps) {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-grotesk text-sm font-bold text-[#454640]">
+              <h3 className="font-sans font-bold text-sm font-bold text-[#454640]">
                 Fault Verification
               </h3>
               {pendingNotificationsCount > 0 ? (
@@ -104,7 +104,7 @@ export function FaultNotificationTray({ onClose }: FaultNotificationTrayProps) {
           <div className="flex items-start justify-between gap-2">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-600 animate-ping" />
-              <strong className="font-grotesk text-xs text-emerald-900">
+              <strong className="font-sans font-bold text-xs text-emerald-900">
                 Active Fault: {activeConfirmedNotification.cableName}
               </strong>
             </div>
@@ -201,7 +201,7 @@ export function FaultNotificationTray({ onClose }: FaultNotificationTrayProps) {
                             ? 'bg-rose-100 text-rose-800 border border-rose-200'
                             : notif.severity === 'Major'
                             ? 'bg-amber-100 text-amber-800 border border-amber-200'
-                            : 'bg-sky-100 text-sky-800 border border-sky-200'
+                            : 'bg-[#E8D9BF] text-[#687B59] border border-sky-200'
                         }`}
                       >
                         {notif.severity}
@@ -292,7 +292,7 @@ export function FaultNotificationTray({ onClose }: FaultNotificationTrayProps) {
                     </span>
                     <button
                       onClick={() => approveFaultNotification(notif.id)}
-                      className="font-mono text-[10px] text-[#1677B8] hover:underline"
+                      className="font-mono text-[10px] text-[#C87954] hover:underline"
                     >
                       Re-evaluate
                     </button>

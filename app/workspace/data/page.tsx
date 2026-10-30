@@ -90,7 +90,7 @@ export default function DataInfrastructurePage() {
               CENTRAL HUB
             </span>
           </div>
-          <h1 className="font-grotesk text-2xl lg:text-3xl font-bold text-[#0E2A47] tracking-tight mt-1">
+          <h1 className="font-sans font-bold text-2xl lg:text-3xl font-bold text-[#0E2A47] tracking-tight mt-1">
             Data & Infrastructure Hub
           </h1>
           <p className="text-xs text-[#4A647D] mt-0.5 max-w-2xl">
@@ -113,7 +113,7 @@ export default function DataInfrastructurePage() {
       <div className="bg-white rounded-2xl border border-[#E2DBD0] p-6 shadow-xs space-y-4">
         <div className="flex items-center justify-between pb-3 border-b border-[#F0EBE0]">
           <div>
-            <h2 className="font-grotesk text-base font-bold text-[#0E2A47]">
+            <h2 className="font-sans font-bold text-base font-bold text-[#0E2A47]">
               Ingest Subsea GIS & Telemetry Datasets
             </h2>
             <p className="font-mono text-[10px] text-[#59738A]">
@@ -266,7 +266,7 @@ export default function DataInfrastructurePage() {
       <div className="bg-white rounded-2xl border border-[#E2DBD0] p-6 shadow-xs space-y-4">
         <div className="flex items-center justify-between pb-3 border-b border-[#F0EBE0]">
           <div>
-            <h2 className="font-grotesk text-base font-bold text-[#0E2A47]">
+            <h2 className="font-sans font-bold text-base font-bold text-[#0E2A47]">
               Registered Datasets & Provenance Archive
             </h2>
             <p className="font-mono text-[10px] text-[#59738A]">
@@ -317,7 +317,7 @@ export default function DataInfrastructurePage() {
                         ds.provenance === 'Observed'
                           ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                           : ds.provenance === 'Derived'
-                          ? 'bg-sky-50 text-sky-700 border border-sky-200'
+                          ? 'bg-[#E8D9BF] text-[#454640] border border-[#D4C4A8]'
                           : ds.provenance === 'Synthetic'
                           ? 'bg-purple-50 text-purple-700 border border-purple-200'
                           : 'bg-amber-50 text-amber-700 border border-amber-200'

@@ -97,23 +97,11 @@ module.exports = {
         },
       },
       fontFamily: {
-        display: [
-          "'Outfit'",
-          "'Space Grotesk'",
-          "system-ui",
-          "-apple-system",
-          "BlinkMacSystemFont",
-          "sans-serif",
-        ],
-        grotesk: [
-          "'Space Grotesk'",
-          "system-ui",
-          "-apple-system",
-          "sans-serif",
-        ],
-        body: ["'Outfit'", "'Manrope'", "system-ui", "-apple-system", "sans-serif"],
+        display: ["'Plus Jakarta Sans'", "'Inter'", "system-ui", "-apple-system", "sans-serif"],
+        grotesk: ["'Plus Jakarta Sans'", "'Inter'", "system-ui", "-apple-system", "sans-serif"],
+        body: ["'Plus Jakarta Sans'", "'Inter'", "system-ui", "-apple-system", "sans-serif"],
+        sans: ["'Plus Jakarta Sans'", "'Inter'", "system-ui", "-apple-system", "sans-serif"],
         mono: ["'IBM Plex Mono'", "ui-monospace", "monospace"],
-        sans: ["'Outfit'", "'Manrope'", "system-ui", "-apple-system", "sans-serif"],
       },
       animation: {
         "fade-in": "fadeIn 0.6s ease-out forwards",

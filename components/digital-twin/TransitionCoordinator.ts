@@ -122,7 +122,7 @@ export class TransitionCoordinator {
       const earthOp = Math.max(0.0, 1.0 - t * 1.5);
       const underOp = Math.min(1.0, t * 1.3);
 
-      if (this.underwater) {
+      if (this.underwater && this.underwater.setDepthLevel) {
         this.underwater.setDepthLevel(currentDepth);
       }
 

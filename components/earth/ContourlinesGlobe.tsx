@@ -163,35 +163,8 @@ void main() {
   vec2 uv = gl_FragCoord.xy / uViewport;
   vec2 p = (gl_FragCoord.xy - uViewport * 0.5) / min(uViewport.x, uViewport.y);
 
-  // Deep space 3D cosmic background with dark indigo gradients
-  vec3 col = mix(vec3(0.004, 0.007, 0.016), vec3(0.012, 0.018, 0.038), uv.y);
-
-  // Milky Way Galactic Dust Lane & Cosmic Nebulae
-  float mwBand = exp(-pow(p.x * 0.6 + p.y * 0.8, 2.0) * 4.0);
-  float neb = fbm(p * 2.2 + vec2(1.5, 3.2));
-  vec3 nebCol = mix(vec3(0.04, 0.06, 0.16), vec3(0.02, 0.10, 0.16), neb);
-  col += nebCol * mwBand * 0.5;
-
-  // Star Layer 1: Distant twinkling micro stars
-  vec2 cell1 = floor(gl_FragCoord.xy / 2.5);
-  float h1 = hash(cell1);
-  if (h1 > 0.9962) {
-    float b1 = hash(cell1 + 71.0);
-    float twinkle = sin(uTime * 2.5 + b1 * 6.28) * 0.35 + 0.65;
-    vec3 starTint = mix(vec3(0.7, 0.85, 1.0), vec3(1.0, 0.95, 0.8), hash(cell1 + 13.0));
-    col += starTint * (b1 * 0.65 + 0.35) * twinkle;
-  }
-
-  // Star Layer 2: Navigational bright stars with soft flare
-  vec2 cell2 = floor(gl_FragCoord.xy / 14.0);
-  float h2 = hash(cell2 + 91.0);
-  if (h2 > 0.993) {
-    vec2 starCenter = (cell2 + 0.5) * 14.0;
-    float dist = length(gl_FragCoord.xy - starCenter);
-    float starGlow = exp(-dist * 0.65) * 1.35;
-    vec3 starCol = mix(vec3(0.85, 0.95, 1.0), vec3(1.0, 0.88, 0.6), hash(cell2 + 55.0));
-    col += starCol * starGlow;
-  }
+  // Clean, neutral deep space canvas ready for user-provided space asset
+  vec3 col = vec3(0.012, 0.014, 0.018);
 
   // 3D Atmospheric Rayleigh Limb Glow around Earth Sphere
   if (uMorph > 0.01) {
@@ -656,20 +629,20 @@ export const ContourlinesGlobe = forwardRef<ContourlinesGlobeHandle, Contourline
       {/* Loading Indicator */}
       {isLoading && (
         <div className="absolute inset-0 bg-[#071322]/80 backdrop-blur-xs flex flex-col items-center justify-center text-white z-30 font-mono text-xs">
-          <div className="w-8 h-8 rounded-full border-2 border-cyan-400 border-t-transparent animate-spin mb-3" />
-          <p className="tracking-widest uppercase text-cyan-300 font-semibold">Streaming NOAA Bathymetry</p>
+          <div className="w-8 h-8 rounded-full border-2 border-[#C87954] border-t-transparent animate-spin mb-3" />
+          <p className="tracking-widest uppercase text-[#454640] font-semibold">Streaming NOAA Bathymetry</p>
           <p className="text-[10px] text-white/50 mt-1">Decoding 16-bit elevation heightmap...</p>
         </div>
       )}
 
       {/* Earth Controls Pill in Official VARUNASETU Styling */}
-      <div className="absolute bottom-4 left-4 z-20 flex items-center gap-2 bg-[#0B1D33]/90 backdrop-blur-md p-1.5 rounded-xl border border-[#153A5B] shadow-lg text-xs font-mono">
+      <div className="absolute bottom-4 left-4 z-20 flex items-center gap-2 bg-[#F7F3EA]/95 backdrop-blur-md p-1.5 rounded-xl border border-[#D4C4A8] shadow-md text-xs font-sans">
         <button
           onClick={() => {
             const v = viewRef.current;
             v.morph = v.morph > 0.5 ? 0.0 : 1.0;
           }}
-          className="px-2.5 py-1 rounded-lg bg-[#102A46] hover:bg-[#153A5B] text-cyan-300 border border-[#13BFD3]/30 transition-all font-semibold"
+          className="px-2.5 py-1 rounded-lg bg-[#83B9A9] hover:bg-[#687B59] text-[#454640] hover:text-white border border-[#D4C4A8] transition-all font-semibold"
           title="Toggle Globe / Flat Equirectangular Projection"
         >
           Globe / 2D
@@ -678,7 +651,7 @@ export const ContourlinesGlobe = forwardRef<ContourlinesGlobeHandle, Contourline
           onClick={() => {
             viewRef.current.scale = Math.min(45.0, viewRef.current.scale * 1.3);
           }}
-          className="p-1.5 rounded-lg bg-[#102A46] hover:bg-[#153A5B] text-white transition-all"
+          className="p-1.5 rounded-lg bg-[#E8D9BF] hover:bg-[#D4C4A8] text-[#454640] border border-[#D4C4A8] transition-all"
           title="Zoom In"
         >
           <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -690,7 +663,7 @@ export const ContourlinesGlobe = forwardRef<ContourlinesGlobeHandle, Contourline
           onClick={() => {
             viewRef.current.scale = Math.max(1.2, viewRef.current.scale * 0.77);
           }}
-          className="p-1.5 rounded-lg bg-[#102A46] hover:bg-[#153A5B] text-white transition-all"
+          className="p-1.5 rounded-lg bg-[#E8D9BF] hover:bg-[#D4C4A8] text-[#454640] border border-[#D4C4A8] transition-all"
           title="Zoom Out"
         >
           <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -703,7 +676,7 @@ export const ContourlinesGlobe = forwardRef<ContourlinesGlobeHandle, Contourline
             viewRef.current.lat = initialLat;
             viewRef.current.scale = initialScale;
           }}
-          className="px-2.5 py-1 rounded-lg bg-[#102A46] hover:bg-[#153A5B] text-[#91A1AF] hover:text-white transition-all"
+          className="px-2.5 py-1 rounded-lg bg-[#E8D9BF] hover:bg-[#D4C4A8] text-[#454640] border border-[#D4C4A8] transition-all font-medium"
           title="Reset to Incident Epicenter"
         >
           Reset

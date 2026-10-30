@@ -268,7 +268,7 @@ export function CableExplorerMap({
           <span className="h-6 w-[1px] bg-white/15" />
           <div>
             <p className="font-mono text-[9px] uppercase tracking-widest text-white/50">PROVENANCE</p>
-            <span className="font-mono text-[10px] text-sky-300">
+            <span className="font-mono text-[10px] text-[#83B9A9]">
               {(hoveredCable || selectedCable).provenance}
             </span>
           </div>

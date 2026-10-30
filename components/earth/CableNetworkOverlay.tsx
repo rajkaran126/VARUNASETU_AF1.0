@@ -111,14 +111,14 @@ export function CableNetworkOverlay({
           if (!pos.visible) return null;
           return (
             <g key={ls.id} className="pointer-events-auto">
-              <circle cx={pos.x} cy={pos.y} r="3" fill="#DDF8FA" stroke="#83B9A9" strokeWidth="1.5" />
+              <circle cx={pos.x} cy={pos.y} r="3" fill="#F7F3EA" stroke="#83B9A9" strokeWidth="1.5" />
               {viewState.scale > 4.0 && (
                 <text
                   x={pos.x + 6}
                   y={pos.y + 3}
                   fill="#454640"
                   fontSize="9"
-                  fontFamily="monospace"
+                  fontFamily="system-ui, sans-serif"
                   className="select-none pointer-events-none drop-shadow"
                 >
                   {ls.city}
@@ -138,7 +138,7 @@ export function CableNetworkOverlay({
               y={vesselPos.y + 4}
               fill="#83B9A9"
               fontSize="10"
-              fontFamily="monospace"
+              fontFamily="system-ui, sans-serif"
               fontWeight="bold"
             >
               CS SOVEREIGN (DP2)
@@ -165,7 +165,7 @@ export function CableNetworkOverlay({
               y={faultPos.y + 4}
               fill="#C87954"
               fontSize="10"
-              fontFamily="monospace"
+              fontFamily="system-ui, sans-serif"
               fontWeight="bold"
               className="select-none drop-shadow"
             >

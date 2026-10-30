@@ -300,61 +300,61 @@ export function CableGlobe3D({
   }, [cables, activeFault, autoRotate]);
 
   return (
-    <div ref={containerRef} className="relative w-full h-[520px] rounded-2xl bg-[#040d1a] border border-[#193351] overflow-hidden shadow-xl select-none">
+    <div ref={containerRef} className="relative w-full h-[520px] rounded-2xl bg-[#F7F3EA] border border-[#D4C4A8] overflow-hidden shadow-xl select-none">
       <canvas ref={canvasRef} className="w-full h-full block cursor-grab active:cursor-grabbing" />
 
-      {/* Top Left 3D Asset Header Overlay */}
-      <div className="absolute top-4 left-4 z-20 flex items-center gap-2.5 bg-[#0b1d33]/90 backdrop-blur-md px-3.5 py-2 rounded-xl border border-white/10 shadow-lg">
-        <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-        <span className="font-mono text-xs font-bold text-white tracking-wider">
-          3D SUBSEA CABLE NETWORK // MODEL 1
+      {/* Top Left 3D Asset Header Overlay (PARJANYAḤ Light Theme) */}
+      <div className="absolute top-4 left-4 z-20 flex items-center gap-2.5 bg-[#F7F3EA]/95 backdrop-blur-md px-3.5 py-2 rounded-xl border border-[#D4C4A8] shadow-md">
+        <span className="w-2 h-2 rounded-full bg-[#C87954] animate-pulse" />
+        <span className="font-sans text-xs font-bold text-[#454640] tracking-wide">
+          3D Subsea Cable Network · Model 1
         </span>
-        <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-cyan-950 text-cyan-400 border border-cyan-800">
-          GLOBAL TOPOLOGY
+        <span className="px-2 py-0.5 rounded text-[10px] font-sans font-bold bg-[#E8D9BF] text-[#454640] border border-[#D4C4A8]">
+          Global Topology
         </span>
       </div>
 
       {/* Top Right Auto-Rotate and Controls */}
-      <div className="absolute top-4 right-4 z-20 flex items-center gap-2 bg-[#0b1d33]/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 shadow-lg">
+      <div className="absolute top-4 right-4 z-20 flex items-center gap-2 bg-[#F7F3EA]/95 backdrop-blur-md px-3 py-1.5 rounded-xl border border-[#D4C4A8] shadow-md">
         <button
           onClick={() => setAutoRotate(!autoRotate)}
-          className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-all ${
+          className={`px-2.5 py-1 rounded-lg text-xs font-sans font-bold transition-all ${
             autoRotate
-              ? 'bg-cyan-500 text-[#0b1d33]'
-              : 'bg-white/10 text-white/70 hover:text-white'
+              ? 'bg-[#83B9A9] text-[#454640] shadow-xs'
+              : 'bg-[#E8D9BF] text-[#454640] hover:bg-[#D4C4A8]'
           }`}
         >
-          {autoRotate ? 'AUTO-ROTATE ON' : 'PAUSED'}
+          {autoRotate ? 'Auto-Rotate On' : 'Paused'}
         </button>
-        <span className="text-white/30 text-xs font-mono">|</span>
-        <span className="text-[10px] font-mono text-white/60">
-          DRAG TO ORBIT / SCROLL TO ZOOM
+        <span className="text-[#A69B89] text-xs">|</span>
+        <span className="text-[11px] font-sans text-[#A69B89]">
+          Drag to orbit / Scroll to zoom
         </span>
       </div>
 
       {/* Bottom Left Active Selected Cable Summary */}
       {selectedCable && (
-        <div className="absolute bottom-4 left-4 z-20 bg-[#0b1d33]/90 backdrop-blur-md px-4 py-3 rounded-xl border border-white/10 shadow-lg max-w-sm">
-          <div className="text-[10px] font-mono uppercase tracking-wider text-cyan-400 font-semibold mb-0.5">
-            SELECTED CORRIDOR
+        <div className="absolute bottom-4 left-4 z-20 bg-[#F7F3EA]/95 backdrop-blur-md px-4 py-3 rounded-xl border border-[#D4C4A8] shadow-md max-w-sm">
+          <div className="text-[10px] font-sans uppercase tracking-wider text-[#C87954] font-bold mb-0.5">
+            Selected Corridor
           </div>
-          <div className="text-sm font-bold text-white tracking-wide">
+          <div className="text-sm font-bold text-[#454640] tracking-tight">
             {selectedCable.name}
           </div>
-          <div className="font-mono text-[10px] text-white/70 flex items-center gap-3 mt-1">
-            <span>RFS: {selectedCable.rfsYear}</span>
-            <span>LENGTH: {selectedCable.lengthKm.toLocaleString()} KM</span>
-            <span>CAPACITY: {selectedCable.designCapacityTbps} TBPS</span>
+          <div className="font-sans text-xs text-[#A69B89] flex items-center gap-3 mt-1">
+            <span>RFS: <strong className="text-[#454640]">{selectedCable.rfsYear}</strong></span>
+            <span>Length: <strong className="text-[#454640]">{selectedCable.lengthKm.toLocaleString()} km</strong></span>
+            <span>Capacity: <strong className="text-[#454640]">{selectedCable.designCapacityTbps} Tbps</strong></span>
           </div>
         </div>
       )}
 
       {/* Loading Overlay */}
       {modelLoading && (
-        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-[#040d1a]/80 backdrop-blur-sm">
-          <div className="w-8 h-8 rounded-full border-2 border-cyan-400 border-t-transparent animate-spin mb-3" />
-          <span className="font-mono text-xs text-cyan-300 font-bold tracking-widest">
-            INITIALIZING 3D CABLE NETWORK MODEL...
+        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-[#F7F3EA]/90 backdrop-blur-sm">
+          <div className="w-8 h-8 rounded-full border-2 border-[#C87954] border-t-transparent animate-spin mb-3" />
+          <span className="font-sans text-xs text-[#454640] font-bold tracking-wide">
+            Initializing 3D Cable Network Model...
           </span>
         </div>
       )}

@@ -52,7 +52,7 @@ export default function RecoveryWarRoomPage() {
               WAR ROOM ACTIVE
             </span>
           </div>
-          <h1 className="font-grotesk text-2xl lg:text-3xl font-bold text-[#0E2A47] tracking-tight mt-1">
+          <h1 className="font-sans font-bold text-2xl lg:text-3xl font-bold text-[#0E2A47] tracking-tight mt-1">
             Recovery War Room
           </h1>
           <p className="text-xs text-[#4A647D] mt-0.5 max-w-2xl">
@@ -74,7 +74,7 @@ export default function RecoveryWarRoomPage() {
       {/* Recovery Strategies Comparison Matrix */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="font-grotesk text-lg font-bold text-[#0E2A47]">
+          <h2 className="font-sans font-bold text-lg font-bold text-[#0E2A47]">
             Recovery Strategy Evaluation Matrix
           </h2>
           <span className="font-mono text-xs text-[#59738A]">
@@ -108,7 +108,7 @@ export default function RecoveryWarRoomPage() {
                     )}
                   </div>
 
-                  <h3 className="font-grotesk text-base font-bold text-[#0E2A47] leading-snug">
+                  <h3 className="font-sans font-bold text-base font-bold text-[#0E2A47] leading-snug">
                     {strat.title}
                   </h3>
 
@@ -163,13 +163,13 @@ export default function RecoveryWarRoomPage() {
                     }}
                     className={`w-full py-2 px-3 rounded-xl text-xs font-semibold font-mono tracking-wider transition-all ${
                       isSelected
-                        ? 'bg-[#0B1D33] text-white shadow-xs'
+                        ? 'bg-[#83B9A9] text-[#454640] shadow-xs'
                         : 'border border-[#CBDDEB] bg-[#EDF3F7] text-[#152D46] hover:bg-white'
                     }`}
                   >
                     {isSelected ? (
                       <span className="flex items-center justify-center gap-1.5 text-white">
-                        <svg className="w-3.5 h-3.5 text-[#13BFD3]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <svg className="w-3.5 h-3.5 text-[#83B9A9]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                           <polyline points="20 6 9 17 4 12" />
                         </svg>
                         <span>STRATEGY COMMITTED</span>
@@ -189,7 +189,7 @@ export default function RecoveryWarRoomPage() {
       <div className="bg-white rounded-2xl border border-[#E2DBD0] p-6 shadow-xs space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#F0EBE0]">
           <div>
-            <h2 className="font-grotesk text-lg font-bold text-[#0E2A47]">
+            <h2 className="font-sans font-bold text-lg font-bold text-[#0E2A47]">
               Subsea Cable Repair Fleet Inventory
             </h2>
             <p className="font-mono text-[10px] text-[#59738A]">
@@ -268,7 +268,7 @@ export default function RecoveryWarRoomPage() {
                       {distanceNm.toLocaleString()} NM
                     </td>
 
-                    <td className="py-3 px-3 font-mono font-bold text-sky-800">
+                    <td className="py-3 px-3 font-mono font-bold text-[#687B59]">
                       {transitHours} Hours
                     </td>
 
@@ -313,7 +313,7 @@ export default function RecoveryWarRoomPage() {
 
         <div className="p-3 rounded-lg bg-[#FAF7F2] border border-[#E8E1D5] text-[11px] text-[#5A738A] font-mono flex items-center justify-between">
           <span>* Transit times calculated via Haversine great-circle at designated cruising speed with Suez Canal maritime scheduling.</span>
-          <Link href="/workspace/mission-control" className="inline-flex items-center gap-1 text-[#1677B8] font-bold hover:underline">
+          <Link href="/workspace/mission-control" className="inline-flex items-center gap-1 text-[#C87954] font-bold hover:underline">
             <span>Brief Agents in Mission Control</span>
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="5" y1="12" x2="19" y2="12" />

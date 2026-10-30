@@ -202,13 +202,13 @@ export default function UnderwaterDigitalTwinPage() {
         <div>
           <div className="flex items-center gap-2">
             <span className="font-mono text-[11px] text-[#A69B89] uppercase tracking-widest">
-              SECTION 02 // SUBSEA DIGITAL TWIN ENCLAVE
+              Section 02 · Subsea Digital Twin
             </span>
             <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#E8D9BF] text-[#454640] border border-[#D4C4A8]">
-              PHASE 3 CERTIFIED // DUAL-ENGINE
+              Dual-Engine Platform
             </span>
           </div>
-          <h1 className="font-grotesk text-2xl lg:text-3xl font-bold text-[#454640] tracking-tight mt-1">
+          <h1 className="text-2xl lg:text-3xl font-bold text-[#454640] tracking-tight mt-1 font-sans">
             Underwater Digital Twin & Earth Visualization
           </h1>
           <p className="text-xs text-[#A69B89] mt-0.5 max-w-2xl">
@@ -218,7 +218,7 @@ export default function UnderwaterDigitalTwinPage() {
 
         {/* Viewport Mode Switcher & PDF Export */}
         <div className="flex items-center gap-2">
-          <div className="flex items-center bg-[#E8D9BF] p-1 rounded-xl border border-[#D4C4A8] shadow-2xs font-mono text-xs">
+          <div className="flex items-center bg-[#E8D9BF] p-1 rounded-xl border border-[#D4C4A8] shadow-2xs font-sans text-xs font-medium">
             <button
               onClick={() => {
                 setActiveMode('earth');
@@ -312,7 +312,7 @@ export default function UnderwaterDigitalTwinPage() {
 
         {/* Transition Status HUD (Visible during descent journey) */}
         {transitionState.currentStage !== 'idle' && transitionState.currentStage !== 'repair_active' && (
-          <div className="absolute top-6 left-1/2 -translate-x-1/2 z-30 bg-[#F7F3EA]/95 backdrop-blur-md px-5 py-2.5 rounded-2xl border border-[#D4C4A8] shadow-xl flex items-center gap-3 font-mono text-xs text-[#454640] animate-pulse">
+          <div className="absolute top-6 left-1/2 -translate-x-1/2 z-30 bg-[#F7F3EA]/95 backdrop-blur-md px-5 py-2.5 rounded-2xl border border-[#D4C4A8] shadow-xl flex items-center gap-3 font-sans text-xs font-medium text-[#454640] animate-pulse">
             <span className="w-2.5 h-2.5 rounded-full bg-[#C87954]" />
             <span className="font-semibold">{transitionState.statusMessage}</span>
             <span className="px-2 py-0.5 rounded bg-[#E8D9BF] text-[#454640] font-bold border border-[#D4C4A8]">

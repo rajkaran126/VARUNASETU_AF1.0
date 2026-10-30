@@ -19,7 +19,7 @@ export default function AnalyticsReportsPage() {
   const incidentCauses = [
     { cause: 'Commercial Anchor Dragging', share: '44%', count: 182, color: 'bg-rose-500' },
     { cause: 'Deepsea Fishing Trawler Gear', share: '26%', count: 108, color: 'bg-amber-500' },
-    { cause: 'Underwater Seismic / Earthquakes', share: '14%', count: 58, color: 'bg-sky-500' },
+    { cause: 'Underwater Seismic / Earthquakes', share: '14%', count: 58, color: 'bg-[#83B9A9]' },
     { cause: 'Optical Repeater & Power Shunts', share: '11%', count: 45, color: 'bg-indigo-500' },
     { cause: 'Submarine Landslides & Current', share: '5%', count: 21, color: 'bg-slate-400' },
   ];
@@ -60,7 +60,7 @@ export default function AnalyticsReportsPage() {
               ANALYTICS ENGINE 2.4
             </span>
           </div>
-          <h1 className="font-grotesk text-2xl lg:text-3xl font-bold text-[#0E2A47] tracking-tight mt-1">
+          <h1 className="font-sans font-bold text-2xl lg:text-3xl font-bold text-[#0E2A47] tracking-tight mt-1">
             Analytics & Reports
           </h1>
           <p className="text-xs text-[#4A647D] mt-0.5 max-w-2xl">
@@ -74,7 +74,7 @@ export default function AnalyticsReportsPage() {
             onClick={handleExportCSV}
             className="btn-secondary"
           >
-            <svg className="w-4 h-4 text-[#1677B8]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg className="w-4 h-4 text-[#C87954]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
               <polyline points="7 10 12 15 17 10" />
               <line x1="12" y1="15" x2="12" y2="3" />
@@ -109,7 +109,7 @@ export default function AnalyticsReportsPage() {
       <div className="bg-white rounded-2xl border border-[#E2DBD0] p-6 shadow-xs space-y-4">
         <div className="flex items-center justify-between pb-3 border-b border-[#F0EBE0]">
           <div>
-            <h2 className="font-grotesk text-base font-bold text-[#0E2A47]">
+            <h2 className="font-sans font-bold text-base font-bold text-[#0E2A47]">
               Regional Subsea Corridor Vulnerability Matrix
             </h2>
             <p className="font-mono text-[10px] text-[#59738A]">
@@ -166,7 +166,7 @@ export default function AnalyticsReportsPage() {
         {/* Left Column: Historical Root Cause Distribution (5 cols) */}
         <div className="lg:col-span-5 bg-white rounded-2xl border border-[#E2DBD0] p-6 shadow-xs space-y-4">
           <div className="pb-3 border-b border-[#F0EBE0]">
-            <h3 className="font-grotesk text-base font-bold text-[#0E2A47]">
+            <h3 className="font-sans font-bold text-base font-bold text-[#0E2A47]">
               Subsea Failure Root Cause Breakdown
             </h3>
             <p className="font-mono text-[10px] text-[#59738A]">
@@ -199,7 +199,7 @@ export default function AnalyticsReportsPage() {
         <div className="lg:col-span-7 bg-white rounded-2xl border border-[#E2DBD0] p-6 shadow-xs space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-[#F0EBE0]">
             <div>
-              <h3 className="font-grotesk text-base font-bold text-[#0E2A47]">
+              <h3 className="font-sans font-bold text-base font-bold text-[#0E2A47]">
                 Simulation Snapshot History & Audit Trail
               </h3>
               <p className="font-mono text-[10px] text-[#59738A]">

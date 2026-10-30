@@ -1,67 +1,59 @@
-"use client";
+'use client';
 
 import React, { useEffect, useRef, useState, useImperativeHandle, forwardRef } from 'react';
 import * as THREE from 'three';
-import { loadSubseaAssets } from '@/lib/3d/asset-loader';
 import { Model9SplicingAssembly } from '@/lib/3d/models/Model9SplicingAssembly';
 import { Model12InspectionEquipment } from '@/lib/3d/models/Model12InspectionEquipment';
+import { FaultIncident } from '@/lib/types';
 
 export type CameraPerspective = 'ROV Cam' | 'Macro Splice' | 'Orbit' | 'Surface Vessel';
 
 export interface UnderwaterSceneHandle {
   setPerspective: (perspective: CameraPerspective) => void;
-  setSimulationStage: (stage: number, progress: number) => void;
+  setSimulationStage: (stageIndex: number, stageProgress: number) => void;
   captureFrame: () => string;
-  setDepthLevel: (depthMeters: number) => void;
+  setDepthLevel?: (depthMeters: number) => void;
 }
 
 interface UnderwaterSceneProps {
+  activeFault: FaultIncident;
+  activePerspective?: CameraPerspective;
   currentStage?: number;
   stageProgress?: number;
-  activePerspective?: CameraPerspective;
-  isGhostModeActive?: boolean;
   isGhostMode?: boolean;
-  activeFault?: any;
 }
 
 const UnderwaterScene = forwardRef<UnderwaterSceneHandle, UnderwaterSceneProps>(
   (
     {
+      activeFault,
+      activePerspective = 'ROV Cam',
       currentStage = 0,
       stageProgress = 0,
-      activePerspective = 'Orbit',
-      isGhostModeActive = false,
       isGhostMode = false,
-      activeFault,
     },
     ref
   ) => {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const containerRef = useRef<HTMLDivElement | null>(null);
+    const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-    // Three.js core references
+    // Three.js References
     const sceneRef = useRef<THREE.Scene | null>(null);
-    const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
     const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+    const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
 
-    // Dynamic scene elements
+    // ROV & Cable References
     const rovGroupRef = useRef<THREE.Group | null>(null);
-    const roboticArmRef = useRef<THREE.Group | null>(null);
-    const craneHookRef = useRef<THREE.Group | null>(null);
-    const hoistCableRef = useRef<THREE.Mesh | null>(null);
-    const vesselGroupRef = useRef<THREE.Group | null>(null);
-    const model9Ref = useRef<Model9SplicingAssembly | null>(null);
     const model12Ref = useRef<Model12InspectionEquipment | null>(null);
+    const model9Ref = useRef<Model9SplicingAssembly | null>(null);
     const opticalPulseMeshRef = useRef<THREE.Mesh | null>(null);
     const opticalPulsePosRef = useRef<number>(0);
+    const tetherMeshRef = useRef<THREE.Mesh | null>(null);
     const marineSnowRef = useRef<THREE.Points | null>(null);
-    const oceanSurfaceMeshRef = useRef<THREE.Mesh | null>(null);
-    const daylightSunRef = useRef<THREE.DirectionalLight | null>(null);
-    const skyHemiLightRef = useRef<THREE.HemisphereLight | null>(null);
 
     // Camera targets
-    const targetCamPos = useRef(new THREE.Vector3(12, -14, 15));
-    const targetLookAt = useRef(new THREE.Vector3(0, -19.0, 0));
+    const targetCamPos = useRef(new THREE.Vector3(0, 1.8, 8.5));
+    const targetLookAt = useRef(new THREE.Vector3(0, 0.5, 6.0));
 
     // Internal state
     const [perspectiveState, setPerspectiveState] = useState<CameraPerspective>(activePerspective);
@@ -75,31 +67,31 @@ const UnderwaterScene = forwardRef<UnderwaterSceneHandle, UnderwaterSceneProps>(
       progressStateRef.current = progressState;
     }, [stageState, progressState]);
 
-    const [assetsLoaded, setAssetsLoaded] = useState(false);
-
     // Update targets on perspective change
     const updateCameraTargets = (persp: CameraPerspective) => {
       switch (persp) {
         case 'Surface Vessel':
-          // Daylight Surface View framing the ship in full daylight
-          targetCamPos.current.set(18, 5.5, 24);
-          targetLookAt.current.set(0, 0.8, 6);
+          targetCamPos.current.set(12, 4.5, 18);
+          targetLookAt.current.set(0, 0.5, 6.0);
           break;
         case 'ROV Cam':
-          // ROV First-person pilot view over inspection sensors
-          targetCamPos.current.set(0, -16.2, 4.2);
-          targetLookAt.current.set(0, -18.8, 0.5);
+          if (rovGroupRef.current) {
+            const p = rovGroupRef.current.position;
+            targetCamPos.current.set(p.x, p.y + 1.1, p.z + 2.8);
+            targetLookAt.current.set(p.x, p.y - 0.2, p.z - 2.5);
+          } else {
+            targetCamPos.current.set(0, 1.8, 8.5);
+            targetLookAt.current.set(0, 0.5, 6.0);
+          }
           break;
         case 'Macro Splice':
-          // Macro inspection view right in front of Model 9 with seabed background
-          targetCamPos.current.set(0, -18.5, 1.6);
+          targetCamPos.current.set(0, -18.4, 1.6);
           targetLookAt.current.set(0, -19.0, 0);
           break;
         case 'Orbit':
         default:
-          // Dramatic operational orbit framing the repair within the seabed canyon
-          targetCamPos.current.set(12, -13.5, 15);
-          targetLookAt.current.set(0, -19.0, 0);
+          targetCamPos.current.set(12, -13.5, 14);
+          targetLookAt.current.set(0, -18.5, 0);
           break;
       }
     };
@@ -122,8 +114,7 @@ const UnderwaterScene = forwardRef<UnderwaterSceneHandle, UnderwaterSceneProps>(
         return '';
       },
       setDepthLevel(depthMeters: number) {
-        if (cameraRef.current && perspectiveState !== 'Macro Splice' && perspectiveState !== 'ROV Cam') {
-          // Map depth 0 to 4820m to y: 0 to -19.0
+        if (cameraRef.current && perspectiveState === 'Orbit') {
           const y = -(depthMeters / 4820) * 19.0;
           cameraRef.current.position.y = y;
         }
@@ -150,11 +141,9 @@ const UnderwaterScene = forwardRef<UnderwaterSceneHandle, UnderwaterSceneProps>(
       const scene = new THREE.Scene();
       sceneRef.current = scene;
 
-      // Atmospheric Color Scheme: Transitions dynamically from Daylight Sky to Deep Abyssal Blue
-      const initialSkyColor = new THREE.Color(0x03182b);
-      scene.background = initialSkyColor;
-      const sceneFog = new THREE.FogExp2(0x04213d, 0.018);
-      scene.fog = sceneFog;
+      // Deep oceanic atmosphere
+      scene.background = new THREE.Color(0x021324);
+      scene.fog = new THREE.FogExp2(0x03182b, 0.016);
 
       const camera = new THREE.PerspectiveCamera(
         48,
@@ -162,7 +151,7 @@ const UnderwaterScene = forwardRef<UnderwaterSceneHandle, UnderwaterSceneProps>(
         0.1,
         350
       );
-      camera.position.set(12, -13.5, 15);
+      camera.position.set(0, 2.0, 9.0);
       cameraRef.current = camera;
 
       const renderer = new THREE.WebGLRenderer({
@@ -177,108 +166,46 @@ const UnderwaterScene = forwardRef<UnderwaterSceneHandle, UnderwaterSceneProps>(
       renderer.shadowMap.enabled = true;
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.35;
+      renderer.toneMappingExposure = 1.3;
       rendererRef.current = renderer;
 
-      // 2. Multi-Tier Lighting: Daylight Sun at Surface + Oceanic Ambient + Benthic Spotlights
-      // A. Surface Daylight Sun
-      const daylightSun = new THREE.DirectionalLight(0xfffbeb, 4.2);
-      daylightSun.position.set(25, 45, 30);
-      daylightSun.castShadow = true;
-      daylightSun.shadow.mapSize.width = 2048;
-      daylightSun.shadow.mapSize.height = 2048;
-      daylightSun.shadow.camera.near = 1;
-      daylightSun.shadow.camera.far = 120;
-      daylightSun.shadow.camera.left = -40;
-      daylightSun.shadow.camera.right = 40;
-      daylightSun.shadow.camera.top = 40;
-      daylightSun.shadow.camera.bottom = -40;
-      scene.add(daylightSun);
-      daylightSunRef.current = daylightSun;
+      // 2. Lighting: Sun radiance + Ambient radiance + Benthic spotlight
+      const sunLight = new THREE.DirectionalLight(0xfff7ed, 3.8);
+      sunLight.position.set(20, 35, 25);
+      sunLight.castShadow = true;
+      scene.add(sunLight);
 
-      // Daylight sky hemisphere light
-      const skyHemiLight = new THREE.HemisphereLight(0x7dd3fc, 0x075985, 2.2);
-      scene.add(skyHemiLight);
-      skyHemiLightRef.current = skyHemiLight;
+      const hemiLight = new THREE.HemisphereLight(0x4a7c91, 0x07273d, 2.2);
+      scene.add(hemiLight);
 
-      // B. Ambient oceanic radiance (ensures objects are clearly visible, never pitch black)
-      const ambientLight = new THREE.AmbientLight(0x0b3a62, 2.6);
+      const ambientLight = new THREE.AmbientLight(0x0a263d, 2.4);
       scene.add(ambientLight);
 
-      // C. Deep water sunlight shafts penetrating down to seabed
-      const downwellingLight = new THREE.DirectionalLight(0x2dd4bf, 2.0);
-      downwellingLight.position.set(8, 30, 10);
-      scene.add(downwellingLight);
-
-      // D. Deep trench benthic key spotlight illuminating repair area
-      const benthicKeyLight = new THREE.SpotLight(0xfff7ed, 6.8, 45, Math.PI / 3.2, 0.45, 1.1);
+      // Benthic key spotlight illuminating cable repair zone
+      const benthicKeyLight = new THREE.SpotLight(0xfff7ed, 6.5, 45, Math.PI / 3.2, 0.45, 1.1);
       benthicKeyLight.position.set(0, -11, 6);
       benthicKeyLight.target.position.set(0, -19.2, 0);
       benthicKeyLight.castShadow = true;
       scene.add(benthicKeyLight);
       scene.add(benthicKeyLight.target);
 
-      // E. Wide-angle backdrop wash lights highlighting the underlying sea environment
-      const backdropWashLeft = new THREE.SpotLight(0x83b9a9, 4.0, 55, Math.PI / 2.8, 0.5);
-      backdropWashLeft.position.set(-18, -10, -5);
-      backdropWashLeft.target.position.set(-15, -19.5, -15);
-      scene.add(backdropWashLeft);
-      scene.add(backdropWashLeft.target);
-
-      const backdropWashRight = new THREE.SpotLight(0xa8b99a, 3.8, 55, Math.PI / 2.8, 0.5);
-      backdropWashRight.position.set(18, -10, -5);
-      backdropWashRight.target.position.set(15, -19.5, -15);
-      scene.add(backdropWashRight);
-      scene.add(backdropWashRight.target);
-
-      // 3. Daytime Ocean Water Surface Plane at y = 0
-      const waterGeo = new THREE.PlaneGeometry(160, 160, 64, 64);
-      waterGeo.rotateX(-Math.PI / 2);
-      const waterMat = new THREE.MeshStandardMaterial({
-        color: 0x0284c7,
-        roughness: 0.1,
-        metalness: 0.35,
-        transparent: true,
-        opacity: 0.78,
+      // Neutral seabed baseline supporting the submarine cable
+      const seafloorGeo = new THREE.PlaneGeometry(120, 120, 48, 48);
+      seafloorGeo.rotateX(-Math.PI / 2);
+      const seafloorMat = new THREE.MeshStandardMaterial({
+        color: 0x1a2632,
+        roughness: 0.9,
+        metalness: 0.1,
       });
-      const waterMesh = new THREE.Mesh(waterGeo, waterMat);
-      waterMesh.position.y = 0;
-      waterMesh.receiveShadow = true;
-      scene.add(waterMesh);
-      oceanSurfaceMeshRef.current = waterMesh;
+      const seafloorMesh = new THREE.Mesh(seafloorGeo, seafloorMat);
+      seafloorMesh.position.y = -19.5;
+      seafloorMesh.receiveShadow = true;
+      scene.add(seafloorMesh);
 
-      // 4. Underlying Sea Environment (Seabed Bathymetry at y = -19.5)
-      const floorGeo = new THREE.PlaneGeometry(140, 140, 96, 96);
-      floorGeo.rotateX(-Math.PI / 2);
-      // Realistic bathymetric displacement: submarine canyon trench along x-axis
-      const posAttr = floorGeo.attributes.position;
-      for (let i = 0; i < posAttr.count; i++) {
-        const x = posAttr.getX(i);
-        const z = posAttr.getZ(i);
-        // Central trench depression near z ~ 0
-        const trench = -Math.exp(-(z * z) / 45.0) * 1.5;
-        // Natural undulating abyssal silt dunes and rocky rises
-        const dune =
-          Math.sin(x * 0.12) * Math.cos(z * 0.1) * 0.7 +
-          Math.sin(x * 0.28 + z * 0.2) * 0.3;
-        posAttr.setY(i, trench + dune);
-      }
-      floorGeo.computeVertexNormals();
-
-      const floorMat = new THREE.MeshStandardMaterial({
-        color: 0x182a3a,
-        roughness: 0.88,
-        metalness: 0.12,
-      });
-      const floorMesh = new THREE.Mesh(floorGeo, floorMat);
-      floorMesh.position.y = -19.5;
-      floorMesh.receiveShadow = true;
-      scene.add(floorMesh);
-
-      // 5. Physical Submarine Fiber Optic Cable on Seafloor
+      // 3. Submarine Fiber Optic Cable on Seafloor
       const createSeafloorCable = (points: THREE.Vector3[], color: number) => {
         const curve = new THREE.CatmullRomCurve3(points);
-        const tubeGeo = new THREE.TubeGeometry(curve, 64, 0.12, 16, false);
+        const tubeGeo = new THREE.TubeGeometry(curve, 64, 0.13, 16, false);
         const tubeMat = new THREE.MeshStandardMaterial({
           color,
           roughness: 0.45,
@@ -290,7 +217,7 @@ const UnderwaterScene = forwardRef<UnderwaterSceneHandle, UnderwaterSceneProps>(
         return mesh;
       };
 
-      // Left cable segment (from landing station towards fault)
+      // Left cable segment leading towards fault
       const leftCablePoints = [
         new THREE.Vector3(-45, -19.4, -6),
         new THREE.Vector3(-25, -19.5, -3),
@@ -301,7 +228,7 @@ const UnderwaterScene = forwardRef<UnderwaterSceneHandle, UnderwaterSceneProps>(
       const leftCable = createSeafloorCable(leftCablePoints, 0x454640);
       scene.add(leftCable);
 
-      // Right cable segment (transoceanic route towards fault)
+      // Right cable segment
       const rightCablePoints = [
         new THREE.Vector3(0.5, -19.2, 0),
         new THREE.Vector3(4, -19.6, 0.4),
@@ -312,13 +239,19 @@ const UnderwaterScene = forwardRef<UnderwaterSceneHandle, UnderwaterSceneProps>(
       const rightCable = createSeafloorCable(rightCablePoints, 0x454640);
       scene.add(rightCable);
 
-      // Optical Data Continuity Laser Pulse (glowing photon wave traveling along cable)
+      // Model 9: Submarine Cable Splicing Assembly (Universal Joint)
+      const model9 = new Model9SplicingAssembly();
+      model9.group.position.set(0, -19.1, 0);
+      model9.group.scale.setScalar(1.25);
+      scene.add(model9.group);
+      model9Ref.current = model9;
+
+      // Optical Continuity Laser Pulse (Stage 8 and 11)
       const pulseGeo = new THREE.SphereGeometry(0.18, 16, 16);
       const pulseMat = new THREE.MeshBasicMaterial({
         color: 0x83b9a9,
         transparent: true,
-        opacity: 0.85,
-        blending: THREE.AdditiveBlending,
+        opacity: 0.9,
       });
       const opticalPulseMesh = new THREE.Mesh(pulseGeo, pulseMat);
       opticalPulseMesh.position.set(-45, -19.4, -6);
@@ -326,20 +259,14 @@ const UnderwaterScene = forwardRef<UnderwaterSceneHandle, UnderwaterSceneProps>(
       scene.add(opticalPulseMesh);
       opticalPulseMeshRef.current = opticalPulseMesh;
 
-      // 6. Model 9: Submarine Cable Splicing and Joint Assembly (Universal Joint)
-      const model9 = new Model9SplicingAssembly();
-      model9.group.position.set(0, -19.1, 0);
-      model9.group.scale.setScalar(1.25);
-      scene.add(model9.group);
-      model9Ref.current = model9;
-
-      // 7. Primary Subsea Vehicle: Work-Class ROV with Model 12 Inspection Suite
+      // 4. Primary Subsea Vehicle: Work-Class ROV
       const rovGroup = new THREE.Group();
-      rovGroup.position.set(0, -17.2, 1.8);
+      // Starts at surface deployment location
+      rovGroup.position.set(0, 0.5, 6.0);
       scene.add(rovGroup);
       rovGroupRef.current = rovGroup;
 
-      // High-Strength Synthetic Syntactic Foam Pack (High-Visibility Offshore Yellow)
+      // Syntactic Foam Pack (Offshore Yellow)
       const foamGeo = new THREE.BoxGeometry(1.4, 0.32, 1.8);
       const foamMat = new THREE.MeshStandardMaterial({
         color: 0xf59e0b,
@@ -351,7 +278,7 @@ const UnderwaterScene = forwardRef<UnderwaterSceneHandle, UnderwaterSceneProps>(
       foam.castShadow = true;
       rovGroup.add(foam);
 
-      // Titanium Structural Spaceframe Chassis (Midnight Navy)
+      // Structural Spaceframe Chassis
       const chassisGeo = new THREE.BoxGeometry(1.36, 0.72, 1.76);
       const chassisMat = new THREE.MeshStandardMaterial({
         color: 0x454640,
@@ -362,12 +289,12 @@ const UnderwaterScene = forwardRef<UnderwaterSceneHandle, UnderwaterSceneProps>(
       chassis.castShadow = true;
       rovGroup.add(chassis);
 
-      // Hydraulic Vectored Thrusters (4 Horizontal + 2 Vertical)
+      // Hydraulic Thrusters
       const thrusterGeo = new THREE.CylinderGeometry(0.14, 0.14, 0.32, 16);
       const thrusterMat = new THREE.MeshStandardMaterial({
-        color: 0x475569,
-        metalness: 0.85,
-        roughness: 0.2,
+        color: 0x687b59,
+        metalness: 0.8,
+        roughness: 0.25,
       });
       const addThrusterPod = (x: number, y: number, z: number, rx: number, ry: number) => {
         const pod = new THREE.Mesh(thrusterGeo, thrusterMat);
@@ -383,45 +310,27 @@ const UnderwaterScene = forwardRef<UnderwaterSceneHandle, UnderwaterSceneProps>(
       addThrusterPod(-0.45, 0.32, 0, Math.PI / 2, 0);
       addThrusterPod(0.45, 0.32, 0, Math.PI / 2, 0);
 
-      // Model 12 Inspection Equipment Forward Sensor Suite
+      // Model 12 Inspection Equipment
       const model12 = new Model12InspectionEquipment();
       model12.group.position.set(0, -0.15, 0.95);
       rovGroup.add(model12.group);
       model12Ref.current = model12;
 
-      // Umbilical Tether Cable leading up through the water column to surface ship
-      const tetherPoints = [
-        new THREE.Vector3(0, -16.8, 1.4),
-        new THREE.Vector3(-2.2, -11.0, 2.5),
-        new THREE.Vector3(1.5, -5.0, 4.0),
-        new THREE.Vector3(0, 0.2, 5.8),
-      ];
-      const tetherCurve = new THREE.CatmullRomCurve3(tetherPoints);
-      const tetherGeo = new THREE.TubeGeometry(tetherCurve, 36, 0.035, 8, false);
-      const tetherMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.5 });
+      // Dynamic Umbilical Tether Cable
+      const initialTetherCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0, 0.5, 6.0),
+        new THREE.Vector3(-0.3, 0.2, 5.8),
+        new THREE.Vector3(0.2, 0.0, 5.9),
+        new THREE.Vector3(0, 0.5, 6.0),
+      ]);
+      const tetherGeo = new THREE.TubeGeometry(initialTetherCurve, 32, 0.035, 8, false);
+      const tetherMat = new THREE.MeshStandardMaterial({ color: 0xe99a65, roughness: 0.5 });
       const tetherMesh = new THREE.Mesh(tetherGeo, tetherMat);
       scene.add(tetherMesh);
+      tetherMeshRef.current = tetherMesh;
 
-      // 8. Surface DP2 Cable Repair Vessel (CS Sovereign class, floating at y = 0.2 in Daylight)
-      const vesselGroup = new THREE.Group();
-      vesselGroup.position.set(0, 0.2, 6.0);
-      scene.add(vesselGroup);
-      vesselGroupRef.current = vesselGroup;
-
-      // 9. Heavy Crane Hook Block & Vertical Hoist Wire
-      const hoistPoints = [
-        new THREE.Vector3(0, 0.5, 6.0), // From ship deck crane
-        new THREE.Vector3(0, -18.2, 0), // Down to repair hook
-      ];
-      const hoistCurve = new THREE.CatmullRomCurve3(hoistPoints);
-      const hoistGeo = new THREE.TubeGeometry(hoistCurve, 16, 0.018, 6, false);
-      const hoistMat = new THREE.MeshStandardMaterial({ color: 0xd1d5db, metalness: 0.9 });
-      const hoistCable = new THREE.Mesh(hoistGeo, hoistMat);
-      scene.add(hoistCable);
-      hoistCableRef.current = hoistCable;
-
-      // 10. Marine Snow Particles in Water Column
-      const snowCount = 450;
+      // Marine Snow Particles
+      const snowCount = 400;
       const snowGeo = new THREE.BufferGeometry();
       const snowPos = new Float32Array(snowCount * 3);
       for (let i = 0; i < snowCount; i++) {
@@ -431,95 +340,16 @@ const UnderwaterScene = forwardRef<UnderwaterSceneHandle, UnderwaterSceneProps>(
       }
       snowGeo.setAttribute('position', new THREE.BufferAttribute(snowPos, 3));
       const snowMat = new THREE.PointsMaterial({
-        color: 0x93c5fd,
-        size: 0.09,
+        color: 0x83b9a9,
+        size: 0.08,
         transparent: true,
-        opacity: 0.55,
+        opacity: 0.5,
       });
       const marineSnow = new THREE.Points(snowGeo, snowMat);
       scene.add(marineSnow);
       marineSnowRef.current = marineSnow;
 
-      // 11. Asynchronously Load Real 3D GLB & OBJ Assets
-      loadSubseaAssets().then((assets) => {
-        // A. Cargo Ship (Surface repair vessel in Daylight)
-        if (assets.cargoShip && vesselGroupRef.current) {
-          assets.cargoShip.scale.setScalar(0.14);
-          assets.cargoShip.position.set(0, 0.25, 0);
-          assets.cargoShip.rotation.y = Math.PI / 2;
-          vesselGroupRef.current.add(assets.cargoShip);
-        }
-
-        // B. Crane Hook Block (Suspended from lift cable)
-        if (assets.craneHook) {
-          assets.craneHook.scale.setScalar(0.35);
-          assets.craneHook.position.set(0, -18.2, 0);
-          scene.add(assets.craneHook);
-          craneHookRef.current = assets.craneHook;
-        }
-
-        // C. Articulated Robotic Manipulator (Mounted to ROV chassis)
-        if (assets.roboticArm && rovGroupRef.current) {
-          assets.roboticArm.scale.setScalar(0.28);
-          assets.roboticArm.position.set(0.55, -0.4, 0.8);
-          assets.roboticArm.rotation.set(Math.PI / 4, 0, 0);
-          rovGroupRef.current.add(assets.roboticArm);
-          roboticArmRef.current = assets.roboticArm;
-        }
-
-        // D. Geological Formations / Reef Walls (Underlying Sea Environment Framing the Trench)
-        if (assets.reefWalls) {
-          const reefL = assets.reefWalls.clone();
-          reefL.scale.setScalar(0.07);
-          reefL.position.set(-18, -19.5, -12);
-          scene.add(reefL);
-
-          const reefR = assets.reefWalls.clone();
-          reefR.scale.setScalar(0.065);
-          reefR.position.set(20, -19.5, 10);
-          reefR.rotation.y = Math.PI;
-          scene.add(reefR);
-
-          // Additional background ridge backdrop
-          const reefBackdrop = assets.reefWalls.clone();
-          reefBackdrop.scale.setScalar(0.08);
-          reefBackdrop.position.set(0, -19.2, -18);
-          reefBackdrop.rotation.y = Math.PI / 2;
-          scene.add(reefBackdrop);
-        }
-
-        // E. Ocean Floor OBJ Mesh if loaded
-        if (assets.oceanFloorMesh) {
-          assets.oceanFloorMesh.scale.setScalar(22);
-          assets.oceanFloorMesh.position.set(0, -19.5, 0);
-          if (assets.seafloorTexture) {
-            assets.oceanFloorMesh.traverse((child) => {
-              if ((child as THREE.Mesh).isMesh) {
-                const m = child as THREE.Mesh;
-                m.material = new THREE.MeshStandardMaterial({
-                  map: assets.seafloorTexture || null,
-                  normalMap: assets.seafloorNormal || null,
-                  roughnessMap: assets.seafloorRoughness || null,
-                  roughness: 0.85,
-                  metalness: 0.1,
-                });
-                m.receiveShadow = true;
-              }
-            });
-          }
-          scene.add(assets.oceanFloorMesh);
-        } else if (assets.seafloorTexture) {
-          // Apply textures to procedural floor
-          floorMat.map = assets.seafloorTexture || null;
-          floorMat.normalMap = assets.seafloorNormal || null;
-          floorMat.roughnessMap = assets.seafloorRoughness || null;
-          floorMat.needsUpdate = true;
-        }
-
-        setAssetsLoaded(true);
-      });
-
-      // Window resize handler
+      // Resize Handler
       const handleResize = () => {
         if (!container || !renderer || !camera) return;
         camera.aspect = container.clientWidth / container.clientHeight;
@@ -528,7 +358,7 @@ const UnderwaterScene = forwardRef<UnderwaterSceneHandle, UnderwaterSceneProps>(
       };
       window.addEventListener('resize', handleResize);
 
-      // Animation Render Loop
+      // Animation Loop
       let animId: number;
       const clock = new THREE.Clock();
 
@@ -536,129 +366,83 @@ const UnderwaterScene = forwardRef<UnderwaterSceneHandle, UnderwaterSceneProps>(
         animId = requestAnimationFrame(animate);
         const timeMs = clock.getElapsedTime() * 1000;
 
-        // 1. Smooth Camera Interpolation towards Target
+        // 1. Compute Continuous Motion of ROV from Ship (Surface) to Cable (Seabed)
+        if (rovGroupRef.current) {
+          let targetROVX = 0;
+          let targetROVY = -17.2;
+          let targetROVZ = 1.8;
+          let targetPitch = 0;
+
+          const stage = stageStateRef.current;
+          const progress = THREE.MathUtils.clamp(progressStateRef.current, 0, 1);
+
+          if (stage === 0) {
+            // Stage 0: Surface Dispatch & Deployment from Ship (y: 0.5 -> -4.0, z: 6.0 -> 5.0)
+            targetROVX = 0;
+            targetROVY = THREE.MathUtils.lerp(0.5, -4.0, progress);
+            targetROVZ = THREE.MathUtils.lerp(6.0, 5.0, progress);
+            targetPitch = THREE.MathUtils.lerp(0.0, -0.35, Math.min(1.0, progress * 1.8));
+          } else if (stage === 1) {
+            // Stage 1: Water Column Descent down to Seabed Cable (y: -4.0 -> -17.2, z: 5.0 -> 1.8)
+            targetROVX = Math.sin(progress * Math.PI * 2) * 0.35;
+            targetROVY = THREE.MathUtils.lerp(-4.0, -17.2, progress);
+            targetROVZ = THREE.MathUtils.lerp(5.0, 1.8, progress);
+            targetPitch = THREE.MathUtils.lerp(-0.35, 0.0, Math.pow(progress, 0.7));
+          } else if (stage >= 2 && stage <= 8) {
+            // Active cable repair & inspection position at seabed
+            targetROVX = 0;
+            targetROVY = -17.2 + Math.sin(timeMs * 0.0015) * 0.06;
+            targetROVZ = 1.8;
+            targetPitch = Math.sin(timeMs * 0.001) * 0.02;
+          } else {
+            // Post-repair inspection hover
+            targetROVX = 0;
+            targetROVY = -16.2 + Math.sin(timeMs * 0.0015) * 0.06;
+            targetROVZ = 2.2;
+            targetPitch = Math.sin(timeMs * 0.001) * 0.015;
+          }
+
+          // Smooth interpolation
+          rovGroupRef.current.position.x = THREE.MathUtils.lerp(rovGroupRef.current.position.x, targetROVX, 0.08);
+          rovGroupRef.current.position.y = THREE.MathUtils.lerp(rovGroupRef.current.position.y, targetROVY, 0.08);
+          rovGroupRef.current.position.z = THREE.MathUtils.lerp(rovGroupRef.current.position.z, targetROVZ, 0.08);
+          rovGroupRef.current.rotation.x = THREE.MathUtils.lerp(rovGroupRef.current.rotation.x, targetPitch, 0.08);
+
+          // 2. Dynamic Tether Umbilical connecting Surface Ship origin to ROV
+          if (tetherMeshRef.current) {
+            const p0 = new THREE.Vector3(0, 0.5, 6.0); // Surface ship origin
+            const rovP = rovGroupRef.current.position;
+            const p3 = new THREE.Vector3(rovP.x, rovP.y + 0.45, rovP.z);
+            const midY = (p0.y + p3.y) * 0.5;
+            const p1 = new THREE.Vector3(-0.9, midY + 1.2, (p0.z + p3.z) * 0.6 + 0.3);
+            const p2 = new THREE.Vector3(0.6, midY - 1.2, (p0.z + p3.z) * 0.4 - 0.2);
+            const tCurve = new THREE.CatmullRomCurve3([p0, p1, p2, p3]);
+            tetherMeshRef.current.geometry.dispose();
+            tetherMeshRef.current.geometry = new THREE.TubeGeometry(tCurve, 32, 0.035, 8, false);
+          }
+
+          // 3. Dynamic Camera Tracking in ROV Cam
+          if (perspectiveState === 'ROV Cam') {
+            const rovP = rovGroupRef.current.position;
+            targetCamPos.current.set(rovP.x, rovP.y + 1.1, rovP.z + 2.8);
+            targetLookAt.current.set(rovP.x, rovP.y - 0.2, rovP.z - 2.5);
+          }
+        }
+
+        // Camera Smooth Lerp
         camera.position.lerp(targetCamPos.current, 0.05);
-        const currentLookAt = new THREE.Vector3();
-        camera.getWorldDirection(currentLookAt);
-        currentLookAt.add(camera.position);
-        currentLookAt.lerp(targetLookAt.current, 0.06);
         camera.lookAt(targetLookAt.current);
 
-        // 2. Dynamic Daylight Atmosphere Transition based on Camera Depth
-        // When camera is near sea surface (y > -5), transition to bright daylight sky and sunlight
-        const surfaceT = THREE.MathUtils.clamp((camera.position.y + 7.0) / 12.0, 0, 1);
-        const deepSkyColor = new THREE.Color(0x03182b);
-        const daylightSkyColor = new THREE.Color(0x7dd3fc);
-        scene.background = deepSkyColor.clone().lerp(daylightSkyColor, surfaceT);
-
-        if (scene.fog) {
-          (scene.fog as THREE.FogExp2).density = THREE.MathUtils.lerp(0.018, 0.003, surfaceT);
-          (scene.fog as THREE.FogExp2).color.lerpColors(new THREE.Color(0x04213d), new THREE.Color(0xbae6fd), surfaceT);
-        }
-
-        if (daylightSunRef.current) {
-          daylightSunRef.current.intensity = THREE.MathUtils.lerp(1.8, 5.0, surfaceT);
-        }
-        if (skyHemiLightRef.current) {
-          skyHemiLightRef.current.intensity = THREE.MathUtils.lerp(1.0, 3.2, surfaceT);
-        }
-
-        // 3. Gentle Ocean Surface Wave Ripple Animation
-        if (oceanSurfaceMeshRef.current) {
-          const pos = oceanSurfaceMeshRef.current.geometry.attributes.position;
-          for (let i = 0; i < pos.count; i++) {
-            const x = pos.getX(i);
-            const z = pos.getZ(i);
-            const wave = Math.sin(x * 0.15 + timeMs * 0.0015) * Math.cos(z * 0.12 + timeMs * 0.0012) * 0.15;
-            pos.setY(i, wave);
-          }
-          pos.needsUpdate = true;
-        }
-
-        // 4. Surface Vessel gentle sea heave & pitch
-        if (vesselGroupRef.current) {
-          const heave = 0.2 + Math.sin(timeMs * 0.0012) * 0.14;
-          const pitch = Math.sin(timeMs * 0.0009) * 0.025;
-          const roll = Math.cos(timeMs * 0.0007) * 0.035;
-          vesselGroupRef.current.position.y = heave;
-          vesselGroupRef.current.rotation.x = pitch;
-          vesselGroupRef.current.rotation.z = roll;
-        }
-
-        // 5. Physical Repair Sequence Driving Model Animations
-        if (rovGroupRef.current) {
-          let baseROVY = -17.2;
-          let baseROVZ = 1.8;
-
-          if (stageStateRef.current <= 1) {
-            // ROV descending from surface
-            baseROVY = -14.0 + (stageStateRef.current + progressStateRef.current) * -1.6;
-          } else if (stageStateRef.current >= 9) {
-            // ROV ascending slightly to monitor lay
-            baseROVY = -16.5;
-          }
-
-          // Gentle buoyancy hover oscillation
-          const hoverY = baseROVY + Math.sin(timeMs * 0.0015) * 0.12;
-          const hoverPitch = Math.sin(timeMs * 0.001) * 0.025;
-          rovGroupRef.current.position.y = hoverY;
-          rovGroupRef.current.position.z = baseROVZ;
-          rovGroupRef.current.rotation.x = hoverPitch;
-        }
-
-        // 6. Robotic Manipulator physical interaction
-        if (roboticArmRef.current) {
-          if (stageStateRef.current >= 3 && stageStateRef.current <= 7) {
-            // Arm extends down towards the damaged cable
-            roboticArmRef.current.rotation.x = THREE.MathUtils.lerp(
-              roboticArmRef.current.rotation.x,
-              Math.PI / 2.6,
-              0.05
-            );
-            roboticArmRef.current.position.y = THREE.MathUtils.lerp(
-              roboticArmRef.current.position.y,
-              -0.55,
-              0.05
-            );
-          } else {
-            // Arm parked in standby stow position
-            roboticArmRef.current.rotation.x = THREE.MathUtils.lerp(
-              roboticArmRef.current.rotation.x,
-              Math.PI / 4,
-              0.05
-            );
-            roboticArmRef.current.position.y = THREE.MathUtils.lerp(
-              roboticArmRef.current.position.y,
-              -0.4,
-              0.05
-            );
-          }
-        }
-
-        // 7. Crane Hook Block physical hoist
-        if (craneHookRef.current) {
-          let hookY = -18.2;
-          if (stageStateRef.current === 4 || stageStateRef.current === 5) {
-            // Hook lifts cable bight up by 0.8m for jointing
-            hookY = -18.2 + Math.min(1.0, progressStateRef.current * 2) * 0.8;
-          } else if (stageStateRef.current >= 9) {
-            // Hook lowers back to seabed
-            hookY = -18.2;
-          }
-          craneHookRef.current.position.y = hookY;
-        }
-
-        // 8. Update Model 12 Inspection Equipment
+        // 4. Update Model 12 Inspection Equipment
         if (model12Ref.current) {
           const isScanning = stageStateRef.current === 2 || stageStateRef.current === 3;
           model12Ref.current.update(timeMs, isScanning);
         }
 
-        // 9. Update Model 9 Splicing Assembly
+        // 5. Update Model 9 Splicing Assembly (Universal Joint Fixing Animation)
         if (model9Ref.current) {
           let model9Progress = 0;
           if (stageStateRef.current >= 5 && stageStateRef.current <= 7) {
-            // Normalized progress across stages 5, 6, 7
             model9Progress = (stageStateRef.current - 5 + progressStateRef.current) / 3.0;
           } else if (stageStateRef.current > 7) {
             model9Progress = 1.0;
@@ -666,12 +450,11 @@ const UnderwaterScene = forwardRef<UnderwaterSceneHandle, UnderwaterSceneProps>(
           model9Ref.current.update(model9Progress, timeMs);
         }
 
-        // 10. Optical Pulse traveling along cable on Stage 8 and Stage 11
+        // 6. Optical Pulse traveling along cable on Stage 8 and Stage 11
         if (opticalPulseMeshRef.current) {
           if (stageStateRef.current === 8 || stageStateRef.current === 11) {
             opticalPulseMeshRef.current.visible = true;
             opticalPulsePosRef.current = (opticalPulsePosRef.current + 0.015) % 1.0;
-            // Traverse from -45 to +45 along x
             const px = -45 + opticalPulsePosRef.current * 90;
             const pz = (px / 45) * 6;
             opticalPulseMeshRef.current.position.set(px, -19.4, pz);
@@ -680,19 +463,16 @@ const UnderwaterScene = forwardRef<UnderwaterSceneHandle, UnderwaterSceneProps>(
           }
         }
 
-        // 11. Marine Snow particle drift
+        // 7. Marine Snow Drift
         if (marineSnowRef.current) {
           const positions = marineSnowRef.current.geometry.attributes.position.array as Float32Array;
           for (let i = 1; i < positions.length; i += 3) {
-            positions[i] -= 0.012;
-            if (positions[i] < -20) {
-              positions[i] = 0;
-            }
+            positions[i] -= 0.01;
+            if (positions[i] < -20) positions[i] = 0;
           }
           marineSnowRef.current.geometry.attributes.position.needsUpdate = true;
         }
 
-        // Render Frame
         renderer.render(scene, camera);
       };
 
@@ -705,16 +485,16 @@ const UnderwaterScene = forwardRef<UnderwaterSceneHandle, UnderwaterSceneProps>(
         if (model12Ref.current) model12Ref.current.dispose();
         renderer.dispose();
       };
-    }, []);
+    }, [perspectiveState]);
 
     return (
-      <div ref={containerRef} className="relative w-full h-full min-h-[580px] bg-[#03182b] overflow-hidden select-none">
+      <div ref={containerRef} className="relative w-full h-full min-h-[580px] bg-[#021324] overflow-hidden select-none font-sans">
         <canvas ref={canvasRef} className="w-full h-full block" />
 
-        {/* Top-Left Perspective Navigation Toolbar (PARJANYAḤ Light Theme) */}
+        {/* Top-Left Perspective Navigation Toolbar (PARJANYAḤ Light Theme, Modern Sans) */}
         <div className="absolute top-4 left-4 z-20 flex flex-wrap items-center gap-2 bg-[#F7F3EA]/95 backdrop-blur-md px-3 py-2 rounded-xl border border-[#D4C4A8] shadow-md">
-          <span className="font-mono text-[10px] uppercase tracking-wider text-[#454640] font-bold px-2 py-0.5 rounded bg-[#E8D9BF] border border-[#D4C4A8]">
-            VIEW CAM
+          <span className="text-[11px] font-sans font-bold uppercase tracking-wider text-[#454640] px-2 py-0.5 rounded bg-[#E8D9BF] border border-[#D4C4A8]">
+            View Camera
           </span>
           {(['ROV Cam', 'Macro Splice', 'Orbit', 'Surface Vessel'] as CameraPerspective[]).map((persp) => (
             <button
@@ -735,42 +515,43 @@ const UnderwaterScene = forwardRef<UnderwaterSceneHandle, UnderwaterSceneProps>(
         </div>
 
         {/* Top-Right Telemetry & Environment HUD */}
-        <div className="absolute top-4 right-4 z-20 flex flex-col items-end gap-2 bg-[#F7F3EA]/95 backdrop-blur-md px-4 py-3 rounded-xl border border-[#D4C4A8] shadow-md">
+        <div className="absolute top-4 right-4 z-20 flex flex-col items-end gap-2 bg-[#F7F3EA]/95 backdrop-blur-md px-4 py-3 rounded-xl border border-[#D4C4A8] shadow-md font-sans">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#C87954] animate-pulse" />
-            <span className="font-mono text-[11px] uppercase tracking-widest text-[#454640] font-bold">
-              SUBSEA DIGITAL TWIN
+            <span className="text-xs uppercase tracking-wider text-[#454640] font-bold">
+              Subsea Digital Twin
             </span>
           </div>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-1 font-mono text-[10px] text-[#A69B89] text-right">
-            <span>BATHYMETRY DEPTH:</span>
-            <span className="text-[#454640] font-bold">4,820 m</span>
-            <span>HYDROSTATIC PRESS:</span>
-            <span className="text-[#454640] font-bold">48.2 MPa</span>
-            <span>WATER TEMP:</span>
-            <span className="text-[#454640] font-bold">1.8 °C</span>
-            <span>ENVIRONMENT:</span>
-            <span className={assetsLoaded ? "text-[#687B59] font-bold" : "text-[#C87954] font-bold"}>
-              {assetsLoaded ? "OCEAN FLOOR LINKED" : "LOADING TERRAIN"}
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-[#A69B89] text-right">
+            <span>Bathymetry Depth:</span>
+            <span className="text-[#454640] font-mono font-bold">4,820 m</span>
+            <span>Hydrostatic Pressure:</span>
+            <span className="text-[#454640] font-mono font-bold">48.2 MPa</span>
+            <span>Water Temperature:</span>
+            <span className="text-[#454640] font-mono font-bold">1.8 °C</span>
+            <span>Status:</span>
+            <span className="text-[#687B59] font-bold">
+              ROV LINKED & ACTIVE
             </span>
           </div>
         </div>
 
         {/* Bottom-Left Real-Time Operational Sequence Monitor */}
-        <div className="absolute bottom-4 left-4 z-20 bg-[#F7F3EA]/95 backdrop-blur-md px-4 py-3 rounded-xl border border-[#D4C4A8] shadow-md max-w-sm">
-          <div className="text-[10px] font-mono uppercase tracking-wider text-[#A69B89] mb-1 font-semibold">
-            PHYSICAL REPAIR TIMELINE
+        <div className="absolute bottom-4 left-4 z-20 bg-[#F7F3EA]/95 backdrop-blur-md px-4 py-3 rounded-xl border border-[#D4C4A8] shadow-md max-w-sm font-sans">
+          <div className="text-[11px] uppercase tracking-wider text-[#A69B89] mb-1 font-semibold">
+            Physical Repair Timeline
           </div>
           <div className="text-sm font-bold text-[#454640] flex items-center gap-2">
             <span className="px-2 py-0.5 rounded bg-[#83B9A9] text-[#454640] font-mono text-xs font-bold border border-[#687B59]/30">
               STAGE {stageState} / 11
             </span>
-            <span className="text-xs">
-              {stageState <= 1 && 'Surface Dispatch & ROV Descent'}
+            <span className="text-xs font-medium">
+              {stageState <= 0 && 'Surface Dispatch & ROV Deployment'}
+              {stageState === 1 && 'Water Column Descent & Cable Approach'}
               {stageState === 2 && 'Benthic Survey & Multibeam Sonar Scan'}
               {stageState === 3 && 'Manipulator Alignment & Clamping'}
-              {stageState === 4 && 'Crane Hoist & Cable Bight Lift'}
-              {stageState === 5 && 'Model 9 Fiber Cleave & Alignment'}
+              {stageState === 4 && 'Cable Bight Lift & Preparation'}
+              {stageState === 5 && 'Model 9 Fiber Cleave & Core Alignment'}
               {stageState === 6 && 'High-Voltage Fusion Arc Splicing'}
               {stageState === 7 && 'Universal Joint Pressure Sealing'}
               {stageState === 8 && 'OTDR Optical Continuity Pulse'}
@@ -779,9 +560,6 @@ const UnderwaterScene = forwardRef<UnderwaterSceneHandle, UnderwaterSceneProps>(
             </span>
           </div>
         </div>
-
-        {/* Subtle Underwater Ambient Vignette */}
-        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_45%,transparent_50%,rgba(3,24,43,0.7)_100%)]" />
       </div>
     );
   }

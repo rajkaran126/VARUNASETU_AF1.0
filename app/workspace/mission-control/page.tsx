@@ -40,7 +40,7 @@ export default function MissionControlPage() {
 
   const agentBadges: Record<AgentRole, { color: string; bg: string }> = {
     'Chief Orchestrator': { color: 'text-indigo-900', bg: 'bg-indigo-100' },
-    'Network Analyst': { color: 'text-sky-900', bg: 'bg-sky-100' },
+    'Network Analyst': { color: 'text-[#454640]', bg: 'bg-[#E8D9BF]' },
     'Risk & Scenario Agent': { color: 'text-amber-900', bg: 'bg-amber-100' },
     'Logistics & Repair Agent': { color: 'text-emerald-900', bg: 'bg-emerald-100' },
     'Policy & Impact Agent': { color: 'text-purple-900', bg: 'bg-purple-100' }
@@ -59,7 +59,7 @@ export default function MissionControlPage() {
               5 SPECIALIST AGENTS ONLINE
             </span>
           </div>
-          <h1 className="font-grotesk text-xl lg:text-2xl font-bold text-[#0E2A47] tracking-tight">
+          <h1 className="font-sans font-bold text-xl lg:text-2xl font-bold text-[#0E2A47] tracking-tight">
             Multi-Agent Mission Control
           </h1>
         </div>
@@ -116,7 +116,7 @@ export default function MissionControlPage() {
                 <span className="font-bold text-[#0E2A47]">Chief Orchestrator</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-sky-500" />
+                <span className="w-2 h-2 rounded-full bg-[#83B9A9]" />
                 <span className="text-[#36506A]">Network Analyst</span>
               </div>
               <div className="flex items-center gap-2">
@@ -236,7 +236,7 @@ export default function MissionControlPage() {
                             onClick={() => sendAgentQuery(act.label)}
                             className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white hover:bg-[#F2ECE1] border border-[#CBDDEB] font-mono text-[10px] text-[#152D46] font-semibold transition-colors shadow-2xs"
                           >
-                            <svg className="w-3 h-3 text-[#1677B8]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <svg className="w-3 h-3 text-[#C87954]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                               <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
                             </svg>
                             <span>{act.label}</span>
@@ -251,7 +251,7 @@ export default function MissionControlPage() {
 
             {isAgentThinking && (
               <div className="flex items-center gap-2 p-3 rounded-xl bg-[#FAF7F2] border border-[#E8E1D5] text-xs text-[#59738A] w-fit font-mono">
-                <span className="w-2 h-2 rounded-full bg-cyan-600 animate-ping" />
+                <span className="w-2 h-2 rounded-full bg-[#C87954] animate-ping" />
                 <span>Specialist agents synthesizing consensus across network graph...</span>
               </div>
             )}

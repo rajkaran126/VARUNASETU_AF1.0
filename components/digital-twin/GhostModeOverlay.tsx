@@ -66,13 +66,13 @@ export function GhostModeOverlay({
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-[#C87954] animate-pulse" />
-            <span className="font-grotesk text-sm font-bold text-[#454640] tracking-wider">
-              GHOST MODE // OPERATIONAL REPLAY
+            <span className="font-sans text-sm font-bold text-[#454640] tracking-tight">
+              Ghost Mode · Operational Replay
             </span>
           </div>
           <span className="text-[#A69B89]">|</span>
-          <span className="font-mono text-[11px] text-[#C87954] font-semibold">
-            INCIDENT: {activeFault.cableName} ({activeFault.nearestLandingStation})
+          <span className="font-sans text-xs text-[#C87954] font-semibold">
+            Incident: {activeFault.cableName} ({activeFault.nearestLandingStation})
           </span>
         </div>
 
@@ -96,7 +96,7 @@ export function GhostModeOverlay({
         <div className="flex items-center gap-2">
           <button
             onClick={onExportReport}
-            className="px-3 py-1.5 rounded-xl bg-[#C87954] hover:bg-[#B86A45] text-white font-mono text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs"
+            className="px-3 py-1.5 rounded-xl bg-[#C87954] hover:bg-[#B86A45] text-white font-sans text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs"
           >
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -108,9 +108,9 @@ export function GhostModeOverlay({
 
           <button
             onClick={onExitGhostMode}
-            className="px-3 py-1.5 rounded-xl bg-[#E8D9BF] hover:bg-[#D4C4A8] text-[#454640] font-mono text-xs font-bold transition-all border border-[#D4C4A8]"
+            className="px-3 py-1.5 rounded-xl bg-[#E8D9BF] hover:bg-[#D4C4A8] text-[#454640] font-sans text-xs font-bold transition-all border border-[#D4C4A8]"
           >
-            Exit Ghost
+            Exit Ghost Mode
           </button>
         </div>
       </div>
@@ -122,7 +122,7 @@ export function GhostModeOverlay({
           {activeTab === 'operations' && (
             <div className="space-y-3 font-mono text-xs">
               <div className="flex items-center justify-between pb-2 border-b border-[#D4C4A8]">
-                <span className="font-grotesk text-sm font-bold text-[#454640]">Simulation Operations & KPIs</span>
+                <span className="font-sans font-bold text-sm font-bold text-[#454640]">Simulation Operations & KPIs</span>
                 <span className="text-[#83B9A9] font-bold">{progressPct}% RESTORED</span>
               </div>
               <div className="grid grid-cols-2 gap-2 text-[11px]">
@@ -153,7 +153,7 @@ export function GhostModeOverlay({
           {activeTab === 'analysis' && (
             <div className="space-y-3 font-mono text-xs">
               <div className="flex items-center justify-between pb-2 border-b border-[#D4C4A8]">
-                <span className="font-grotesk text-sm font-bold text-[#454640]">Strategy Tradeoff Analysis</span>
+                <span className="font-sans font-bold text-sm font-bold text-[#454640]">Strategy Tradeoff Analysis</span>
                 <span className="text-[#C87954] font-bold">MODEL 2.4</span>
               </div>
               <div className="space-y-2">
@@ -181,7 +181,7 @@ export function GhostModeOverlay({
               <div className="flex items-center justify-between pb-2 border-b border-[#D4C4A8]">
                 <div className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-[#83B9A9] animate-ping" />
-                  <span className="font-grotesk text-sm font-bold text-[#454640]">Ghost Copilot Intelligence</span>
+                  <span className="font-sans font-bold text-sm font-bold text-[#454640]">Ghost Copilot Intelligence</span>
                 </div>
                 <span className="text-[#83B9A9] text-[10px] font-bold">DETERMINISTIC BUS</span>
               </div>
@@ -243,7 +243,7 @@ export function GhostModeOverlay({
           <div className="flex items-center gap-2">
             <button
               onClick={onTogglePlay}
-              className="px-4 py-1.5 rounded-xl bg-[#C87954] hover:bg-[#B86A45] text-white font-mono text-xs font-bold transition-all flex items-center gap-2 shadow-xs active:scale-95"
+              className="px-4 py-1.5 rounded-xl bg-[#C87954] hover:bg-[#B86A45] text-white font-sans text-xs font-bold transition-all flex items-center gap-2 shadow-xs active:scale-95"
             >
               {isPlaying ? (
                 <>
@@ -276,15 +276,15 @@ export function GhostModeOverlay({
 
             <button
               onClick={() => onSetStage(Math.max(0, currentStageIndex - 1))}
-              className="px-2.5 py-1.5 rounded-xl bg-[#E8D9BF] hover:bg-[#D4C4A8] text-[#454640] font-mono text-xs font-semibold border border-[#D4C4A8]"
+              className="px-2.5 py-1.5 rounded-xl bg-[#E8D9BF] hover:bg-[#D4C4A8] text-[#454640] font-sans text-xs font-semibold border border-[#D4C4A8]"
             >
-              PREV
+              Prev
             </button>
             <button
               onClick={() => onSetStage(Math.min(REPAIR_STAGES.length - 1, currentStageIndex + 1))}
-              className="px-2.5 py-1.5 rounded-xl bg-[#E8D9BF] hover:bg-[#D4C4A8] text-[#454640] font-mono text-xs font-semibold border border-[#D4C4A8]"
+              className="px-2.5 py-1.5 rounded-xl bg-[#E8D9BF] hover:bg-[#D4C4A8] text-[#454640] font-sans text-xs font-semibold border border-[#D4C4A8]"
             >
-              NEXT
+              Next
             </button>
           </div>
 

@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --font-display: 'Outfit', 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-body: 'Outfit', 'Manrope', system-ui, -apple-system, sans-serif;
+  --font-display: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 }
 
@@ -325,8 +325,8 @@
     font-size: 0.625rem;
     font-weight: 700;
     background-color: #DDF8FA;
-    color: #0E8B99;
-    border: 1px solid rgba(19, 191, 211, 0.35);
+    color: #454640;
+    border: 1px solid #83B9A9;
   }
 
   /* Pure crisp white button */

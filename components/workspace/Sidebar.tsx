@@ -118,7 +118,7 @@ export function Sidebar() {
       }`}
     >
       {/* Brand & Workspace Identity (Midnight Navy Header) */}
-      <div className="h-14 flex items-center justify-between px-3.5 border-b border-[#102A46] bg-[#D4C4A8]">
+      <div className="h-14 flex items-center justify-between px-3.5 border-b border-[#D4C4A8] bg-[#D4C4A8]">
         {!collapsed ? (
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="w-8 h-8 rounded-xl bg-[#F7F3EA] border border-[#D4C4A8] flex items-center justify-center text-[#C87954] shadow-xs transition-transform group-hover:scale-105">
@@ -146,7 +146,7 @@ export function Sidebar() {
 
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className={`p-1.5 rounded-lg text-[#6D6E66] hover:bg-[#102A46] hover:text-[#C87954] transition-colors ${
+          className={`p-1.5 rounded-lg text-[#6D6E66] hover:bg-[#D4C4A8] hover:text-[#C87954] transition-colors ${
             collapsed ? 'hidden' : 'block'
           }`}
           title="Collapse navigation"
@@ -161,7 +161,7 @@ export function Sidebar() {
       {/* Navigation Links */}
       <nav className="flex-1 py-4 px-2 space-y-1.5 overflow-y-auto">
         {!collapsed && (
-          <p className="px-3 pb-1 font-mono text-[10px] tracking-[0.2em] text-[#A69B89] uppercase">
+          <p className="px-3 pb-1 font-sans text-xs font-semibold text-[#A69B89]">
             Platform Sections
           </p>
         )}
@@ -174,8 +174,8 @@ export function Sidebar() {
               href={item.path}
               className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all group ${
                 isActive
-                  ? 'bg-[#153A5B] text-[#454640] shadow-xs'
-                  : 'text-[#6D6E66] hover:bg-[#102A46] hover:text-[#454640]'
+                  ? 'bg-[#83B9A9] text-[#454640] shadow-xs'
+                  : 'text-[#6D6E66] hover:bg-[#D4C4A8] hover:text-[#454640]'
               } ${collapsed ? 'justify-center px-2' : ''}`}
               title={collapsed ? item.name : undefined}
             >
@@ -193,7 +193,7 @@ export function Sidebar() {
                     <span
                       className={`ml-2 px-1.5 py-0.5 rounded text-[9px] font-mono tracking-wider ${
                         isActive
-                          ? 'bg-[#102A46] text-[#C87954] border border-[#13BFD3]/30 font-bold'
+                          ? 'bg-[#F7F3EA] text-[#454640] border border-[#83B9A9] font-bold'
                           : 'bg-[#D4C4A8] text-[#6D6E66]'
                       }`}
                     >
@@ -208,12 +208,12 @@ export function Sidebar() {
       </nav>
 
       {/* Footer Controls / Expand Toggle */}
-      <div className="p-2.5 border-t border-[#102A46] bg-[#D4C4A8] space-y-1.5">
+      <div className="p-2.5 border-t border-[#D4C4A8] bg-[#D4C4A8] space-y-1.5">
         {/* Expand / Collapse Button when Collapsed */}
         {collapsed ? (
           <button
             onClick={() => setCollapsed(false)}
-            className="w-full flex items-center justify-center p-2 rounded-xl text-[#6D6E66] hover:text-[#C87954] hover:bg-[#102A46] transition-colors"
+            className="w-full flex items-center justify-center p-2 rounded-xl text-[#6D6E66] hover:text-[#C87954] hover:bg-[#D4C4A8] transition-colors"
             title="Expand Navigation (Detailed)"
             aria-label="Expand sidebar"
           >
@@ -224,7 +224,7 @@ export function Sidebar() {
         ) : (
           <button
             onClick={() => setCollapsed(true)}
-            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-[#6D6E66] hover:text-[#454640] hover:bg-[#102A46] text-xs font-mono transition-colors"
+            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-[#6D6E66] hover:text-[#454640] hover:bg-[#D4C4A8] text-xs font-mono transition-colors"
             title="Compact Navigation"
           >
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -237,7 +237,7 @@ export function Sidebar() {
         {/* Exit Link */}
         <Link
           href="/"
-          className={`flex items-center rounded-xl text-[#6D6E66] hover:text-[#454640] hover:bg-[#102A46] text-xs font-body transition-colors ${
+          className={`flex items-center rounded-xl text-[#6D6E66] hover:text-[#454640] hover:bg-[#D4C4A8] text-xs font-body transition-colors ${
             collapsed ? 'justify-center p-2' : 'gap-2 px-3 py-2'
           }`}
           title="Exit to Landing"
