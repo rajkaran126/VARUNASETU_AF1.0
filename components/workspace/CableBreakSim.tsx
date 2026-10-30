@@ -147,37 +147,47 @@ export default function CableBreakSim() {
       seabed.receiveShadow = true;
       scene.add(seabed);
 
-      // Rocks (Dark Charcoal)
-      const rockMat = new THREE.MeshLambertMaterial({ color: 0x1a1a1a });
-      [[-16,-10,3,1.3],[-8,-11,-2.5,0.9],[-3,-11,4.5,1.6],[5,-10,-3.5,1.0],[10,-10,2.5,1.2],[17,-10,-2.5,0.8],[-21,-9,-4.5,2.1],[0,-11,-5.5,1.4],[14,-9,5.5,1.9],[7,-10.5,5,1.1]].forEach(([x,y,z,s]) => {
-        const r = new THREE.Mesh(new THREE.DodecahedronGeometry(s as number, 1), rockMat);
-        r.position.set(x as number, y as number, z as number);
-        r.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, Math.random()*Math.PI);
-        scene.add(r);
-      });
-
       // Benthic Seaweed Flora (GLB Asset: /models/sea_weed.glb from ns2)
+      // Replacing spherical rock balls with compact seaweed clusters lying along the cables
       const weedClumps: THREE.Group[] = [];
       gltfLoader.load(
         '/models/sea_weed.glb',
         (gltf) => {
           const baseWeed = gltf.scene;
+          // Coordinates positioned close to the submarine cables with minimized scale (0.35 - 0.45)
           const weedPositions = [
-            [-20, -10.0, 4.0, 0.7, 0.3],
-            [-15, -10.6, -3.5, 0.85, 1.2],
-            [-10, -11.0, 3.2, 0.65, 2.1],
-            [-6,  -11.2, -4.0, 0.9, 0.7],
-            [-2,  -11.4, 2.5, 0.75, 3.1],
-            [1,   -11.3, -3.2, 0.8, 1.6],
-            [5,   -10.8, 3.6, 0.7, 0.2],
-            [9,   -10.2, -4.1, 0.85, 2.4],
-            [14,  -9.6,  2.2, 0.6, 1.0],
-            [18,  -9.1, -2.8, 0.75, 2.7],
-            [-12, -10.9, 5.0, 0.9, 0.9],
-            [6,   -10.5, 4.8, 0.8, 1.4],
-            [0,   -11.6, 4.2, 0.7, 2.0],
-            [-4,  -11.1, -5.0, 0.85, 0.5],
-            [11,  -9.8,  4.5, 0.65, 1.8],
+            // Along west cable descent and furrow
+            [-18, -8.2,   1.4, 0.38, 0.5],
+            [-17, -8.8,  -0.7, 0.42, 1.8],
+            [-15, -9.6,   0.8, 0.35, 2.7],
+            [-14, -10.1, -1.9, 0.45, 0.9],
+            [-12, -10.4, -0.3, 0.40, 3.1],
+            [-10, -10.9,  1.2, 0.38, 1.4],
+            [-9,  -11.1,  2.6, 0.44, 2.2],
+            [-7,  -11.1,  0.9, 0.36, 0.3],
+            [-5,  -10.8,  1.8, 0.42, 1.7],
+            [-4,  -10.7, -0.4, 0.38, 2.8],
+            [-2,  -11.2,  1.1, 0.40, 0.8],
+            [-1,  -11.6, -1.4, 0.45, 2.4],
+            // Around break / repair zone
+            [1,   -11.2,  0.7, 0.42, 1.1],
+            [2,   -10.8, -1.1, 0.35, 2.9],
+            [4,   -10.4,  1.2, 0.44, 0.4],
+            [5,   -10.6, -0.8, 0.38, 1.9],
+            // Along east trench and ascent
+            [7,   -10.7, -2.1, 0.40, 2.6],
+            [8.5, -10.3, -0.2, 0.42, 0.7],
+            [10,  -10.1,  1.8, 0.36, 3.0],
+            [11.5,-9.7,   0.3, 0.45, 1.5],
+            [13,  -9.4,   2.1, 0.38, 0.2],
+            [14.5,-9.0,   0.6, 0.42, 2.3],
+            [16,  -8.4,  -1.3, 0.35, 1.0],
+            [18,  -7.6,   0.5, 0.40, 2.5],
+            // Along alternative optical bypass route
+            [-11, -11.0, -7.2, 0.42, 1.3],
+            [-4,  -11.4, -9.0, 0.38, 2.1],
+            [2,   -11.5, -9.8, 0.44, 0.6],
+            [8,   -11.2, -8.5, 0.40, 2.8],
           ];
 
           weedPositions.forEach(([wx, wy, wz, ws, wr]) => {
@@ -264,13 +274,14 @@ export default function CableBreakSim() {
       buildStation(23);
 
       // Load Industrial Facility / Building Model (factory_plant.glb from ns2)
+      // Horizontal orientation — naturally flat on the coastal terrain (zero vertical tilt)
       gltfLoader.load(
         '/models/factory_plant.glb',
         (gltf) => {
-          // West Shore Facility
+          // West Shore Facility (horizontal flat alignment)
           const plantWest = gltf.scene;
-          plantWest.rotation.x = -Math.PI / 2;
-          plantWest.scale.setScalar(0.045);
+          plantWest.rotation.set(0, 0, 0);
+          plantWest.scale.setScalar(0.042);
 
           plantWest.traverse((child) => {
             if ((child as THREE.Mesh).isMesh) {
@@ -279,14 +290,14 @@ export default function CableBreakSim() {
             }
           });
 
-          // Ground to land surface
+          // Ground flat to coastal surface (y = 0.8)
           const boxWest = new THREE.Box3().setFromObject(plantWest);
           plantWest.position.set(-28, 0.8 - boxWest.min.y, 0);
           scene.add(plantWest);
 
-          // East Shore Facility (mirrored orientation)
+          // East Shore Facility (horizontal flat alignment facing opposite across the sea)
           const plantEast = plantWest.clone(true);
-          plantEast.rotation.z = Math.PI;
+          plantEast.rotation.set(0, Math.PI, 0);
           const boxEast = new THREE.Box3().setFromObject(plantEast);
           plantEast.position.set(28, 0.8 - boxEast.min.y, 0);
           scene.add(plantEast);
