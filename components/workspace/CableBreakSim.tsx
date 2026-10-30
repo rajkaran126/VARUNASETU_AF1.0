@@ -157,13 +157,31 @@ export default function CableBreakSim() {
       }
 
       // Benthic Seaweed Flora (GLB Asset: /models/sea_weed.glb from ns2)
-      // Confined strictly to deep seabed floor along the cables (zero seaweed on surface of water)
+      // Converted to pure static meshes with skinning stripped to prevent bone/mesh artifacts at water surface (0, 0, 0)
       const weedClumps: THREE.Group[] = [];
       gltfLoader.load(
         '/models/sea_weed.glb',
         (gltf) => {
-          const baseWeed = gltf.scene;
-          // Coordinates positioned strictly in the deep seabed basin (-13 to +13), flanking the cable
+          // Extract clean unskinned static meshes
+          const staticWeedTemplate = new THREE.Group();
+          gltf.scene.traverse((child) => {
+            if ((child as THREE.Mesh).isMesh) {
+              const mesh = child as THREE.Mesh;
+              const geom = mesh.geometry.clone();
+              // Remove skeletal skinning bindings so no vertices bind to the origin (0, 0, 0)
+              geom.deleteAttribute('skinIndex');
+              geom.deleteAttribute('skinWeight');
+              geom.deleteAttribute('JOINTS_0');
+              geom.deleteAttribute('WEIGHTS_0');
+              const mat = mesh.material;
+              const staticMesh = new THREE.Mesh(geom, mat);
+              staticMesh.castShadow = true;
+              staticMesh.receiveShadow = true;
+              staticWeedTemplate.add(staticMesh);
+            }
+          });
+
+          // Coordinates positioned strictly in deep seabed basin (-13 to +13), flanking cable
           const weedCoords: [number, number, number, number][] = [
             [-13, -0.6, 0.35, 1.2],
             [-12,  0.8, 0.40, 2.5],
@@ -194,18 +212,12 @@ export default function CableBreakSim() {
           ];
 
           weedCoords.forEach(([wx, wz, ws, wr]) => {
-            const clump = baseWeed.clone(true);
+            const clump = staticWeedTemplate.clone(true);
             clump.scale.setScalar(ws);
             clump.rotation.y = wr;
-            // Rooted directly on the deep ocean floor (y ≈ -10.5 to -11.5, never near surface)
+            // Rooted strictly on the deep ocean floor (y ≈ -10.5 to -11.5, never near surface)
             const seabedY = getSeabedY(wx, wz);
             clump.position.set(wx, seabedY, wz);
-            clump.traverse((child) => {
-              if ((child as THREE.Mesh).isMesh) {
-                child.castShadow = true;
-                child.receiveShadow = true;
-              }
-            });
             scene.add(clump);
             weedClumps.push(clump);
           });
@@ -451,7 +463,7 @@ export default function CableBreakSim() {
 
       /* ─── REPAIR SHIP (GLB ASSET) ─── */
       const ship = new THREE.Group();
-      ship.position.set(-55, 0.4, 0); // starts off-screen
+      ship.position.set(-42, 0.4, 0); // starts off-screen at west sea perimeter
       scene.add(ship);
 
       gltfLoader.load(
@@ -648,15 +660,17 @@ export default function CableBreakSim() {
 
       function triggerROVDeploy() {
         phase = 5;
-        setPhaseText('◈ PHASE 6: ROV "NEMO-7" DEPLOYMENT IN PROGRESS');
+        setPhaseText('◈ PHASE 6: VESSEL ARRIVED AT CENTER — ROV DEPLOYING FROM SHIP');
         rov.visible = true;
-        rov.position.set(ship.position.x + 1.8, 4.5, 0);
+        // ROV emerges directly from bottom hull of ship at surface level
+        rov.position.set(ship.position.x, 0.2, 0);
         (tetherLine.material as THREE.LineBasicMaterial).opacity = 0.85;
         bubMat.opacity = 0.65;
         if (h.rovPanel.current) h.rovPanel.current.style.opacity = '1';
-        addAILine('--- ROV DEPLOYMENT ---', 'ok', 0);
-        addAILine('ROV NEMO-7 launched from crane.', 'info', 600);
-        addAILine('Descending at 0.5 m/s to 4,200m...', 'info', 1200);
+        addAILine('--- VESSEL ON STATION AT FAULT SITE ---', 'ok', 0);
+        addAILine('VSS Varunasetu stationed directly above fault.', 'info', 500);
+        addAILine('ROV NEMO-7 released from vessel hull sliding down...', 'ok', 1000);
+        addAILine('Descending at 1.8 m/s towards seabed cable furrow...', 'info', 1800);
       }
 
       function triggerROVRepair() {
@@ -819,27 +833,45 @@ export default function CableBreakSim() {
           ring.rotation.z = t*0.6;
         }
 
-        /* — Ship sailing — */
-        if (phase >= 4) {
+        /* ── Ship sailing ── */
+        if (phase === 4) {
           if (ship.position.x < breakPos.x - 0.1) {
-            ship.position.x += dt*3.5;
+            ship.position.x += dt * 5.2;
           } else {
             ship.position.x = breakPos.x;
+            // WHEN SHIP REACHES THE CENTER: Trigger ROV deploy from ship sliding down
+            if (!triggered.rov) {
+              triggered.rov = true;
+              triggerROVDeploy();
+            }
           }
+          ship.position.y = 0.4 + Math.sin(t*0.85)*0.12;
+          ship.rotation.z = Math.sin(t*0.7)*0.02;
+        } else if (phase >= 5) {
+          // Ship stays stationary on station above fault site
+          ship.position.x = breakPos.x;
           ship.position.y = 0.4 + Math.sin(t*0.85)*0.12;
           ship.rotation.z = Math.sin(t*0.7)*0.02;
         }
 
-        /* — ROV descent — */
+        /* ── ROV sliding down from ship ── */
         if (phase === 5) {
-          if (rov.position.y > breakPos.y + 1.2) {
-            rov.position.y -= dt * 1.8;
-            rovDepthVal = Math.min(4200, Math.floor((4.5 - rov.position.y) / (4.5 - (breakPos.y + 1.2)) * 4200));
+          if (rov.position.y > breakPos.y + 1.05) {
+            // Smoothly slide down through the water column
+            rov.position.y -= dt * 2.2;
+            const progress = (0.2 - rov.position.y) / (0.2 - (breakPos.y + 1.05));
+            rovDepthVal = Math.min(4200, Math.floor(Math.max(0, progress) * 4200));
             if (h.rovDepth.current) h.rovDepth.current.textContent = `${rovDepthVal.toLocaleString()} m`;
+          } else {
+            // ROV reached the seabed cable -> begin repair
+            if (!triggered.repair) {
+              triggered.repair = true;
+              triggerROVRepair();
+            }
           }
-          // Tether update
-          tetherBuf[0] = ship.position.x + 2; tetherBuf[1] = ship.position.y + 4.5; tetherBuf[2] = 0;
-          tetherBuf[3] = rov.position.x;      tetherBuf[4] = rov.position.y + 0.4;  tetherBuf[5] = 0;
+          // Tether update from ship hull to descending ROV
+          tetherBuf[0] = ship.position.x;     tetherBuf[1] = ship.position.y + 0.8; tetherBuf[2] = 0;
+          tetherBuf[3] = rov.position.x;      tetherBuf[4] = rov.position.y + 0.3;  tetherBuf[5] = 0;
           tetherGeo.attributes.position.needsUpdate = true;
 
           // Bubbles
@@ -854,15 +886,15 @@ export default function CableBreakSim() {
           bubGeo.attributes.position.needsUpdate = true;
         }
 
-        /* — ROV repairing — */
+        /* ── ROV repairing ── */
         if (phase === 6) {
           rov.position.x = breakPos.x + Math.sin(t*1.2)*0.15;
           rov.position.y = breakPos.y + 1.0 + Math.sin(t*0.8)*0.08;
           rov.rotation.y = Math.sin(t*0.5)*0.1;
           rovSpot.intensity = 3.5 + Math.sin(t*8)*0.8;
           // Tether update
-          tetherBuf[0] = ship.position.x + 2; tetherBuf[1] = ship.position.y + 4.5; tetherBuf[2] = 0;
-          tetherBuf[3] = rov.position.x;      tetherBuf[4] = rov.position.y + 0.4;  tetherBuf[5] = 0;
+          tetherBuf[0] = ship.position.x;     tetherBuf[1] = ship.position.y + 0.8; tetherBuf[2] = 0;
+          tetherBuf[3] = rov.position.x;      tetherBuf[4] = rov.position.y + 0.3;  tetherBuf[5] = 0;
           tetherGeo.attributes.position.needsUpdate = true;
         }
 
