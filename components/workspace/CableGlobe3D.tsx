@@ -261,21 +261,33 @@ export function CableGlobe3D({
           cableModel.add(rerouteGroup);
         }
 
-        // UNMASK MODEL 1:
-        // Do NOT wrap in artificial occlusion spheres or dark blue emissive masks.
-        // Mesh 0 is the textured Earth globe with high-res 5400x2700 map.
+        // Explicitly load the authentic high-resolution 5400x2700 Earth planetary texture
+        const textureLoader = new THREE.TextureLoader();
+        const earthTexture = textureLoader.load('/models/model1/gltf_embedded_0.png', (tex) => {
+          tex.colorSpace = THREE.SRGBColorSpace;
+          tex.flipY = false;
+          tex.needsUpdate = true;
+        });
+        earthTexture.colorSpace = THREE.SRGBColorSpace;
+        earthTexture.flipY = false;
+
+        let hasEarthMesh = false;
+
+        // UNMASK & TEXTURE MODEL 1:
+        // Mesh 0 is the textured Earth globe. We bind the 5400x2700 world map directly to it.
         // Mesh 1 is the 3D submarine cable ribbons with COLOR_0 vertex colors.
         cableModel.traverse((child) => {
           if ((child as THREE.Mesh).isMesh) {
             const mesh = child as THREE.Mesh;
             mesh.castShadow = true;
             mesh.receiveShadow = true;
+            mesh.frustumCulled = false;
 
             const hasVertexColors = mesh.geometry.attributes.color !== undefined;
 
             if (hasVertexColors) {
               // Mesh 1: 3D Cable Ribbons
-              // Unmask the authentic vertex colors and make ribbons double-sided so they are visible from all angles
+              // Unmask authentic vertex colors and make ribbons double-sided so they are visible from all angles
               mesh.material = new THREE.MeshStandardMaterial({
                 vertexColors: true,
                 roughness: 0.25,
@@ -286,17 +298,38 @@ export function CableGlobe3D({
               });
             } else {
               // Mesh 0: Base Textured Earth Globe
-              // Unmask the authentic Earth surface map without any tint or dark cover
-              if (mesh.material) {
-                const mat = mesh.material as THREE.MeshStandardMaterial;
-                mat.roughness = 0.82;
-                mat.metalness = 0.08;
-                mat.emissive.set(0x000000);
-                mat.side = THREE.FrontSide;
-              }
+              // Bind authentic Earth surface map with natural ocean/continent illumination
+              hasEarthMesh = true;
+              mesh.material = new THREE.MeshStandardMaterial({
+                map: earthTexture,
+                roughness: 0.72,
+                metalness: 0.06,
+                emissive: new THREE.Color(0x182838),
+                emissiveIntensity: 0.35,
+                side: THREE.DoubleSide,
+              });
             }
           }
         });
+
+        // Fail-safe: If Mesh 0 was omitted by the glTF parser, add the Earth sphere beneath cable ribbons
+        if (!hasEarthMesh) {
+          const fallbackEarthGeo = new THREE.SphereGeometry(2948, 64, 64);
+          fallbackEarthGeo.rotateX(Math.PI / 2);
+          const fallbackEarth = new THREE.Mesh(
+            fallbackEarthGeo,
+            new THREE.MeshStandardMaterial({
+              map: earthTexture,
+              roughness: 0.72,
+              metalness: 0.06,
+              emissive: new THREE.Color(0x182838),
+              emissiveIntensity: 0.35,
+              side: THREE.DoubleSide,
+            })
+          );
+          fallbackEarth.frustumCulled = false;
+          cableModel.add(fallbackEarth);
+        }
 
         globeGroup.add(cableModel);
         setModelLoaded(true);

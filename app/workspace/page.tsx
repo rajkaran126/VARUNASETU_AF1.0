@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { useWorkspace } from '@/lib/workspace-context';
-import { CableExplorerMap } from '@/components/workspace/CableExplorerMap';
 import { CableGlobe3D } from '@/components/workspace/CableGlobe3D';
 import { CableDetailCard } from '@/components/workspace/CableDetailCard';
 import { VERIFIED_LANDING_STATIONS } from '@/lib/cable-data';
@@ -27,7 +26,6 @@ export default function NetworkOverviewPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('All');
   const [selectedRegion, setSelectedRegion] = useState<string>('All');
-  const [viewMode, setViewMode] = useState<'3D' | '2D'>('3D');
   const [showComparisonMatrix, setShowComparisonMatrix] = useState<boolean>(false);
   const [showSimulationLog, setShowSimulationLog] = useState<boolean>(false);
 
@@ -64,29 +62,11 @@ export default function NetworkOverviewPage() {
 
         {/* Global Topology Summary Telemetry Strip & 3D / 2D View Switcher */}
         <div className="flex flex-wrap items-center gap-2">
-          {/* View Mode Toggle: 3D Globe Model 1 vs 2D Mercator */}
-          <div className="flex items-center p-1 bg-white rounded-xl border border-[#D4C4A8] shadow-2xs font-mono text-xs">
-            <button
-              onClick={() => setViewMode('3D')}
-              className={`px-3 py-1 rounded-lg font-bold transition-all flex items-center gap-1.5 ${
-                viewMode === '3D'
-                  ? 'bg-[#83B9A9] text-[#454640] font-bold shadow-xs'
-                  : 'text-[#A69B89] hover:text-[#454640]'
-              }`}
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-[#C87954]" />
-              <span>3D Cable Model</span>
-            </button>
-            <button
-              onClick={() => setViewMode('2D')}
-              className={`px-3 py-1 rounded-lg font-bold transition-all ${
-                viewMode === '2D'
-                  ? 'bg-[#83B9A9] text-[#454640] font-bold shadow-xs'
-                  : 'text-[#A69B89] hover:text-[#454640]'
-              }`}
-            >
-              <span>2D Grid</span>
-            </button>
+          {/* Exclusive 3D Subsea Model 1 Telemetry Indicator */}
+          <div className="px-3 py-1.5 rounded-xl bg-white border border-[#D4C4A8] font-mono text-xs shadow-2xs flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#83B9A9] animate-pulse" />
+            <span className="text-[#A69B89]">Topology Mode:</span>
+            <strong className="text-[#454640]">Model 1 · 3D Earth Globe</strong>
           </div>
 
           <div className="px-3 py-1.5 rounded-xl bg-white border border-[#D4C4A8] font-mono text-xs shadow-2xs flex items-center gap-2">
@@ -316,30 +296,17 @@ export default function NetworkOverviewPage() {
         </div>
       )}
 
-      {/* Main Interactive Submarine Cable Visualization (3D Model 1 vs 2D Explorer Map) */}
-      {viewMode === '3D' ? (
-        <CableGlobe3D
-          cables={filteredCables}
-          selectedCable={selectedCable}
-          activeFault={activeFault}
-          activeReroute={activeReroutePlan}
-          showReroute={isRerouteActive}
-          isSimulating={isRerouteSimulating}
-          onSelectCable={setSelectedCable}
-          onToggleReroute={toggleRerouteStatus}
-        />
-      ) : (
-        <CableExplorerMap
-          cables={filteredCables}
-          landingStations={VERIFIED_LANDING_STATIONS}
-          selectedCable={selectedCable}
-          activeReroute={activeReroutePlan}
-          showReroute={isRerouteActive}
-          isSimulating={isRerouteSimulating}
-          onSelectCable={setSelectedCable}
-          onToggleReroute={toggleRerouteStatus}
-        />
-      )}
+      {/* Main Interactive Submarine Cable Visualization (Exclusive 3D Model 1) */}
+      <CableGlobe3D
+        cables={filteredCables}
+        selectedCable={selectedCable}
+        activeFault={activeFault}
+        activeReroute={activeReroutePlan}
+        showReroute={isRerouteActive}
+        isSimulating={isRerouteSimulating}
+        onSelectCable={setSelectedCable}
+        onToggleReroute={toggleRerouteStatus}
+      />
 
       {/* Two Column Layout: Filterable Explorer List + Single Cable Intelligence Card */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
