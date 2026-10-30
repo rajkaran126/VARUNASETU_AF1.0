@@ -184,3 +184,4 @@ export function generateSimulationPDFReport(
   // Download PDF
   doc.save(`VARUNASETU_Simulation_Report_${activeFault.cableId}_${Date.now()}.pdf`);
 }
+

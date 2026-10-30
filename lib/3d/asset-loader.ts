@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 
 export interface Loaded3DAssets {
   cargoShip?: THREE.Group;
@@ -7,14 +8,17 @@ export interface Loaded3DAssets {
   roboticArm?: THREE.Group;
   submarineDrone?: THREE.Group;
   reefWalls?: THREE.Group;
+  oceanFloorMesh?: THREE.Group;
   seafloorTexture?: THREE.Texture;
   seafloorNormal?: THREE.Texture;
+  seafloorRoughness?: THREE.Texture;
 }
 
-const assetCache: Record<string, THREE.Group | THREE.Texture> = {};
+const assetCache: Record<string, any> = {};
 
 export async function loadSubseaAssets(onProgress?: (pct: number) => void): Promise<Loaded3DAssets> {
   const gltfLoader = new GLTFLoader();
+  const objLoader = new OBJLoader();
   const textureLoader = new THREE.TextureLoader();
 
   const loadGLTF = (path: string): Promise<THREE.Group> => {
@@ -29,7 +33,10 @@ export async function loadSubseaAssets(onProgress?: (pct: number) => void): Prom
           resolve(gltf.scene.clone());
         },
         undefined,
-        (err) => reject(err)
+        (err) => {
+          console.warn(`Could not load GLTF at ${path}:`, err);
+          reject(err);
+        }
       );
     });
   };
@@ -42,43 +49,78 @@ export async function loadSubseaAssets(onProgress?: (pct: number) => void): Prom
       textureLoader.load(
         path,
         (tex) => {
+          tex.wrapS = THREE.RepeatWrapping;
+          tex.wrapT = THREE.RepeatWrapping;
           assetCache[path] = tex;
           resolve(tex);
         },
         undefined,
         () => {
-          // Resolve empty texture on error to prevent crashing
           resolve(new THREE.Texture());
         }
       );
     });
   };
 
+  const loadOceanFloorOBJ = async (): Promise<THREE.Group | undefined> => {
+    const path = '/models/oceanfloor/Oceanfloor Fixed Final.obj';
+    if (assetCache[path]) {
+      return (assetCache[path] as THREE.Group).clone();
+    }
+    return new Promise((resolve) => {
+      objLoader.load(
+        path,
+        (obj) => {
+          assetCache[path] = obj;
+          resolve(obj.clone());
+        },
+        undefined,
+        (err) => {
+          console.warn('OBJLoader error on oceanfloor, using fallback terrain:', err);
+          resolve(undefined);
+        }
+      );
+    });
+  };
+
   try {
-    const [cargoShip, craneHook, roboticArm, submarineDrone, reefWalls, seafloorTexture, seafloorNormal] =
-      await Promise.allSettled([
-        loadGLTF('/models/cargo-ship.glb'),
-        loadGLTF('/models/crane-hook-block.glb'),
-        loadGLTF('/models/robotic_manipulator.glb'),
-        loadGLTF('/models/one-person-submarine-0b9d14.glb'),
-        loadGLTF('/models/model.glb'),
-        loadTexture('/models/oceanfloor/basecolor.jpg'),
-        loadTexture('/models/oceanfloor/normals.jpg'),
-      ]);
+    const [
+      cargoShipRes,
+      craneHookRes,
+      roboticArmRes,
+      submarineDroneRes,
+      reefWallsRes,
+      oceanFloorRes,
+      seafloorTexRes,
+      seafloorNormRes,
+      seafloorRoughRes,
+    ] = await Promise.allSettled([
+      loadGLTF('/models/cargo-ship.glb'),
+      loadGLTF('/models/crane-hook-block.glb'),
+      loadGLTF('/models/robotic_manipulator.glb'),
+      loadGLTF('/models/one-person-submarine-0b9d14.glb'),
+      loadGLTF('/models/model.glb'),
+      loadOceanFloorOBJ(),
+      loadTexture('/models/oceanfloor/basecolor.jpg'),
+      loadTexture('/models/oceanfloor/normals.jpg'),
+      loadTexture('/models/oceanfloor/roughness.jpg'),
+    ]);
 
     if (onProgress) onProgress(100);
 
     return {
-      cargoShip: cargoShip.status === 'fulfilled' ? cargoShip.value : undefined,
-      craneHook: craneHook.status === 'fulfilled' ? craneHook.value : undefined,
-      roboticArm: roboticArm.status === 'fulfilled' ? roboticArm.value : undefined,
-      submarineDrone: submarineDrone.status === 'fulfilled' ? submarineDrone.value : undefined,
-      reefWalls: reefWalls.status === 'fulfilled' ? reefWalls.value : undefined,
-      seafloorTexture: seafloorTexture.status === 'fulfilled' ? seafloorTexture.value : undefined,
-      seafloorNormal: seafloorNormal.status === 'fulfilled' ? seafloorNormal.value : undefined,
+      cargoShip: cargoShipRes.status === 'fulfilled' ? cargoShipRes.value : undefined,
+      craneHook: craneHookRes.status === 'fulfilled' ? craneHookRes.value : undefined,
+      roboticArm: roboticArmRes.status === 'fulfilled' ? roboticArmRes.value : undefined,
+      submarineDrone: submarineDroneRes.status === 'fulfilled' ? submarineDroneRes.value : undefined,
+      reefWalls: reefWallsRes.status === 'fulfilled' ? reefWallsRes.value : undefined,
+      oceanFloorMesh: oceanFloorRes.status === 'fulfilled' ? oceanFloorRes.value : undefined,
+      seafloorTexture: seafloorTexRes.status === 'fulfilled' ? seafloorTexRes.value : undefined,
+      seafloorNormal: seafloorNormRes.status === 'fulfilled' ? seafloorNormRes.value : undefined,
+      seafloorRoughness: seafloorRoughRes.status === 'fulfilled' ? seafloorRoughRes.value : undefined,
     };
   } catch (error) {
-    console.warn('Failed to load some 3D assets, falling back to procedural meshes:', error);
+    console.warn('Failed to load some 3D assets:', error);
     return {};
   }
 }

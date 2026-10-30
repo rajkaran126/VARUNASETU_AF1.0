@@ -188,3 +188,4 @@ export class TransitionCoordinator {
     return { ...this.state };
   }
 }
+

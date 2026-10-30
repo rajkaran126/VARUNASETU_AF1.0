@@ -1,28 +1,29 @@
 import * as THREE from 'three';
 
 /**
- * MODEL 9 — SUBMARINE CABLE SPLICING AND JOINT ASSEMBLY
+ * MODEL 9 — SUBMARINE CABLE SPLICING & JOINT ASSEMBLY (UNIVERSAL JOINT UJ)
  * 
- * Modular procedural Three.js model representing:
- * - Armored subsea cable layers (outer polyethylene, double steel wire armor, copper conductor, loose tube)
- * - Microscopic optical fiber ribbons (colored core filaments)
- * - Ceramic micro-v-groove alignment blocks with precision micron servos
- * - Fusion electric arc electrodes with glowing plasma discharge
- * - Universal Joint (UJ) stainless steel pressure cylinder and seal endcaps
+ * Subsea Telecom Engineering Architecture:
+ * 1. Dual Stripped Cable Ends (Double Galvanized Steel Armor Wire, Copper Conductor, Polyethylene Outer Jacket)
+ * 2. Precision Optical Fiber Ribbon Array (Standard 6-color optical fibers: Blue, Orange, Green, Brown, Slate, White)
+ * 3. Ceramic Micro-V-Groove Piezoelectric Core Alignment Blocks
+ * 4. High-Voltage Tungsten Electrodes with Dynamic Atmospheric Plasma Fusion Arc
+ * 5. Heat-Shrink Steel-Reinforced Splice Protection Sleeve
+ * 6. Stainless Steel Universal Joint (UJ) Pressure-Resistant Outer Casing with Locking Flange Seals
  */
 export class Model9SplicingAssembly {
   public group: THREE.Group;
 
-  // Sub-assemblies
+  // Mechanical Subassemblies
   private cableLeft: THREE.Group;
   private cableRight: THREE.Group;
-  private fibersLeft: THREE.Line[];
-  private fibersRight: THREE.Line[];
+  private fiberLinesLeft: THREE.Line[] = [];
+  private fiberLinesRight: THREE.Line[] = [];
   private alignmentStage: THREE.Group;
   private electrodeLeft: THREE.Mesh;
   private electrodeRight: THREE.Mesh;
-  private arcSpark: THREE.PointLight;
-  private arcMesh: THREE.Mesh;
+  private arcPlasmaMesh: THREE.Mesh;
+  private arcSparkLight: THREE.PointLight;
   private jointSleeve: THREE.Mesh;
   private jointHousing: THREE.Group;
 
@@ -31,255 +32,263 @@ export class Model9SplicingAssembly {
   private copperMaterial: THREE.MeshStandardMaterial;
   private steelMaterial: THREE.MeshStandardMaterial;
   private casingMaterial: THREE.MeshStandardMaterial;
+  private ceramicMaterial: THREE.MeshStandardMaterial;
   private arcMaterial: THREE.MeshBasicMaterial;
 
   constructor() {
     this.group = new THREE.Group();
     this.group.name = 'Model9_SplicingAssembly';
 
-    // Materials setup
+    // 1. Engineering Materials
     this.armorMaterial = new THREE.MeshStandardMaterial({
-      color: 0x242d38,
-      roughness: 0.45,
-      metalness: 0.65,
+      color: 0x1f2937,
+      roughness: 0.5,
+      metalness: 0.6,
     });
     this.copperMaterial = new THREE.MeshStandardMaterial({
-      color: 0xd97736,
-      roughness: 0.3,
-      metalness: 0.85,
-    });
-    this.steelMaterial = new THREE.MeshStandardMaterial({
-      color: 0xd8e2ec,
+      color: 0xd97706,
       roughness: 0.25,
       metalness: 0.9,
+    });
+    this.steelMaterial = new THREE.MeshStandardMaterial({
+      color: 0xd1d5db,
+      roughness: 0.2,
+      metalness: 0.95,
+    });
+    this.ceramicMaterial = new THREE.MeshStandardMaterial({
+      color: 0xe2e8f0,
+      roughness: 0.15,
+      metalness: 0.1,
     });
     this.casingMaterial = new THREE.MeshStandardMaterial({
       color: 0x153a5b,
       roughness: 0.35,
-      metalness: 0.75,
+      metalness: 0.8,
       transparent: true,
-      opacity: 0.92,
+      opacity: 0.94,
     });
     this.arcMaterial = new THREE.MeshBasicMaterial({
-      color: 0x00ffff,
+      color: 0x38bdf8,
       transparent: true,
       opacity: 0.0,
+      blending: THREE.AdditiveBlending,
     });
 
-    // 1. Cables on Left and Right
-    this.cableLeft = this.createCableEnd(-1);
-    this.cableRight = this.createCableEnd(1);
+    // 2. Dual Cable Ends (Left & Right)
+    this.cableLeft = this.createStrippedCableEnd(-1);
+    this.cableRight = this.createStrippedCableEnd(1);
     this.group.add(this.cableLeft);
     this.group.add(this.cableRight);
 
-    // 2. Optical Fiber filaments
-    this.fibersLeft = this.createFiberBundle(-1);
-    this.fibersRight = this.createFiberBundle(1);
-    this.fibersLeft.forEach((f) => this.group.add(f));
-    this.fibersRight.forEach((f) => this.group.add(f));
+    // 3. Exposed Optical Fiber Filaments
+    this.createFiberArray();
 
-    // 3. Precision V-Groove Alignment Stage
-    this.alignmentStage = this.createAlignmentStage();
+    // 4. Ceramic Micro V-Groove Alignment Blocks
+    this.alignmentStage = this.createMicroAlignmentStage();
     this.group.add(this.alignmentStage);
 
-    // 4. Fusion Arc Electrodes & Spark
-    const electrodeGeo = new THREE.CylinderGeometry(0.015, 0.005, 0.25, 12);
+    // 5. Tungsten Electrodes & Plasma Arc
+    const electrodeGeo = new THREE.CylinderGeometry(0.012, 0.003, 0.22, 16);
     this.electrodeLeft = new THREE.Mesh(electrodeGeo, this.steelMaterial);
     this.electrodeLeft.rotation.z = Math.PI / 4;
-    this.electrodeLeft.position.set(-0.06, 0.12, 0);
+    this.electrodeLeft.position.set(-0.05, 0.1, 0);
 
     this.electrodeRight = new THREE.Mesh(electrodeGeo, this.steelMaterial);
     this.electrodeRight.rotation.z = -Math.PI / 4;
-    this.electrodeRight.position.set(0.06, 0.12, 0);
+    this.electrodeRight.position.set(0.05, 0.1, 0);
 
-    const arcGeo = new THREE.SphereGeometry(0.04, 16, 16);
-    this.arcMesh = new THREE.Mesh(arcGeo, this.arcMaterial);
-    this.arcMesh.position.set(0, 0, 0);
+    const arcGeo = new THREE.SphereGeometry(0.045, 16, 16);
+    this.arcPlasmaMesh = new THREE.Mesh(arcGeo, this.arcMaterial);
+    this.arcPlasmaMesh.position.set(0, 0, 0);
 
-    this.arcSpark = new THREE.PointLight(0x00ffff, 0, 2.5);
-    this.arcSpark.position.set(0, 0, 0);
+    this.arcSparkLight = new THREE.PointLight(0x00ffff, 0, 4.0, 1.2);
+    this.arcSparkLight.position.set(0, 0, 0);
 
     this.group.add(this.electrodeLeft);
     this.group.add(this.electrodeRight);
-    this.group.add(this.arcMesh);
-    this.group.add(this.arcSpark);
+    this.group.add(this.arcPlasmaMesh);
+    this.group.add(this.arcSparkLight);
 
-    // 5. Splice Protection Sleeve
-    const sleeveGeo = new THREE.CylinderGeometry(0.06, 0.06, 0.45, 24);
+    // 6. Splice Protection Heat-Shrink Sleeve
+    const sleeveGeo = new THREE.CylinderGeometry(0.065, 0.065, 0.45, 24);
     sleeveGeo.rotateZ(Math.PI / 2);
-    this.jointSleeve = new THREE.Mesh(sleeveGeo, new THREE.MeshStandardMaterial({
-      color: 0x91a1af,
+    const sleeveMat = new THREE.MeshStandardMaterial({
+      color: 0x94a3b8,
       roughness: 0.2,
-      metalness: 0.4,
+      metalness: 0.5,
       transparent: true,
       opacity: 0.85,
-    }));
-    this.jointSleeve.position.set(-0.6, 0, 0); // Parked on left cable initially
+    });
+    this.jointSleeve = new THREE.Mesh(sleeveGeo, sleeveMat);
+    this.jointSleeve.position.set(-0.65, 0, 0); // Parked on left cable
     this.group.add(this.jointSleeve);
 
-    // 6. Universal Joint (UJ) Outer Pressure Housing Cylinder
-    this.jointHousing = this.createJointHousing();
+    // 7. Universal Joint (UJ) Outer Pressure Casing
+    this.jointHousing = this.createPressureHousing();
     this.group.add(this.jointHousing);
   }
 
-  private createCableEnd(dir: number): THREE.Group {
-    const cable = new THREE.Group();
+  private createStrippedCableEnd(dir: number): THREE.Group {
+    const end = new THREE.Group();
 
-    // Outer Polyethylene Jacket
-    const jacketGeo = new THREE.CylinderGeometry(0.18, 0.18, 0.8, 24);
-    jacketGeo.rotateZ(Math.PI / 2);
-    const jacket = new THREE.Mesh(jacketGeo, this.armorMaterial);
-    jacket.position.x = dir * 0.9;
-    cable.add(jacket);
+    // Layer 1: Outer Polyethylene Sheath
+    const outerGeo = new THREE.CylinderGeometry(0.18, 0.18, 0.7, 24);
+    outerGeo.rotateZ(Math.PI / 2);
+    const outerMesh = new THREE.Mesh(outerGeo, this.armorMaterial);
+    outerMesh.position.x = dir * 0.85;
+    end.add(outerMesh);
 
-    // Galvanized Steel Armor Wire Layer (Helix representation)
-    const armorGeo = new THREE.CylinderGeometry(0.15, 0.15, 0.3, 24);
+    // Layer 2: Galvanized Steel Armor Wire Strands
+    const armorGeo = new THREE.CylinderGeometry(0.15, 0.15, 0.25, 24);
     armorGeo.rotateZ(Math.PI / 2);
-    const armor = new THREE.Mesh(armorGeo, this.steelMaterial);
-    armor.position.x = dir * 0.45;
-    cable.add(armor);
+    const armorMesh = new THREE.Mesh(armorGeo, this.steelMaterial);
+    armorMesh.position.x = dir * 0.42;
+    end.add(armorMesh);
 
-    // Copper Conductor Tube
-    const copperGeo = new THREE.CylinderGeometry(0.11, 0.11, 0.25, 24);
+    // Layer 3: Copper Power Conductor Tube
+    const copperGeo = new THREE.CylinderGeometry(0.11, 0.11, 0.2, 24);
     copperGeo.rotateZ(Math.PI / 2);
-    const copper = new THREE.Mesh(copperGeo, this.copperMaterial);
-    copper.position.x = dir * 0.25;
-    cable.add(copper);
+    const copperMesh = new THREE.Mesh(copperGeo, this.copperMaterial);
+    copperMesh.position.x = dir * 0.22;
+    end.add(copperMesh);
 
-    // Loose Tube Polycarbonate Core
-    const coreGeo = new THREE.CylinderGeometry(0.06, 0.06, 0.2, 16);
-    coreGeo.rotateZ(Math.PI / 2);
-    const core = new THREE.Mesh(coreGeo, new THREE.MeshStandardMaterial({ color: 0xf5faff, roughness: 0.1 }));
-    core.position.x = dir * 0.12;
-    cable.add(core);
+    // Layer 4: Stainless Steel Central Buffer Tube
+    const tubeGeo = new THREE.CylinderGeometry(0.06, 0.06, 0.12, 16);
+    tubeGeo.rotateZ(Math.PI / 2);
+    const tubeMesh = new THREE.Mesh(tubeGeo, this.steelMaterial);
+    tubeMesh.position.x = dir * 0.08;
+    end.add(tubeMesh);
 
-    return cable;
+    return end;
   }
 
-  private createFiberBundle(dir: number): THREE.Line[] {
-    const colors = [0x00ffff, 0xff0055, 0x00ff88, 0xffaa00, 0x8844ff, 0xffffff];
-    const fibers: THREE.Line[] = [];
-
+  private createFiberArray() {
+    const colors = [0x00ffff, 0xf97316, 0x10b981, 0x854d0e, 0x94a3b8, 0xffffff];
     colors.forEach((col, idx) => {
       const angle = (idx / colors.length) * Math.PI * 2;
       const r = 0.025;
       const y = Math.sin(angle) * r;
       const z = Math.cos(angle) * r;
 
-      const points = [
-        new THREE.Vector3(dir * 0.12, y, z),
-        new THREE.Vector3(dir * 0.015, y * 0.3, z * 0.3),
-      ];
-      const geo = new THREE.BufferGeometry().setFromPoints(points);
-      const mat = new THREE.LineBasicMaterial({ color: col, linewidth: 2 });
-      const line = new THREE.Line(geo, mat);
-      fibers.push(line);
-    });
+      // Left fiber segment
+      const ptsL = [new THREE.Vector3(-0.08, y, z), new THREE.Vector3(-0.015, y * 0.25, z * 0.25)];
+      const geoL = new THREE.BufferGeometry().setFromPoints(ptsL);
+      const matL = new THREE.LineBasicMaterial({ color: col, linewidth: 2 });
+      const lineL = new THREE.Line(geoL, matL);
+      this.fiberLinesLeft.push(lineL);
+      this.group.add(lineL);
 
-    return fibers;
+      // Right fiber segment
+      const ptsR = [new THREE.Vector3(0.08, y, z), new THREE.Vector3(0.015, y * 0.25, z * 0.25)];
+      const geoR = new THREE.BufferGeometry().setFromPoints(ptsR);
+      const matR = new THREE.LineBasicMaterial({ color: col, linewidth: 2 });
+      const lineR = new THREE.Line(geoR, matR);
+      this.fiberLinesRight.push(lineR);
+      this.group.add(lineR);
+    });
   }
 
-  private createAlignmentStage(): THREE.Group {
+  private createMicroAlignmentStage(): THREE.Group {
     const stage = new THREE.Group();
 
-    // Base ceramic mounting plate
-    const baseGeo = new THREE.BoxGeometry(0.35, 0.08, 0.22);
-    const base = new THREE.Mesh(baseGeo, new THREE.MeshStandardMaterial({ color: 0x3a4f66, roughness: 0.5 }));
-    base.position.y = -0.1;
+    // Base ceramic chassis
+    const baseGeo = new THREE.BoxGeometry(0.38, 0.07, 0.22);
+    const base = new THREE.Mesh(baseGeo, this.ceramicMaterial);
+    base.position.y = -0.09;
     stage.add(base);
 
-    // Left and Right V-Groove clamping blocks
-    const blockGeo = new THREE.BoxGeometry(0.08, 0.06, 0.1);
-    const leftBlock = new THREE.Mesh(blockGeo, this.steelMaterial);
-    leftBlock.position.set(-0.08, -0.03, 0);
-    const rightBlock = new THREE.Mesh(blockGeo, this.steelMaterial);
-    rightBlock.position.set(0.08, -0.03, 0);
-    stage.add(leftBlock);
-    stage.add(rightBlock);
+    // Left and Right Micro V-Groove alignment clamps
+    const clampGeo = new THREE.BoxGeometry(0.09, 0.05, 0.12);
+    const leftClamp = new THREE.Mesh(clampGeo, this.steelMaterial);
+    leftClamp.position.set(-0.08, -0.03, 0);
+    const rightClamp = new THREE.Mesh(clampGeo, this.steelMaterial);
+    rightClamp.position.set(0.08, -0.03, 0);
+    stage.add(leftClamp);
+    stage.add(rightClamp);
 
     return stage;
   }
 
-  private createJointHousing(): THREE.Group {
+  private createPressureHousing(): THREE.Group {
     const housing = new THREE.Group();
 
-    // Universal Joint Main Shell (Stainless Steel Cylinder with flanges)
-    const shellGeo = new THREE.CylinderGeometry(0.32, 0.32, 1.8, 32, 1, true);
+    // Universal Joint Main Stainless Pressure Cylinder
+    const shellGeo = new THREE.CylinderGeometry(0.32, 0.32, 1.85, 32, 1, true);
     shellGeo.rotateZ(Math.PI / 2);
     const shell = new THREE.Mesh(shellGeo, this.casingMaterial);
     housing.add(shell);
 
-    // Endcap Flanges with O-Ring Seals
-    const capGeo = new THREE.CylinderGeometry(0.34, 0.34, 0.08, 32);
+    // High-Pressure Endcap Flanges with O-Ring Seals
+    const capGeo = new THREE.CylinderGeometry(0.35, 0.35, 0.08, 32);
     capGeo.rotateZ(Math.PI / 2);
     const capLeft = new THREE.Mesh(capGeo, this.steelMaterial);
-    capLeft.position.x = -0.9;
+    capLeft.position.x = -0.92;
     const capRight = new THREE.Mesh(capGeo, this.steelMaterial);
-    capRight.position.x = 0.9;
+    capRight.position.x = 0.92;
     housing.add(capLeft);
     housing.add(capRight);
 
-    // Beryllium Copper Clamping Collars
-    const collarGeo = new THREE.TorusGeometry(0.24, 0.03, 16, 32);
-    collarGeo.rotateY(Math.PI / 2);
-    const collarLeft = new THREE.Mesh(collarGeo, this.copperMaterial);
-    collarLeft.position.x = -0.55;
-    const collarRight = new THREE.Mesh(collarGeo, this.copperMaterial);
-    collarRight.position.x = 0.55;
-    housing.add(collarLeft);
-    housing.add(collarRight);
+    // Bronze-Beryllium Clamping Bands
+    const bandGeo = new THREE.TorusGeometry(0.26, 0.025, 16, 32);
+    bandGeo.rotateY(Math.PI / 2);
+    const bandLeft = new THREE.Mesh(bandGeo, this.copperMaterial);
+    bandLeft.position.x = -0.55;
+    const bandRight = new THREE.Mesh(bandGeo, this.copperMaterial);
+    bandRight.position.x = 0.55;
+    housing.add(bandLeft);
+    housing.add(bandRight);
 
-    // Start with housing opened / split along axis so interior splicing is visible
-    housing.position.y = 1.2;
+    // Start with housing lifted up and transparent
+    housing.position.y = 1.0;
     housing.visible = false;
 
     return housing;
   }
 
   /**
-   * Update animation state based on progress (0.0 to 1.0)
-   * 0.0 - 0.2: Cable End Exposure & Stripping
-   * 0.2 - 0.4: Fiber Cleaving & Micro V-Groove Alignment
-   * 0.4 - 0.6: Fusion Arc Discharge & Spark Welding
-   * 0.6 - 0.8: Heat-Shrink Sleeve Slide & Curing
-   * 0.8 - 1.0: Universal Joint Pressure Housing Sealing
+   * Splicing Sequence Animation Update
+   * progress 0.0 - 1.0 across physical stages:
+   * 0.0 - 0.25: Fiber Stripping & Micro V-Groove Alignment
+   * 0.25 - 0.55: High-Voltage Fusion Arc Discharge (Bright spark welding)
+   * 0.55 - 0.75: Splice Protection Sleeve Sliding & Thermocuring
+   * 0.75 - 1.00: Universal Joint Stainless Pressure Housing Closure
    */
   public update(progress: number, timeMs: number = 0) {
     const p = Math.max(0, Math.min(1, progress));
 
-    // Stage 1: Cable Alignment Movement (gap closes from 0.08 to 0.0)
-    const gap = (1 - Math.min(1, p * 2.5)) * 0.12;
+    // 1. Fiber Core Gap Alignment Movement
+    const gap = (1 - Math.min(1, p * 2.2)) * 0.12;
     this.cableLeft.position.x = -gap;
     this.cableRight.position.x = gap;
 
-    // Stage 2: Splicing Fusion Arc Discharge (between p = 0.35 and p = 0.55)
-    if (p >= 0.35 && p <= 0.58) {
-      const flicker = (Math.sin(timeMs * 0.05) + Math.cos(timeMs * 0.12)) * 0.5 + 0.5;
-      this.arcMaterial.opacity = 0.85 * flicker;
-      this.arcSpark.intensity = 3.5 * flicker;
-      this.arcMesh.scale.setScalar(0.8 + 0.4 * flicker);
+    // 2. High-Voltage Fusion Arc Discharge (between p = 0.28 and p = 0.55)
+    if (p >= 0.28 && p <= 0.58) {
+      const flicker = (Math.sin(timeMs * 0.06) + Math.cos(timeMs * 0.14)) * 0.5 + 0.5;
+      this.arcMaterial.opacity = 0.9 * flicker;
+      this.arcSparkLight.intensity = 5.0 * flicker;
+      this.arcPlasmaMesh.scale.setScalar(0.8 + 0.5 * flicker);
     } else {
       this.arcMaterial.opacity = 0.0;
-      this.arcSpark.intensity = 0.0;
+      this.arcSparkLight.intensity = 0.0;
     }
 
-    // Stage 3: Protective Sleeve Sliding (moves from x = -0.6 to x = 0.0 between p = 0.55 and 0.75)
+    // 3. Splice Protection Sleeve Sliding (moves from x = -0.65 to x = 0.0)
     if (p > 0.55) {
       const sleeveT = Math.min(1.0, (p - 0.55) / 0.2);
-      this.jointSleeve.position.x = -0.6 * (1 - sleeveT);
+      this.jointSleeve.position.x = -0.65 * (1 - sleeveT);
     } else {
-      this.jointSleeve.position.x = -0.6;
+      this.jointSleeve.position.x = -0.65;
     }
 
-    // Stage 4: Joint Housing Enclosure & Sealing (p > 0.75)
+    // 4. Universal Joint Pressure Housing Closure & Locking
     if (p >= 0.75) {
       this.jointHousing.visible = true;
       const housingT = Math.min(1.0, (p - 0.75) / 0.2);
-      this.jointHousing.position.y = (1 - housingT) * 0.8;
-      this.jointHousing.scale.setScalar(0.9 + 0.1 * housingT);
+      this.jointHousing.position.y = (1 - housingT) * 0.7;
+      this.jointHousing.scale.setScalar(0.92 + 0.08 * housingT);
     } else {
       this.jointHousing.visible = false;
-      this.jointHousing.position.y = 1.2;
+      this.jointHousing.position.y = 1.0;
     }
   }
 
@@ -287,6 +296,7 @@ export class Model9SplicingAssembly {
     this.armorMaterial.dispose();
     this.copperMaterial.dispose();
     this.steelMaterial.dispose();
+    this.ceramicMaterial.dispose();
     this.casingMaterial.dispose();
     this.arcMaterial.dispose();
   }

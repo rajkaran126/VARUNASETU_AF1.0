@@ -57,6 +57,7 @@ module.exports = {
       },
       fontFamily: {
         display: [
+          "'Outfit'",
           "'Space Grotesk'",
           "system-ui",
           "-apple-system",
@@ -69,9 +70,9 @@ module.exports = {
           "-apple-system",
           "sans-serif",
         ],
-        body: ["'Manrope'", "system-ui", "-apple-system", "sans-serif"],
+        body: ["'Outfit'", "'Manrope'", "system-ui", "-apple-system", "sans-serif"],
         mono: ["'IBM Plex Mono'", "ui-monospace", "monospace"],
-        sans: ["'Manrope'", "system-ui", "-apple-system", "sans-serif"],
+        sans: ["'Outfit'", "'Manrope'", "system-ui", "-apple-system", "sans-serif"],
       },
       animation: {
         "fade-in": "fadeIn 0.6s ease-out forwards",
