@@ -62,6 +62,11 @@ interface WorkspaceContextType {
   isRerouteActive: boolean;
   setIsRerouteActive: (active: boolean) => void;
   toggleRerouteStatus: () => void;
+  isRerouteSimulating: boolean;
+  rerouteSimulationProgress: number;
+  rerouteSimulationStep: string;
+  rerouteSimulationLog: string[];
+  runRerouteSimulation: (targetPlanId: string) => Promise<void>;
 
   // Multi-Agent Mission Control State
   agentMessages: AgentMessage[];
@@ -146,9 +151,69 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const [reroutePlans, setReroutePlans] = useState<ReroutePlan[]>(DETERMINED_REROUTE_PLANS);
   const [activeReroutePlan, setActiveReroutePlan] = useState<ReroutePlan | null>(DETERMINED_REROUTE_PLANS[0]);
   const [isRerouteActive, setIsRerouteActive] = useState<boolean>(true);
+  const [isRerouteSimulating, setIsRerouteSimulating] = useState<boolean>(false);
+  const [rerouteSimulationProgress, setRerouteSimulationProgress] = useState<number>(0);
+  const [rerouteSimulationStep, setRerouteSimulationStep] = useState<string>('');
+  const [rerouteSimulationLog, setRerouteSimulationLog] = useState<string[]>([]);
 
   const toggleRerouteStatus = () => {
     setIsRerouteActive(prev => !prev);
+  };
+
+  const runRerouteSimulation = async (targetPlanId: string) => {
+    const targetPlan = reroutePlans.find(p => p.id === targetPlanId);
+    if (!targetPlan) return;
+
+    setIsRerouteSimulating(true);
+    setRerouteSimulationProgress(8);
+    setRerouteSimulationStep(`Initiating path transition to ${targetPlan.title.split(':')[0]}...`);
+    setRerouteSimulationLog([`[T+0.00s] Commencing deterministic reroute simulation kernel...`]);
+
+    const steps = [
+      {
+        progress: 24,
+        delay: 320,
+        step: `Isolating optical LOS alarms on SEA-ME-WE 4 Djibouti Segment 4 (-4,120m)`,
+        log: `[T+0.42s] Optical loss detected: 42.8 dB. Segment flagged unviable. Ingesting candidate topological graph.`
+      },
+      {
+        progress: 52,
+        delay: 450,
+        step: `Calculating path vector & distance: ${targetPlan.bypassCorridorName}`,
+        log: `[T+1.05s] Candidate path traversed across ${targetPlan.waypoints.length} landing stations. Querying transponder headroom.`
+      },
+      {
+        progress: 78,
+        delay: 400,
+        step: `Grooming coherent 800G lambdas & equalizing optical OSNR margins`,
+        log: `[T+1.75s] Allocating ${targetPlan.restoredCapacityTbps} Tbps burst lambdas. Computed latency penalty: +${targetPlan.latencyPenaltyMs} ms.`
+      },
+      {
+        progress: 94,
+        delay: 380,
+        step: `Broadcasting BGP community updates & activating DWDM cross-connects`,
+        log: `[T+2.35s] BGP convergence confirmed across border gateways. Simulated convergence time: 3.8s.`
+      },
+      {
+        progress: 100,
+        delay: 300,
+        step: `Reroute Path Locked & Operational: Restoring ${targetPlan.restoredCapacityPct}% network flow`,
+        log: `[T+2.85s] Complete. Post-breakdown bypass locked until physical benthic splice.`
+      }
+    ];
+
+    for (const s of steps) {
+      await new Promise(r => setTimeout(r, s.delay));
+      setRerouteSimulationProgress(s.progress);
+      setRerouteSimulationStep(s.step);
+      setRerouteSimulationLog(prev => [...prev, s.log]);
+    }
+
+    setActiveReroutePlan(targetPlan);
+    setIsRerouteActive(true);
+    setTimeout(() => {
+      setIsRerouteSimulating(false);
+    }, 1000);
   };
 
   const [agentMessages, setAgentMessages] = useState<AgentMessage[]>(initialAgentConversation);
@@ -437,6 +502,11 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
         isRerouteActive,
         setIsRerouteActive,
         toggleRerouteStatus,
+        isRerouteSimulating,
+        rerouteSimulationProgress,
+        rerouteSimulationStep,
+        rerouteSimulationLog,
+        runRerouteSimulation,
         agentMessages,
         sendAgentQuery,
         resetAgentChat,

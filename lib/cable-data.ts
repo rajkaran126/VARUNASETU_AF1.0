@@ -689,6 +689,41 @@ export const DETERMINED_REROUTE_PLANS: ReroutePlan[] = [
       [5.3698, 43.2965]
     ],
     notes: 'Transfers bulk cloud replication and asynchronous payload across the global Pacific/Atlantic ring, bypassing Eurasia entirely.'
+  },
+  {
+    id: 'reroute-charlie-cape-circumnavigation',
+    strategyId: 'strat-c-cape-circumnavigation',
+    title: 'Strategy Charlie: Cape of Good Hope Circumnavigation',
+    targetCableId: 'smw4',
+    targetFaultId: 'flt-smw4-red-sea-01',
+    status: 'Standby',
+    determinedAt: '2026-10-30T09:16:00Z',
+    bypassCorridorName: '2Africa Pan-African Subsea Trunk via Cape Town',
+    restoredCapacityTbps: 16.5,
+    restoredCapacityPct: 89.2,
+    latencyPenaltyMs: 64.2,
+    operationalWindow: 'Full Red Sea isolation contingency',
+    waypoints: [
+      { id: 'wp-bom-c', name: 'Mumbai CLS', lat: 19.0760, lon: 72.8777, type: 'Origin', status: 'Active' },
+      { id: 'wp-ind', name: 'Central Indian Ocean Transit', lat: 5.0000, lon: 65.0000, type: 'Transshipment', status: 'Active' },
+      { id: 'wp-cpt', name: 'Cape Town Melkbosstrand CLS', lat: -33.7231, lon: 18.4385, type: 'Optical Grooming Node', status: 'Active' },
+      { id: 'wp-waf', name: 'West Africa Coastal Highway', lat: 10.0000, lon: -16.0000, type: 'Transshipment', status: 'Active' },
+      { id: 'wp-mrs-c', name: 'Marseille Marine Terminal', lat: 43.2965, lon: 5.3698, type: 'Terminus', status: 'Active' }
+    ],
+    pathCoordinates: [
+      [72.8777, 19.0760], // Mumbai
+      [65.0, 5.0],        // Indian Ocean
+      [55.0, -5.0],       // East Africa Bight
+      [42.0, -18.0],      // Mozambique Channel
+      [31.0, -29.8],      // South Africa East Coast
+      [18.4385, -33.7231],// Cape Town
+      [12.0, -22.0],      // South Atlantic
+      [2.0, -5.0],        // Gulf of Guinea
+      [-16.0, 15.0],      // West Africa
+      [-12.0, 36.0],      // Portugal / Iberian Coast
+      [5.3698, 43.2965]   // Marseille
+    ],
+    notes: 'Circumnavigates the entire African continent via the Cape of Good Hope, isolating the volatile Red Sea geopolitical corridor completely.'
   }
 ];
 

@@ -11,6 +11,7 @@ interface CableGlobe3DProps {
   activeFault?: FaultIncident;
   activeReroute?: ReroutePlan | null;
   showReroute?: boolean;
+  isSimulating?: boolean;
   onSelectCable?: (cable: CableRoute) => void;
   onToggleReroute?: () => void;
 }
@@ -21,6 +22,7 @@ export function CableGlobe3D({
   activeFault,
   activeReroute,
   showReroute = true,
+  isSimulating = false,
   onSelectCable,
   onToggleReroute,
 }: CableGlobe3DProps) {
@@ -497,28 +499,32 @@ export function CableGlobe3D({
 
       {/* Bottom Right Post-Breakdown Determined Rerouting Card */}
       {activeReroute && showReroute && (
-        <div className="absolute bottom-4 right-4 z-20 bg-[#F7F3EA]/95 backdrop-blur-md px-4 py-3 rounded-2xl border border-[#83B9A9] shadow-lg max-w-sm transition-all font-sans">
+        <div className={`absolute bottom-4 right-4 z-20 bg-[#F7F3EA]/95 backdrop-blur-md px-4 py-3 rounded-2xl border shadow-lg max-w-sm transition-all font-sans ${isSimulating ? 'border-[#E99A65] ring-2 ring-[#E99A65]/30' : 'border-[#83B9A9]'}`}>
           <div className="flex items-center justify-between gap-2 mb-1">
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#83B9A9] animate-pulse" />
-              <span className="text-[10px] font-sans uppercase tracking-wider text-[#687B59] font-bold">
-                Post-Breakdown Reroute Active
+              <span className={`w-2.5 h-2.5 rounded-full ${isSimulating ? 'bg-[#E99A65] animate-ping' : 'bg-[#83B9A9] animate-pulse'}`} />
+              <span className={`text-[10px] font-sans uppercase tracking-wider font-bold ${isSimulating ? 'text-[#C87954]' : 'text-[#687B59]'}`}>
+                {isSimulating ? 'Simulating Path Switch...' : 'Post-Breakdown Reroute Active'}
               </span>
             </div>
-            <span className="px-2 py-0.5 rounded text-[10px] font-sans font-bold bg-[#83B9A9]/20 text-[#454640] border border-[#83B9A9]/40">
-              {activeReroute.restoredCapacityPct}% Restored
+            <span className={`px-2 py-0.5 rounded text-[10px] font-sans font-bold border ${isSimulating ? 'bg-[#E99A65]/20 text-[#C87954] border-[#E99A65]/40' : 'bg-[#83B9A9]/20 text-[#454640] border-[#83B9A9]/40'}`}>
+              {isSimulating ? 'Simulating' : `${activeReroute.restoredCapacityPct}% Restored`}
             </span>
           </div>
           <div className="text-sm font-bold text-[#454640] tracking-tight">
             {activeReroute.bypassCorridorName}
           </div>
           <p className="text-[11px] text-[#687B59] mt-0.5 leading-snug">
-            Switches compromised traffic across diverse terrestrial & subsea channels until benthic repair is finished.
+            {isSimulating 
+              ? 'DSP transponders querying coherent optical headroom & recalculating BGP routing table...'
+              : 'Switches compromised traffic across diverse terrestrial & subsea channels until benthic repair is finished.'}
           </p>
           <div className="flex items-center justify-between text-[10px] font-sans text-[#A69B89] mt-2 pt-1.5 border-t border-[#D4C4A8]">
             <span>Throughput: <strong className="text-[#454640]">{activeReroute.restoredCapacityTbps} Tbps</strong></span>
             <span>Latency Delta: <strong className="text-[#C87954]">+{activeReroute.latencyPenaltyMs} ms</strong></span>
-            <span className="text-emerald-700 font-semibold">● Protection Live</span>
+            <span className={isSimulating ? 'text-[#C87954] font-semibold animate-pulse' : 'text-emerald-700 font-semibold'}>
+              {isSimulating ? '⚡ Convergence In-Flight' : '● Protection Live'}
+            </span>
           </div>
         </div>
       )}

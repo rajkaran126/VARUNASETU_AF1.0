@@ -17,12 +17,19 @@ export default function NetworkOverviewPage() {
     activeReroutePlan,
     setActiveReroutePlan,
     isRerouteActive,
-    toggleRerouteStatus
+    toggleRerouteStatus,
+    isRerouteSimulating,
+    rerouteSimulationProgress,
+    rerouteSimulationStep,
+    rerouteSimulationLog,
+    runRerouteSimulation
   } = useWorkspace();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('All');
   const [selectedRegion, setSelectedRegion] = useState<string>('All');
   const [viewMode, setViewMode] = useState<'3D' | '2D'>('3D');
+  const [showComparisonMatrix, setShowComparisonMatrix] = useState<boolean>(false);
+  const [showSimulationLog, setShowSimulationLog] = useState<boolean>(false);
 
   // Filter cables based on search query, status, and region
   const filteredCables = cables.filter(c => {
@@ -97,17 +104,17 @@ export default function NetworkOverviewPage() {
 
       {/* Post-Breakdown Determined Rerouting Intelligence Banner */}
       {activeReroutePlan && (
-        <div className="bg-[#F7F3EA] rounded-2xl border border-[#D4C4A8] p-4 lg:p-5 shadow-sm space-y-3 font-sans">
+        <div className="bg-[#F7F3EA] rounded-2xl border border-[#D4C4A8] p-4 lg:p-5 shadow-sm space-y-4 font-sans">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-[#D4C4A8]">
             <div className="flex items-center gap-2.5">
-              <span className={`w-3 h-3 rounded-full ${isRerouteActive ? 'bg-[#83B9A9] animate-pulse' : 'bg-[#C87954]'}`} />
+              <span className={`w-3 h-3 rounded-full ${isRerouteSimulating ? 'bg-[#E99A65] animate-ping' : (isRerouteActive ? 'bg-[#83B9A9] animate-pulse' : 'bg-[#C87954]')}`} />
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] uppercase font-bold tracking-wider text-[#687B59]">
                     Emergency Optical Rerouting Plan · Deterministic Protection
                   </span>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#83B9A9]/20 text-[#454640] border border-[#83B9A9]/40">
-                    {isRerouteActive ? 'BYPASS ACTIVE ON MAP' : 'BYPASS MUTED'}
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${isRerouteSimulating ? 'bg-[#E99A65]/20 text-[#C87954] border-[#E99A65]/40 animate-pulse' : 'bg-[#83B9A9]/20 text-[#454640] border-[#83B9A9]/40'}`}>
+                    {isRerouteSimulating ? 'SIMULATION IN PROGRESS' : (isRerouteActive ? 'BYPASS ACTIVE ON MAP' : 'BYPASS MUTED')}
                   </span>
                 </div>
                 <h3 className="font-bold text-base text-[#454640] tracking-tight mt-0.5">
@@ -116,24 +123,58 @@ export default function NetworkOverviewPage() {
               </div>
             </div>
 
-            {/* Strategy Selector and Toggle */}
+            {/* Interactive Path Switching & Simulation Actions */}
             <div className="flex flex-wrap items-center gap-2">
               <div className="flex items-center p-1 bg-white rounded-xl border border-[#D4C4A8] text-xs">
-                {reroutePlans.map((plan) => (
-                  <button
-                    key={plan.id}
-                    onClick={() => setActiveReroutePlan(plan)}
-                    className={`px-3 py-1 rounded-lg font-bold transition-all ${
-                      activeReroutePlan.id === plan.id
-                        ? 'bg-[#83B9A9] text-[#454640] shadow-2xs'
-                        : 'text-[#A69B89] hover:text-[#454640]'
-                    }`}
-                  >
-                    {plan.id.includes('alpha') ? 'Strategy Alpha (AAE-1)' : 'Strategy Bravo (Pacific)'}
-                  </button>
-                ))}
+                {reroutePlans.map((plan) => {
+                  const isActive = activeReroutePlan.id === plan.id;
+                  const label = plan.id.includes('alpha') 
+                    ? 'Strategy Alpha (AAE-1)' 
+                    : plan.id.includes('bravo') 
+                    ? 'Strategy Bravo (Pacific)' 
+                    : 'Strategy Charlie (Cape)';
+                  return (
+                    <button
+                      key={plan.id}
+                      disabled={isRerouteSimulating}
+                      onClick={() => runRerouteSimulation(plan.id)}
+                      className={`px-3 py-1 rounded-lg font-bold transition-all disabled:opacity-50 ${
+                        isActive
+                          ? 'bg-[#83B9A9] text-[#454640] shadow-2xs'
+                          : 'text-[#A69B89] hover:text-[#454640]'
+                      }`}
+                      title={`Simulate reroute transition to ${plan.title}`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
               </div>
 
+              {/* Run Simulation on Current Path */}
+              <button
+                disabled={isRerouteSimulating}
+                onClick={() => runRerouteSimulation(activeReroutePlan.id)}
+                className="px-3 py-1.5 rounded-xl font-bold text-xs bg-[#E8D9BF] text-[#454640] border border-[#D4C4A8] hover:bg-[#D4C4A8] transition-all flex items-center gap-1.5 disabled:opacity-50"
+                title="Re-run deterministic optical convergence simulation"
+              >
+                <span className="text-[12px]">⚡</span>
+                <span>{isRerouteSimulating ? 'Simulating...' : 'Simulate Path'}</span>
+              </button>
+
+              {/* Toggle Comparison Matrix */}
+              <button
+                onClick={() => setShowComparisonMatrix(!showComparisonMatrix)}
+                className={`px-3 py-1.5 rounded-xl font-bold text-xs border transition-all ${
+                  showComparisonMatrix 
+                    ? 'bg-[#687B59] text-white border-[#687B59]' 
+                    : 'bg-white text-[#454640] border-[#D4C4A8] hover:bg-[#E8D9BF]'
+                }`}
+              >
+                {showComparisonMatrix ? 'Hide Paths' : 'Compare 3 Paths'}
+              </button>
+
+              {/* Bypass Visual Toggle */}
               <button
                 onClick={toggleRerouteStatus}
                 className={`px-3.5 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-2 border ${
@@ -148,6 +189,50 @@ export default function NetworkOverviewPage() {
             </div>
           </div>
 
+          {/* Real-Time Simulation Convergence Progress Bar */}
+          {isRerouteSimulating && (
+            <div className="p-3.5 rounded-xl bg-white border border-[#E99A65] shadow-xs space-y-2 animate-fadeIn">
+              <div className="flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#E99A65] animate-spin" />
+                  <span className="font-mono font-bold text-[#454640]">
+                    DETERMINISTIC OPTICAL CONVERGENCE SIMULATION
+                  </span>
+                </div>
+                <span className="font-mono font-bold text-[#C87954]">{rerouteSimulationProgress}%</span>
+              </div>
+              <div className="w-full h-2.5 rounded-full bg-[#E8D9BF] overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-[#C87954] via-[#E99A65] to-[#83B9A9] transition-all duration-300 ease-out"
+                  style={{ width: `${rerouteSimulationProgress}%` }}
+                />
+              </div>
+              <div className="flex items-center justify-between text-[11px] font-mono text-[#687B59]">
+                <span className="truncate">{rerouteSimulationStep}</span>
+                <button 
+                  onClick={() => setShowSimulationLog(!showSimulationLog)}
+                  className="text-[#C87954] hover:underline text-[10px] font-bold ml-2 shrink-0"
+                >
+                  {showSimulationLog ? 'Hide Telemetry Logs' : 'View Kernel Logs'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Expandable Live Simulation Kernel Logs */}
+          {showSimulationLog && (
+            <div className="p-3 rounded-xl bg-[#2b2c28] text-[#E6E5DF] font-mono text-[11px] space-y-1 max-h-36 overflow-y-auto border border-[#454640]">
+              <div className="text-[10px] text-[#A8B99A] uppercase tracking-wider font-bold border-b border-white/10 pb-1 mb-1">
+                SimKernel Telemetry Stream (Deterministic vSetu 2.4)
+              </div>
+              {rerouteSimulationLog.map((log, i) => (
+                <div key={i} className="text-[#83B9A9] leading-relaxed">
+                  {log}
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* Reroute Telemetry Strip */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
             <div className="p-2.5 rounded-xl bg-white border border-[#D4C4A8]">
@@ -158,7 +243,7 @@ export default function NetworkOverviewPage() {
             <div className="p-2.5 rounded-xl bg-white border border-[#D4C4A8]">
               <span className="text-[10px] text-[#A69B89] font-medium block">Bypass Conduit</span>
               <strong className="text-[#454640] font-bold block truncate">{activeReroutePlan.bypassCorridorName}</strong>
-              <span className="text-[10px] text-emerald-700 font-semibold">14.2 Tbps Burst Lambdas</span>
+              <span className="text-[10px] text-emerald-700 font-semibold">{activeReroutePlan.restoredCapacityTbps} Tbps Burst Lambdas</span>
             </div>
             <div className="p-2.5 rounded-xl bg-white border border-[#D4C4A8]">
               <span className="text-[10px] text-[#A69B89] font-medium block">Restored Capacity</span>
@@ -171,6 +256,63 @@ export default function NetworkOverviewPage() {
               <span className="text-[10px] text-[#C87954]">+{activeReroutePlan.latencyPenaltyMs} ms Latency</span>
             </div>
           </div>
+
+          {/* Expandable 3-Path Evaluation Comparison Matrix */}
+          {showComparisonMatrix && (
+            <div className="pt-2 border-t border-[#D4C4A8] space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#687B59]">
+                  Candidate Reroute Corridors · Simulation Comparison
+                </span>
+                <span className="text-[10px] text-[#A69B89]">
+                  Click any strategy to simulate path convergence and update map
+                </span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {reroutePlans.map((plan) => {
+                  const isSelected = activeReroutePlan.id === plan.id;
+                  return (
+                    <div 
+                      key={plan.id}
+                      onClick={() => runRerouteSimulation(plan.id)}
+                      className={`p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
+                        isSelected 
+                          ? 'bg-white border-[#83B9A9] shadow-sm ring-2 ring-[#83B9A9]/30' 
+                          : 'bg-white/80 border-[#D4C4A8] hover:border-[#83B9A9]'
+                      }`}
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${
+                            isSelected ? 'bg-[#83B9A9] text-[#454640]' : 'bg-[#E8D9BF] text-[#454640]'
+                          }`}>
+                            {plan.id.includes('alpha') ? 'Lowest Latency' : plan.id.includes('bravo') ? 'Max Throughput' : 'Full Red Sea Bypass'}
+                          </span>
+                          <span className="text-[10px] font-mono text-[#687B59] font-bold">
+                            {plan.restoredCapacityPct}% Restored
+                          </span>
+                        </div>
+                        <h4 className="font-bold text-xs text-[#454640] line-clamp-1">{plan.title}</h4>
+                        <p className="text-[10px] text-[#A69B89] mt-0.5 line-clamp-2">{plan.notes}</p>
+                      </div>
+
+                      <div className="mt-3 pt-2 border-t border-[#D4C4A8]/60 flex items-center justify-between text-[10px] font-mono">
+                        <span>Load: <strong>{plan.restoredCapacityTbps}T</strong></span>
+                        <span className="text-[#C87954]">+{plan.latencyPenaltyMs}ms</span>
+                        <button 
+                          className={`px-2 py-0.5 rounded text-[9px] font-bold font-sans ${
+                            isSelected ? 'bg-[#83B9A9] text-[#454640]' : 'bg-[#E8D9BF] text-[#454640]'
+                          }`}
+                        >
+                          {isSelected ? 'Active Path' : 'Simulate'}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -182,6 +324,7 @@ export default function NetworkOverviewPage() {
           activeFault={activeFault}
           activeReroute={activeReroutePlan}
           showReroute={isRerouteActive}
+          isSimulating={isRerouteSimulating}
           onSelectCable={setSelectedCable}
           onToggleReroute={toggleRerouteStatus}
         />
@@ -192,6 +335,7 @@ export default function NetworkOverviewPage() {
           selectedCable={selectedCable}
           activeReroute={activeReroutePlan}
           showReroute={isRerouteActive}
+          isSimulating={isRerouteSimulating}
           onSelectCable={setSelectedCable}
           onToggleReroute={toggleRerouteStatus}
         />
