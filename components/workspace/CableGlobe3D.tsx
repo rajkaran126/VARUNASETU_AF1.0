@@ -77,52 +77,100 @@ export function CableGlobe3D({
     rimLight.position.set(-3000, 3000, 3000);
     scene.add(rimLight);
 
-    // 3. Central Globe Group
+    // 3. Realistic 3D Space Environment around Earth
+    const starCount = 1800;
+    const starGeo = new THREE.BufferGeometry();
+    const starPositions = new Float32Array(starCount * 3);
+    const starColors = new Float32Array(starCount * 3);
+    for (let i = 0; i < starCount; i++) {
+      const radius = 11000 + Math.random() * 14000;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+      starPositions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+      starPositions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+      starPositions[i * 3 + 2] = radius * Math.cos(phi);
+
+      // Deep space starlight: soft warm white and ivory
+      const lum = 0.5 + Math.random() * 0.5;
+      starColors[i * 3] = lum;
+      starColors[i * 3 + 1] = lum * 0.95;
+      starColors[i * 3 + 2] = lum * 0.88;
+    }
+    starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+    starGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
+    const starMat = new THREE.PointsMaterial({
+      size: 16,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.8,
+      sizeAttenuation: true,
+    });
+    const starField = new THREE.Points(starGeo, starMat);
+    scene.add(starField);
+
+    // 4. Central Globe Group
     const globeGroup = new THREE.Group();
     scene.add(globeGroup);
     globeGroupRef.current = globeGroup;
 
-    // Active Fault 3D Beacon Marker on Globe
     let faultMarker: THREE.Group | null = null;
-    if (activeFault) {
-      faultMarker = new THREE.Group();
-      const phi = (90 - activeFault.lat) * (Math.PI / 180);
-      const theta = (activeFault.lon + 180) * (Math.PI / 180);
-      const r = 3010;
-      const fx = -r * Math.sin(phi) * Math.cos(theta);
-      const fz = r * Math.sin(phi) * Math.sin(theta);
-      const fy = r * Math.cos(phi);
-      faultMarker.position.set(fx, fy, fz);
 
-      // Core fault dot
-      const dot = new THREE.Mesh(
-        new THREE.SphereGeometry(38, 16, 16),
-        new THREE.MeshBasicMaterial({ color: 0xc87954 })
-      );
-      faultMarker.add(dot);
-
-      // Radar pulse ring
-      const ring = new THREE.Mesh(
-        new THREE.RingGeometry(38, 85, 32),
-        new THREE.MeshBasicMaterial({
-          color: 0xe99a65,
-          side: THREE.DoubleSide,
-          transparent: true,
-          opacity: 0.8,
-        })
-      );
-      ring.lookAt(new THREE.Vector3(0, 0, 0));
-      faultMarker.add(ring);
-
-      globeGroup.add(faultMarker);
-    }
-
-    // 4. Load the Subsea Cable Network 3D Model (Model 1) from public/models/model1/globe_ribbons.gltf
+    // 5. Load the Subsea Cable Network 3D Model (Model 1) from public/models/model1/globe_ribbons.gltf
     const gltfLoader = new GLTFLoader();
     gltfLoader.load(
       '/models/model1/globe_ribbons.gltf',
       (gltf) => {
         const cableModel = gltf.scene;
+
+        // ALIGN MODEL 1: GEOGRAPHICALLY UPRIGHT CONTINENTAL ALIGNMENT
+        // In Model 1's geometry, Z-up is the polar axis (Z = +2950 is North Pole, Z = -2950 is South Pole).
+        // Standard Three.js coordinates use Y-up.
+        // We set rotation.order = 'YXZ':
+        // 1. rotation.x = -Math.PI / 2 brings North Pole to +Y (UP) and South Pole to -Y (DOWN).
+        // 2. rotation.y brings the active fault (Djibouti / Red Sea / Indian Ocean) to face forward (+Z) toward the camera.
+        cableModel.rotation.order = 'YXZ';
+        cableModel.rotation.x = -Math.PI / 2;
+        const targetLon = activeFault ? (activeFault.lon * Math.PI / 180) : (43.49 * Math.PI / 180);
+        cableModel.rotation.y = -(targetLon + Math.PI / 2);
+
+        // Attach Active Fault Beacon directly to cableModel in Model 1's authentic coordinates
+        if (activeFault) {
+          const markerGroup = new THREE.Group();
+          const latRad = activeFault.lat * (Math.PI / 180);
+          const lonRad = activeFault.lon * (Math.PI / 180);
+          const r = 2965; // Sits flush right on the ocean surface / cable ribbons
+          const fx = r * Math.cos(latRad) * Math.cos(lonRad);
+          const fy = r * Math.cos(latRad) * Math.sin(lonRad);
+          const fz = r * Math.sin(latRad);
+          markerGroup.position.set(fx, fy, fz);
+
+          // Orient beacon normal outward from the Earth center
+          const normal = new THREE.Vector3(fx, fy, fz).normalize();
+          markerGroup.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
+
+          // Core fault dot
+          const dot = new THREE.Mesh(
+            new THREE.SphereGeometry(32, 16, 16),
+            new THREE.MeshBasicMaterial({ color: 0xc87954 })
+          );
+          markerGroup.add(dot);
+
+          // Radar pulse ring
+          const ring = new THREE.Mesh(
+            new THREE.RingGeometry(38, 90, 32),
+            new THREE.MeshBasicMaterial({
+              color: 0xe99a65,
+              side: THREE.DoubleSide,
+              transparent: true,
+              opacity: 0.85,
+            })
+          );
+          ring.position.z = 2;
+          markerGroup.add(ring);
+
+          cableModel.add(markerGroup);
+          faultMarker = markerGroup;
+        }
 
         // UNMASK MODEL 1:
         // Do NOT wrap in artificial occlusion spheres or dark blue emissive masks.
@@ -270,6 +318,11 @@ export function CableGlobe3D({
             }
           }
         }
+      }
+
+      // Subtle celestial space drift
+      if (starField) {
+        starField.rotation.y += 0.00008;
       }
 
       // Animate active fault marker pulse
