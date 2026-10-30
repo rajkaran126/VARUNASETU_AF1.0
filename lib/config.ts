@@ -42,3 +42,4 @@ export const PLATFORM_CONFIG: SystemConfig = {
     maxAlternateRoutes: 12,
   },
 };
+

@@ -1,4 +1,4 @@
-import { CableRoute, LandingStation, FaultIncident, RepairVessel, RecoveryStrategy, DatasetRecord } from './types';
+import { CableRoute, LandingStation, FaultIncident, FaultNotification, RepairVessel, RecoveryStrategy, DatasetRecord } from './types';
 
 export const VERIFIED_LANDING_STATIONS: LandingStation[] = [
   { id: 'cls-mumbai', name: 'Mumbai CLS (Versova/Prabhadevi)', city: 'Mumbai', country: 'India', region: 'South Asia', lat: 19.0760, lon: 72.8777, cablesConnected: ['smw4', 'smw5', 'aae1', 'bbg', 'fal'] },
@@ -379,6 +379,63 @@ export const ACTIVE_FAULT_INCIDENTS: FaultIncident[] = [
   }
 ];
 
+export const INITIAL_FAULT_NOTIFICATIONS: FaultNotification[] = [
+  {
+    id: 'notif-smw4-01',
+    cableId: 'smw4',
+    cableName: 'SEA-ME-WE 4',
+    title: 'Severe Loss of Light Alarm (42.8 dB) — Bab el-Mandeb',
+    description: 'OTDR telemetry detects sudden optical reflection spike at 640km mark from Djibouti CLS. Loss of signal (LOS) across 12 DWDM transponders.',
+    faultType: 'Physical Anchor Drag',
+    lat: 12.3081,
+    lon: 43.4892,
+    depthMeters: 4120,
+    nearestLandingStation: 'Djibouti CLS',
+    severity: 'Critical',
+    opticalLossDb: 42.8,
+    affectedTrafficTbps: 4.6,
+    detectedAt: '2026-10-30T09:12:00Z',
+    sourceSensor: 'OTDR Benthic Reflector Array #412',
+    status: 'Pending'
+  },
+  {
+    id: 'notif-smw5-02',
+    cableId: 'smw5',
+    cableName: 'SEA-ME-WE 5',
+    title: 'Subsea Current Microbending Anomaly — Red Sea Segment 4',
+    description: 'Coherent DSP detects sudden chromatic dispersion jump and 18.4 dB power attenuation. Pre-FEC BER degraded past nominal threshold.',
+    faultType: 'Shunt Fault (Insulation Breakdown)',
+    lat: 13.1120,
+    lon: 43.1904,
+    depthMeters: 3840,
+    nearestLandingStation: 'Djibouti CLS',
+    severity: 'Major',
+    opticalLossDb: 18.4,
+    affectedTrafficTbps: 9.2,
+    detectedAt: '2026-10-30T09:25:30Z',
+    sourceSensor: 'DWDM Coherent DSP Telemetry',
+    status: 'Pending'
+  },
+  {
+    id: 'notif-faster-03',
+    cableId: 'faster',
+    cableName: 'FASTER Cable System',
+    title: 'Cascading Seismic Ground Shaking Alert — Japan Trench Subduction Zone',
+    description: 'USGS subsea seismometer network reports 6.2 Mw benthic tremor within 45km of FASTER Chikura branch. Optical power currently stable but strain sensors triggered.',
+    faultType: 'Benthic Rupture / Seismic',
+    lat: 35.1200,
+    lon: 142.4500,
+    depthMeters: 5600,
+    nearestLandingStation: 'Chikura / Shima CLS, Japan',
+    severity: 'Moderate',
+    opticalLossDb: 4.2,
+    affectedTrafficTbps: 18.0,
+    detectedAt: '2026-10-30T09:35:10Z',
+    sourceSensor: 'Benthic Seismometer Array #8',
+    status: 'Pending'
+  }
+];
+
 export const REPAIR_FLEET: RepairVessel[] = [
   {
     id: 'vsl-sovereign',
@@ -560,3 +617,4 @@ export const INITIAL_DATASETS: DatasetRecord[] = [
     description: 'High-frequency optical power attenuation (dB), chromatic dispersion (ps/nm), and BGP flap logs derived from DWDM transponder monitors.'
   }
 ];
+

@@ -178,3 +178,4 @@ export function CableDetailCard({ cable }: CableDetailCardProps) {
     </div>
   );
 }
+

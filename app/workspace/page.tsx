@@ -4,13 +4,21 @@ import React, { useState } from 'react';
 import { useWorkspace } from '@/lib/workspace-context';
 import { CableExplorerMap } from '@/components/workspace/CableExplorerMap';
 import { CableDetailCard } from '@/components/workspace/CableDetailCard';
+import { FaultNotificationTray } from '@/components/workspace/FaultNotificationTray';
 import { VERIFIED_LANDING_STATIONS } from '@/lib/cable-data';
 
 export default function NetworkOverviewPage() {
-  const { cables, selectedCable, setSelectedCable, activeFault } = useWorkspace();
+  const { 
+    cables, 
+    selectedCable, 
+    setSelectedCable, 
+    activeFault,
+    pendingNotificationsCount 
+  } = useWorkspace();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('All');
   const [selectedRegion, setSelectedRegion] = useState<string>('All');
+  const [showNotificationSection, setShowNotificationSection] = useState<boolean>(true);
 
   // Filter cables based on search query, status, and region
   const filteredCables = cables.filter(c => {
@@ -21,8 +29,6 @@ export default function NetworkOverviewPage() {
     const matchesRegion = selectedRegion === 'All' || c.region === selectedRegion;
     return matchesSearch && matchesStatus && matchesRegion;
   });
-
-  const totalLength = cables.reduce((acc, c) => typeof c.lengthKm === 'number' ? acc + c.lengthKm : acc, 0);
 
   return (
     <div className="space-y-6">
@@ -45,8 +51,27 @@ export default function NetworkOverviewPage() {
           </p>
         </div>
 
-        {/* Global Topology Summary Telemetry Strip */}
+        {/* Global Topology Summary Telemetry Strip & Notification Toggle */}
         <div className="flex flex-wrap items-center gap-2">
+          {/* Notification Section Trigger Badge */}
+          <button
+            onClick={() => setShowNotificationSection(!showNotificationSection)}
+            className={`px-3 py-1.5 rounded-xl border font-mono text-xs shadow-2xs flex items-center gap-2 transition-all ${
+              pendingNotificationsCount > 0
+                ? 'bg-rose-50 border-rose-300 text-rose-800 hover:bg-rose-100'
+                : 'bg-white border-[#E0D7C9] text-[#0E2A47] hover:bg-[#FAF7F2]'
+            }`}
+          >
+            <span className={`w-2 h-2 rounded-full ${pendingNotificationsCount > 0 ? 'bg-rose-500 animate-ping' : 'bg-[#185382]'}`} />
+            <span>Fault Notifications:</span>
+            <strong className={pendingNotificationsCount > 0 ? 'text-rose-700' : 'text-[#0E2A47]'}>
+              {pendingNotificationsCount > 0 ? `${pendingNotificationsCount} PENDING` : 'All Clear'}
+            </strong>
+            <span className="font-mono text-[10px] text-[#7A8E9F]">
+              {showNotificationSection ? '▲' : '▼'}
+            </span>
+          </button>
+
           <div className="px-3 py-1.5 rounded-xl bg-white border border-[#E0D7C9] font-mono text-xs shadow-2xs flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#185382]" />
             <span className="text-[#5A738A]">Systems:</span>
@@ -58,15 +83,16 @@ export default function NetworkOverviewPage() {
             <strong className="text-[#0E2A47]">{VERIFIED_LANDING_STATIONS.length} Grid</strong>
           </div>
           <div className="px-3 py-1.5 rounded-xl bg-white border border-[#E0D7C9] font-mono text-xs shadow-2xs flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
-            <span className="text-rose-700 font-semibold">2 Anomalies</span>
-          </div>
-          <div className="px-3 py-1.5 rounded-xl bg-white border border-[#E0D7C9] font-mono text-xs shadow-2xs flex items-center gap-2">
             <span className="text-[#5A738A]">Flow:</span>
             <strong className="text-[#0E2A47]">97.4%</strong>
           </div>
         </div>
       </div>
+
+      {/* Fault Notification & Triage Section */}
+      {showNotificationSection && (
+        <FaultNotificationTray />
+      )}
 
       {/* Main Interactive Map Component */}
       <CableExplorerMap

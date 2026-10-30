@@ -58,6 +58,29 @@ export interface FaultIncident {
   provenance: ProvenanceType;
 }
 
+export interface FaultNotification {
+  id: string;
+  cableId: string;
+  cableName: string;
+  title: string;
+  description: string;
+  faultType: FaultType;
+  lat: number;
+  lon: number;
+  depthMeters: number;
+  nearestLandingStation: string;
+  severity: 'Critical' | 'Major' | 'Moderate' | 'Minor';
+  opticalLossDb: number;
+  affectedTrafficTbps: number;
+  detectedAt: string;
+  sourceSensor: string;
+  status: 'Pending' | 'Approved' | 'Declined';
+  approvalDecision?: {
+    decidedAt: string;
+    actionTaken: 'Considered as Active Fault' | 'Dismissed as False Alarm';
+  };
+}
+
 export interface ScenarioConfig {
   id: string;
   name: string;
@@ -185,3 +208,4 @@ export interface SimulationSnapshot {
   result: SimulationResult;
   provenance: 'Derived';
 }
+

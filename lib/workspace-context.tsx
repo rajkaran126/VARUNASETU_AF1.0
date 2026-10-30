@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { 
   CableRoute, 
   FaultIncident, 
+  FaultNotification,
   ScenarioConfig, 
   SimulationResult, 
   RepairVessel, 
@@ -15,6 +16,7 @@ import {
 import { 
   VERIFIED_CABLE_ROUTES, 
   ACTIVE_FAULT_INCIDENTS, 
+  INITIAL_FAULT_NOTIFICATIONS,
   REPAIR_FLEET, 
   INITIAL_RECOVERY_STRATEGIES, 
   INITIAL_DATASETS 
@@ -29,6 +31,16 @@ interface WorkspaceContextType {
   activeFault: FaultIncident;
   setActiveFault: (fault: FaultIncident) => void;
   
+  // Fault Notifications System
+  notifications: FaultNotification[];
+  pendingNotificationsCount: number;
+  approveFaultNotification: (id: string) => void;
+  declineFaultNotification: (id: string) => void;
+  isNotificationTrayOpen: boolean;
+  setIsNotificationTrayOpen: (open: boolean) => void;
+  activeConfirmedNotification: FaultNotification | null;
+  dismissConfirmedNotification: () => void;
+
   // Scenario & Simulation Engine State
   activeScenario: ScenarioConfig;
   setActiveScenario: (scenario: ScenarioConfig) => void;
@@ -68,7 +80,7 @@ const defaultScenario: ScenarioConfig = {
   trafficDemandAssumptionTbps: 45.0,
   failureDurationHours: 336,
   availableAlternateRoutes: ['aae1', '2africa', 'faster', 'marea'],
-  notes: 'Commercial cargo ship dragged dragging anchor during gale conditions across subsea corridor.'
+  notes: 'Commercial cargo ship dragged anchor during gale conditions across subsea corridor.'
 };
 
 const initialSimulationResult = runNetworkSimulation(defaultScenario, VERIFIED_CABLE_ROUTES);
@@ -106,6 +118,13 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const [selectedCable, setSelectedCable] = useState<CableRoute>(VERIFIED_CABLE_ROUTES[0]);
   const [activeFault, setActiveFault] = useState<FaultIncident>(ACTIVE_FAULT_INCIDENTS[0]);
   
+  // Notifications State
+  const [notifications, setNotifications] = useState<FaultNotification[]>(INITIAL_FAULT_NOTIFICATIONS);
+  const [isNotificationTrayOpen, setIsNotificationTrayOpen] = useState<boolean>(false);
+  const [activeConfirmedNotification, setActiveConfirmedNotification] = useState<FaultNotification | null>(null);
+
+  const pendingNotificationsCount = notifications.filter(n => n.status === 'Pending').length;
+
   const [activeScenario, setActiveScenario] = useState<ScenarioConfig>(defaultScenario);
   const [simulationResult, setSimulationResult] = useState<SimulationResult>(initialSimulationResult);
 
@@ -142,6 +161,100 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     const sc = customScenario || activeScenario;
     const result = runNetworkSimulation(sc, cables);
     setSimulationResult(result);
+  };
+
+  const approveFaultNotification = (id: string) => {
+    const notif = notifications.find(n => n.id === id);
+    if (!notif) return;
+
+    // 1. Mark notification as Approved
+    setNotifications(prev => prev.map(n => 
+      n.id === id 
+        ? {
+            ...n,
+            status: 'Approved' as const,
+            approvalDecision: {
+              decidedAt: new Date().toISOString(),
+              actionTaken: 'Considered as Active Fault' as const
+            }
+          }
+        : n
+    ));
+
+    // 2. Formulate canonical FaultIncident
+    const confirmedIncident: FaultIncident = {
+      id: `flt-${notif.cableId}-${Date.now()}`,
+      cableId: notif.cableId,
+      cableName: notif.cableName,
+      timestamp: new Date().toISOString(),
+      faultType: notif.faultType,
+      lat: notif.lat,
+      lon: notif.lon,
+      depthMeters: notif.depthMeters,
+      distanceKmFromLanding: 480,
+      nearestLandingStation: notif.nearestLandingStation,
+      severity: notif.severity,
+      opticalLossDb: notif.opticalLossDb,
+      affectedTrafficTbps: notif.affectedTrafficTbps,
+      status: 'Active',
+      provenance: 'Observed'
+    };
+    setActiveFault(confirmedIncident);
+
+    // 3. Mark target cable status
+    const matchedCable = cables.find(c => c.id === notif.cableId);
+    if (matchedCable) {
+      const updatedCable: CableRoute = {
+        ...matchedCable,
+        status: notif.severity === 'Critical' ? 'Severed' : 'Degraded'
+      };
+      setSelectedCable(updatedCable);
+      setCables(prev => prev.map(c => c.id === notif.cableId ? updatedCable : c));
+    }
+
+    // 4. Update Scenario and run deterministic simulation
+    const updatedScenario: ScenarioConfig = {
+      id: `scen-${notif.cableId}-${Date.now()}`,
+      name: `${notif.cableName} Confirmed Fault Scenario`,
+      selectedCableIds: [notif.cableId],
+      faultType: notif.faultType,
+      faultLocation: {
+        lat: notif.lat,
+        lon: notif.lon,
+        depthM: notif.depthMeters,
+        description: `${notif.nearestLandingStation} (${notif.depthMeters}m depth)`
+      },
+      trafficDemandAssumptionTbps: Math.max(35.0, notif.affectedTrafficTbps * 1.5),
+      failureDurationHours: 336,
+      availableAlternateRoutes: ['aae1', '2africa', 'faster', 'marea']
+    };
+    setActiveScenario(updatedScenario);
+    executeSimulation(updatedScenario);
+
+    // 5. Set active confirmed notification for user navigation banner
+    setActiveConfirmedNotification(notif);
+  };
+
+  const declineFaultNotification = (id: string) => {
+    setNotifications(prev => prev.map(n => 
+      n.id === id 
+        ? {
+            ...n,
+            status: 'Declined' as const,
+            approvalDecision: {
+              decidedAt: new Date().toISOString(),
+              actionTaken: 'Dismissed as False Alarm' as const
+            }
+          }
+        : n
+    ));
+    if (activeConfirmedNotification?.id === id) {
+      setActiveConfirmedNotification(null);
+    }
+  };
+
+  const dismissConfirmedNotification = () => {
+    setActiveConfirmedNotification(null);
   };
 
   const addDatasetRecord = (record: DatasetRecord) => {
@@ -256,7 +369,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
           sender: 'orchestrator',
           agentName: 'Chief Orchestrator',
           agentRole: 'Chief Orchestrator',
-          content: `Multi-agent consensus consensus synthesized for query: "${promptText}".\n\nAll 5 specialist agents (Network, Risk, Logistics, Policy, Orchestrator) are synchronized with the active digital twin kernel. Current canonical target is **${selectedCable.name}** at fault location **${activeFault.nearestLandingStation}**.\n\nYou can inspect specific recommendations in the Recovery War Room or trigger a deterministic scenario run.`,
+          content: `Multi-agent consensus synthesized for query: "${promptText}".\n\nAll 5 specialist agents (Network, Risk, Logistics, Policy, Orchestrator) are synchronized with the active digital twin kernel. Current canonical target is **${selectedCable.name}** at fault location **${activeFault.nearestLandingStation}**.\n\nYou can inspect specific recommendations in the Recovery War Room or trigger a deterministic scenario run.`,
           timestamp: new Date().toISOString(),
           reasoningChain: [
             'Cross-referenced operator prompt with canonical state context.',
@@ -283,6 +396,14 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
         setSelectedCable,
         activeFault,
         setActiveFault,
+        notifications,
+        pendingNotificationsCount,
+        approveFaultNotification,
+        declineFaultNotification,
+        isNotificationTrayOpen,
+        setIsNotificationTrayOpen,
+        activeConfirmedNotification,
+        dismissConfirmedNotification,
         activeScenario,
         setActiveScenario,
         simulationResult,
