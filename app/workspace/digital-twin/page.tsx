@@ -146,9 +146,13 @@ export default function UnderwaterDigitalTwinPage() {
         <div className="flex items-center gap-3">
           <Link
             href="/workspace"
-            className="text-xs font-semibold text-[#185382] hover:underline flex items-center gap-1.5"
+            className="text-xs font-semibold text-[#1677B8] hover:underline flex items-center gap-1.5"
           >
-            <span>← Return to Global Topology</span>
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="19" y1="12" x2="5" y2="12" />
+              <polyline points="12 19 5 12 12 5" />
+            </svg>
+            <span>Return to Global Topology</span>
           </Link>
           <span className="text-[#DDD3C3]">|</span>
           <span className="font-mono text-[11px] text-[#5A738A]">
@@ -159,14 +163,14 @@ export default function UnderwaterDigitalTwinPage() {
         <div className="flex items-center gap-3">
           <Link
             href="/workspace/operations"
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[#D5CCBC] bg-white hover:bg-[#FAF7F1] text-xs font-semibold text-[#153B5B] shadow-2xs transition-all"
+            className="btn-secondary"
           >
             <span>Simulate Disruption</span>
           </Link>
 
           <Link
             href="/workspace/war-room"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0E2A47] hover:bg-[#153B5B] text-white text-xs font-semibold shadow-xs transition-all"
+            className="btn-primary"
           >
             <span>Recovery War Room</span>
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

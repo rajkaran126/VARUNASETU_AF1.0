@@ -14,16 +14,17 @@ export interface NavItem {
 
 export function Sidebar() {
   const pathname = usePathname();
-  const [collapsed, setCollapsed] = useState(false);
+  // Compact icon-based navigation by default as required
+  const [collapsed, setCollapsed] = useState(true);
 
   const navItems: NavItem[] = [
     {
       id: 'overview',
       name: 'Network Overview',
       path: '/workspace',
-      badge: '426 Cables',
+      badge: '426',
       icon: (active) => (
-        <svg className={`w-5 h-5 ${active ? 'text-[#0E3A60]' : 'text-[#4A647D]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <svg className={`w-5 h-5 transition-colors ${active ? 'text-[#13BFD3]' : 'text-[#91A1AF]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
           <circle cx="12" cy="12" r="9" />
           <path d="M3.6 9h16.8" />
           <path d="M3.6 15h16.8" />
@@ -36,9 +37,9 @@ export function Sidebar() {
       id: 'digital-twin',
       name: 'Underwater Digital Twin',
       path: '/workspace/digital-twin',
-      badge: 'Benthic',
+      badge: '3D',
       icon: (active) => (
-        <svg className={`w-5 h-5 ${active ? 'text-[#0E3A60]' : 'text-[#4A647D]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <svg className={`w-5 h-5 transition-colors ${active ? 'text-[#13BFD3]' : 'text-[#91A1AF]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
           <path d="M2 17c3-3 6-3 9 0s6 3 9 0" />
           <path d="M2 12c3-3 6-3 9 0s6 3 9 0" />
           <path d="M12 3v6" />
@@ -50,9 +51,9 @@ export function Sidebar() {
       id: 'operations',
       name: 'Network Operations & Simulation',
       path: '/workspace/operations',
-      badge: 'SimKernel',
+      badge: 'Sim',
       icon: (active) => (
-        <svg className={`w-5 h-5 ${active ? 'text-[#0E3A60]' : 'text-[#4A647D]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <svg className={`w-5 h-5 transition-colors ${active ? 'text-[#13BFD3]' : 'text-[#91A1AF]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
           <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
         </svg>
       )
@@ -61,9 +62,9 @@ export function Sidebar() {
       id: 'war-room',
       name: 'Recovery War Room',
       path: '/workspace/war-room',
-      badge: '3 Strat',
+      badge: 'Logistics',
       icon: (active) => (
-        <svg className={`w-5 h-5 ${active ? 'text-[#0E3A60]' : 'text-[#4A647D]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <svg className={`w-5 h-5 transition-colors ${active ? 'text-[#13BFD3]' : 'text-[#91A1AF]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           <polyline points="9 12 11 14 15 10" />
         </svg>
@@ -75,7 +76,7 @@ export function Sidebar() {
       path: '/workspace/mission-control',
       badge: '5 Agents',
       icon: (active) => (
-        <svg className={`w-5 h-5 ${active ? 'text-[#0E3A60]' : 'text-[#4A647D]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <svg className={`w-5 h-5 transition-colors ${active ? 'text-[#13BFD3]' : 'text-[#91A1AF]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
           <line x1="8" y1="9" x2="16" y2="9" />
           <line x1="8" y1="13" x2="13" y2="13" />
@@ -88,7 +89,7 @@ export function Sidebar() {
       path: '/workspace/analytics',
       badge: 'Audit',
       icon: (active) => (
-        <svg className={`w-5 h-5 ${active ? 'text-[#0E3A60]' : 'text-[#4A647D]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <svg className={`w-5 h-5 transition-colors ${active ? 'text-[#13BFD3]' : 'text-[#91A1AF]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
           <line x1="18" y1="20" x2="18" y2="10" />
           <line x1="12" y1="20" x2="12" y2="4" />
           <line x1="6" y1="20" x2="6" y2="14" />
@@ -99,9 +100,9 @@ export function Sidebar() {
       id: 'data',
       name: 'Data & Infrastructure',
       path: '/workspace/data',
-      badge: 'Registry',
+      badge: 'GIS Hub',
       icon: (active) => (
-        <svg className={`w-5 h-5 ${active ? 'text-[#0E3A60]' : 'text-[#4A647D]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <svg className={`w-5 h-5 transition-colors ${active ? 'text-[#13BFD3]' : 'text-[#91A1AF]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
           <ellipse cx="12" cy="5" rx="9" ry="3" />
           <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
           <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
@@ -112,56 +113,56 @@ export function Sidebar() {
 
   return (
     <aside
-      className={`relative z-20 flex flex-col flex-shrink-0 bg-[#F8F5EE] border-r border-[#E2DBD0] transition-all duration-300 ease-in-out ${
-        collapsed ? 'w-20' : 'w-72'
+      className={`relative z-20 flex flex-col flex-shrink-0 bg-[#0B1D33] border-r border-[#102A46] text-[#F5FAFF] transition-all duration-300 ease-in-out ${
+        collapsed ? 'w-[70px]' : 'w-64'
       }`}
     >
-      {/* Brand & Workspace Identity */}
-      <div className="h-16 flex items-center justify-between px-4 border-b border-[#E2DBD0] bg-[#F5F1E6]">
-        {!collapsed && (
+      {/* Brand & Workspace Identity (Midnight Navy Header) */}
+      <div className="h-14 flex items-center justify-between px-3.5 border-b border-[#102A46] bg-[#091728]">
+        {!collapsed ? (
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-lg bg-[#0E2A47] flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
+            <div className="w-8 h-8 rounded-xl bg-[#102A46] border border-[#153A5B] flex items-center justify-center text-[#13BFD3] shadow-xs transition-transform group-hover:scale-105">
               <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-                <path d="M2 10 Q5 5, 10 7.5 Q15 10, 18 5" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" fill="none" />
-                <path d="M2 13 Q5 8, 10 10.5 Q15 13, 18 8" stroke="#FFFFFF" strokeWidth="1.2" strokeLinecap="round" fill="none" opacity="0.6" />
+                <path d="M2 10 Q5 5, 10 7.5 Q15 10, 18 5" stroke="#13BFD3" strokeWidth="2" strokeLinecap="round" fill="none" />
+                <path d="M2 13 Q5 8, 10 10.5 Q15 13, 18 8" stroke="#13BFD3" strokeWidth="1.2" strokeLinecap="round" fill="none" opacity="0.6" />
                 <circle cx="10" cy="8.75" r="1.8" fill="#FFFFFF" />
               </svg>
             </div>
             <div>
-              <span className="font-grotesk font-bold text-sm tracking-wider text-[#0E2A47]">VARUNASETU</span>
-              <p className="font-mono text-[9px] text-[#4A647D] tracking-widest uppercase">Twin Kernel v2.4</p>
+              <span className="font-grotesk font-bold text-xs tracking-wider text-white">VARUNASETU</span>
+              <p className="font-mono text-[9px] text-[#13BFD3] tracking-widest uppercase font-semibold">Subsea Twin</p>
             </div>
           </Link>
-        )}
-
-        {collapsed && (
-          <Link href="/" className="mx-auto">
-            <div className="w-9 h-9 rounded-lg bg-[#0E2A47] flex items-center justify-center text-white shadow-sm">
-              <span className="font-grotesk font-bold text-sm text-white">VS</span>
+        ) : (
+          <Link href="/" className="mx-auto" title="VARUNASETU Home">
+            <div className="w-8 h-8 rounded-xl bg-[#102A46] border border-[#153A5B] flex items-center justify-center text-[#13BFD3] shadow-xs">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                <path d="M2 10 Q5 5, 10 7.5 Q15 10, 18 5" stroke="#13BFD3" strokeWidth="2" strokeLinecap="round" fill="none" />
+                <circle cx="10" cy="8.75" r="1.8" fill="#FFFFFF" />
+              </svg>
             </div>
           </Link>
         )}
 
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="p-1.5 rounded-lg text-[#5B738A] hover:bg-[#EAE4D7] hover:text-[#0E2A47] transition-colors"
-          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          className={`p-1.5 rounded-lg text-[#91A1AF] hover:bg-[#102A46] hover:text-[#13BFD3] transition-colors ${
+            collapsed ? 'hidden' : 'block'
+          }`}
+          title="Collapse navigation"
+          aria-label="Collapse sidebar"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            {collapsed ? (
-              <polyline points="9 18 15 12 9 6" />
-            ) : (
-              <polyline points="15 18 9 12 15 6" />
-            )}
+            <polyline points="15 18 9 12 15 6" />
           </svg>
         </button>
       </div>
 
       {/* Navigation Links */}
-      <nav className="flex-1 py-4 px-2.5 space-y-1 overflow-y-auto">
+      <nav className="flex-1 py-4 px-2 space-y-1.5 overflow-y-auto">
         {!collapsed && (
-          <p className="px-3 pb-2 font-mono text-[10px] tracking-[0.2em] text-[#69829A] uppercase">
-            Workspace Enclave
+          <p className="px-3 pb-1 font-mono text-[10px] tracking-[0.2em] text-[#60758A] uppercase">
+            Platform Sections
           </p>
         )}
 
@@ -171,27 +172,29 @@ export function Sidebar() {
             <Link
               key={item.id}
               href={item.path}
-              className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all ${
+              className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all group ${
                 isActive
-                  ? 'bg-[#EAF1F8] text-[#0A3052] font-semibold shadow-xs'
-                  : 'text-[#3E576F] hover:bg-[#EFE9DC] hover:text-[#0E2A47]'
+                  ? 'bg-[#153A5B] text-white shadow-xs'
+                  : 'text-[#91A1AF] hover:bg-[#102A46] hover:text-white'
               } ${collapsed ? 'justify-center px-2' : ''}`}
               title={collapsed ? item.name : undefined}
             >
+              {/* Cyan Active Indicator on Midnight Navy */}
               {isActive && (
-                <span className="absolute left-0 top-2 bottom-2 w-1 bg-[#1E5685] rounded-r-full" />
+                <span className="absolute left-0 top-2 bottom-2 w-1 bg-[#13BFD3] rounded-r-full shadow-[0_0_8px_#13BFD3]" />
               )}
+
               <div className="flex-shrink-0">{item.icon(isActive)}</div>
 
               {!collapsed && (
                 <div className="flex-1 flex items-center justify-between min-w-0">
-                  <span className="truncate">{item.name}</span>
+                  <span className="truncate font-body">{item.name}</span>
                   {item.badge && (
                     <span
                       className={`ml-2 px-1.5 py-0.5 rounded text-[9px] font-mono tracking-wider ${
                         isActive
-                          ? 'bg-[#D2E4F2] text-[#0B3A65] font-semibold'
-                          : 'bg-[#E8E2D5] text-[#556E84]'
+                          ? 'bg-[#102A46] text-[#13BFD3] border border-[#13BFD3]/30 font-bold'
+                          : 'bg-[#091728] text-[#91A1AF]'
                       }`}
                     >
                       {item.badge}
@@ -204,50 +207,48 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Workspace System & Exit Panel */}
-      <div className="p-3 border-t border-[#E2DBD0] bg-[#F5F1E6] space-y-2">
-        {!collapsed ? (
-          <>
-            <div className="p-2.5 rounded-xl bg-white border border-[#E0D7C9] shadow-xs">
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="flex items-center gap-1.5 text-[11px] font-medium text-[#1E3A5F]">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  Twin Telemetry
-                </span>
-                <span className="font-mono text-[10px] text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded font-semibold">
-                  LIVE
-                </span>
-              </div>
-              <p className="font-mono text-[10px] text-[#59738A] leading-tight">
-                Benthic Sensors: 1,248 CLS Nodes Syncing
-              </p>
-            </div>
-
-            <Link
-              href="/"
-              className="flex items-center justify-center gap-2 w-full py-2 px-3 rounded-xl border border-[#D5CCBC] bg-[#FAF7F2] text-[#3A536B] hover:text-[#0E2A47] hover:bg-white text-xs font-semibold transition-all shadow-2xs"
-            >
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="19" y1="12" x2="5" y2="12" />
-                <polyline points="12 19 5 12 12 5" />
-              </svg>
-              <span>Exit to Landing</span>
-            </Link>
-          </>
-        ) : (
-          <Link
-            href="/"
-            className="flex items-center justify-center p-2 rounded-xl text-[#4A647D] hover:bg-white transition-colors"
-            title="Exit to Landing"
+      {/* Footer Controls / Expand Toggle */}
+      <div className="p-2.5 border-t border-[#102A46] bg-[#091728] space-y-1.5">
+        {/* Expand / Collapse Button when Collapsed */}
+        {collapsed ? (
+          <button
+            onClick={() => setCollapsed(false)}
+            className="w-full flex items-center justify-center p-2 rounded-xl text-[#91A1AF] hover:text-[#13BFD3] hover:bg-[#102A46] transition-colors"
+            title="Expand Navigation (Detailed)"
+            aria-label="Expand sidebar"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="19" y1="12" x2="5" y2="12" />
-              <polyline points="12 19 5 12 12 5" />
+              <polyline points="9 18 15 12 9 6" />
             </svg>
-          </Link>
+          </button>
+        ) : (
+          <button
+            onClick={() => setCollapsed(true)}
+            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-[#91A1AF] hover:text-white hover:bg-[#102A46] text-xs font-mono transition-colors"
+            title="Compact Navigation"
+          >
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+            <span>Collapse Navigation</span>
+          </button>
         )}
+
+        {/* Exit Link */}
+        <Link
+          href="/"
+          className={`flex items-center rounded-xl text-[#91A1AF] hover:text-white hover:bg-[#102A46] text-xs font-body transition-colors ${
+            collapsed ? 'justify-center p-2' : 'gap-2 px-3 py-2'
+          }`}
+          title="Exit to Landing"
+        >
+          <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="19" y1="12" x2="5" y2="12" />
+            <polyline points="12 19 5 12 12 5" />
+          </svg>
+          {!collapsed && <span>Exit to Landing</span>}
+        </Link>
       </div>
     </aside>
   );
 }
-

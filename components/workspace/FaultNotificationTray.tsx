@@ -114,9 +114,13 @@ export function FaultNotificationTray({ isSlideOver = false, onClose }: FaultNot
             </div>
             <button
               onClick={dismissConfirmedNotification}
-              className="text-emerald-700 hover:text-emerald-950 text-xs font-mono font-bold"
+              className="text-emerald-700 hover:text-emerald-950 p-1 rounded-md hover:bg-emerald-100 transition-colors"
+              aria-label="Dismiss notification"
             >
-              ✕
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
             </button>
           </div>
           <p className="font-body text-emerald-800 text-[11px] leading-relaxed">
@@ -126,23 +130,35 @@ export function FaultNotificationTray({ isSlideOver = false, onClose }: FaultNot
             <Link
               href="/workspace/digital-twin"
               onClick={() => onClose && onClose()}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-mono text-[11px] font-bold shadow-xs transition-all"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-mono text-[11px] font-bold shadow-xs transition-all"
             >
-              <span>Underwater Digital Twin →</span>
+              <span>Underwater Digital Twin</span>
+              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
             </Link>
             <Link
               href="/workspace/operations"
               onClick={() => onClose && onClose()}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white border border-emerald-300 hover:bg-emerald-100 text-emerald-900 font-mono text-[11px] font-bold shadow-xs transition-all"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-emerald-300 hover:bg-emerald-100 text-emerald-900 font-mono text-[11px] font-bold shadow-xs transition-all"
             >
-              <span>Operations & Simulation →</span>
+              <span>Operations & Simulation</span>
+              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
             </Link>
             <Link
               href="/workspace/war-room"
               onClick={() => onClose && onClose()}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white border border-emerald-300 hover:bg-emerald-100 text-emerald-900 font-mono text-[11px] font-bold shadow-xs transition-all"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-emerald-300 hover:bg-emerald-100 text-emerald-900 font-mono text-[11px] font-bold shadow-xs transition-all"
             >
-              <span>Recovery War Room →</span>
+              <span>Recovery War Room</span>
+              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
             </Link>
           </div>
         </div>
@@ -261,15 +277,22 @@ export function FaultNotificationTray({ isSlideOver = false, onClose }: FaultNot
                 {isApproved && (
                   <div className="mt-3 pt-2.5 border-t border-emerald-200 flex flex-wrap items-center justify-between gap-2 text-xs">
                     <span className="font-mono text-[11px] font-bold text-emerald-800 flex items-center gap-1.5">
-                      ✓ Confirmed as Active Canonical Fault
+                      <svg className="w-3.5 h-3.5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                      <span>Confirmed as Active Canonical Fault</span>
                     </span>
                     <div className="flex items-center gap-2">
                       <Link
                         href="/workspace/digital-twin"
                         onClick={() => onClose && onClose()}
-                        className="font-mono text-[11px] text-emerald-800 font-bold hover:underline"
+                        className="font-mono text-[11px] text-emerald-800 font-bold hover:underline flex items-center gap-1"
                       >
-                        Proceed to Digital Twin →
+                        <span>Proceed to Digital Twin</span>
+                        <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <line x1="5" y1="12" x2="19" y2="12" />
+                          <polyline points="12 5 19 12 12 19" />
+                        </svg>
                       </Link>
                     </div>
                   </div>
@@ -277,12 +300,16 @@ export function FaultNotificationTray({ isSlideOver = false, onClose }: FaultNot
 
                 {isDeclined && (
                   <div className="mt-3 pt-2 border-t border-[#E8E1D5] flex items-center justify-between text-xs">
-                    <span className="font-mono text-[10px] text-[#7A8E9F]">
-                      ✕ Alert Dismissed as Sensor Calibration Noise
+                    <span className="font-mono text-[10px] text-[#7A8E9F] flex items-center gap-1.5">
+                      <svg className="w-3 h-3 text-[#91A1AF]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
+                      <span>Alert Dismissed as Sensor Calibration Noise</span>
                     </span>
                     <button
                       onClick={() => approveFaultNotification(notif.id)}
-                      className="font-mono text-[10px] text-[#185382] hover:underline"
+                      className="font-mono text-[10px] text-[#1677B8] hover:underline"
                     >
                       Re-evaluate
                     </button>
@@ -296,3 +323,4 @@ export function FaultNotificationTray({ isSlideOver = false, onClose }: FaultNot
     </div>
   );
 }
+

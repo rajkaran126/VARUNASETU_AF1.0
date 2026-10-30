@@ -73,7 +73,7 @@ export default function DataInfrastructurePage() {
       };
 
       addDatasetRecord(newRecord);
-      setUploadStatus(`✓ Dataset "${newRecord.name}" successfully validated and registered into Digital Twin Enclave.`);
+      setUploadStatus(`Dataset "${newRecord.name}" successfully validated and registered into Digital Twin Enclave.`);
     }
   };
 
@@ -190,14 +190,17 @@ export default function DataInfrastructurePage() {
             <button
               onClick={handleValidateAndIngest}
               disabled={!selectedFile}
-              className="w-full py-2.5 px-4 rounded-xl bg-[#0E2A47] hover:bg-[#153B5B] disabled:opacity-40 text-white text-xs font-semibold font-mono tracking-wider shadow-xs transition-all"
+              className="btn-primary w-full py-2.5 disabled:opacity-40 font-mono tracking-wider"
             >
               VALIDATE & INGEST INTO TWIN REGISTRY
             </button>
 
             {uploadStatus && (
-              <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs font-mono">
-                {uploadStatus}
+              <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs font-mono flex items-center gap-2">
+                <svg className="w-4 h-4 text-emerald-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                <span>{uploadStatus}</span>
               </div>
             )}
           </div>
@@ -231,10 +234,21 @@ export default function DataInfrastructurePage() {
                   </p>
                   <ul className="space-y-1 font-mono text-[10px] text-emerald-800">
                     {validationReport.warnings.map((w, idx) => (
-                      <li key={idx}>✓ {w}</li>
+                      <li key={idx} className="flex items-center gap-1.5">
+                        <svg className="w-3 h-3 text-emerald-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                        <span>{w}</span>
+                      </li>
                     ))}
                     {validationReport.errors.map((err, idx) => (
-                      <li key={idx} className="text-rose-700">✕ {err}</li>
+                      <li key={idx} className="flex items-center gap-1.5 text-rose-700">
+                        <svg className="w-3 h-3 text-rose-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <line x1="18" y1="6" x2="6" y2="18" />
+                          <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                        <span>{err}</span>
+                      </li>
                     ))}
                   </ul>
                 </div>
@@ -314,7 +328,12 @@ export default function DataInfrastructurePage() {
                   </td>
 
                   <td className="py-3 px-3 font-mono text-emerald-700 font-bold">
-                    ✓ {ds.validationStatus}
+                    <span className="flex items-center gap-1.5">
+                      <svg className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                      <span>{ds.validationStatus}</span>
+                    </span>
                   </td>
 
                   <td className="py-3 px-3 font-mono text-[10px] text-[#69829A]">

@@ -177,7 +177,7 @@ export default function NetworkOperationsPage() {
             </div>
             <button
               type="submit"
-              className="px-4 py-1.5 rounded-xl bg-[#0E2A47] hover:bg-[#153B5B] text-white text-xs font-semibold shadow-xs transition-all active:scale-95"
+              className="btn-primary"
             >
               Run Model
             </button>
@@ -310,9 +310,18 @@ export default function NetworkOperationsPage() {
             <button
               type="button"
               onClick={handleSaveSnapshot}
-              className="px-3 py-1.5 rounded-lg border border-[#D5CCBC] bg-white hover:bg-[#FAF7F1] text-xs font-semibold text-[#153B5B] whitespace-nowrap shadow-2xs"
+              className="btn-outline text-xs whitespace-nowrap"
             >
-              {snapshotSaved ? '✓ Saved!' : 'Save Snapshot'}
+              {snapshotSaved ? (
+                <span className="flex items-center gap-1.5 text-emerald-700">
+                  <svg className="w-3.5 h-3.5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  <span>Saved</span>
+                </span>
+              ) : (
+                'Save Snapshot'
+              )}
             </button>
           </div>
         </form>

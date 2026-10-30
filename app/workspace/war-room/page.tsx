@@ -163,11 +163,20 @@ export default function RecoveryWarRoomPage() {
                     }}
                     className={`w-full py-2 px-3 rounded-xl text-xs font-semibold font-mono tracking-wider transition-all ${
                       isSelected
-                        ? 'bg-[#0E2A47] text-white shadow-xs'
-                        : 'border border-[#D5CCBC] bg-[#FAF7F2] text-[#3A536B] hover:bg-white'
+                        ? 'bg-[#0B1D33] text-white shadow-xs'
+                        : 'border border-[#CBDDEB] bg-[#EDF3F7] text-[#152D46] hover:bg-white'
                     }`}
                   >
-                    {isSelected ? '✓ STRATEGY COMMITTED' : 'SELECT STRATEGY'}
+                    {isSelected ? (
+                      <span className="flex items-center justify-center gap-1.5 text-white">
+                        <svg className="w-3.5 h-3.5 text-[#13BFD3]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                        <span>STRATEGY COMMITTED</span>
+                      </span>
+                    ) : (
+                      'SELECT STRATEGY'
+                    )}
                   </button>
                 </div>
               </div>
@@ -269,10 +278,19 @@ export default function RecoveryWarRoomPage() {
                         className={`px-3 py-1.5 rounded-lg font-mono text-[11px] font-bold transition-all shadow-2xs ${
                           isMobilized
                             ? 'bg-emerald-600 text-white'
-                            : 'bg-[#0E2A47] hover:bg-[#153B5B] text-white'
+                            : 'btn-primary'
                         }`}
                       >
-                        {isMobilized ? '✓ MOBILIZED' : 'DISPATCH'}
+                        {isMobilized ? (
+                          <span className="flex items-center gap-1.5">
+                            <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                            <span>MOBILIZED</span>
+                          </span>
+                        ) : (
+                          'DISPATCH'
+                        )}
                       </button>
                     </td>
                   </tr>
@@ -284,7 +302,7 @@ export default function RecoveryWarRoomPage() {
 
         {orderConfirmed && (
           <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs font-mono flex items-center gap-2">
-            <svg className="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg className="w-4 h-4 text-emerald-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="20 6 9 17 4 12" />
             </svg>
             <span>
@@ -295,8 +313,12 @@ export default function RecoveryWarRoomPage() {
 
         <div className="p-3 rounded-lg bg-[#FAF7F2] border border-[#E8E1D5] text-[11px] text-[#5A738A] font-mono flex items-center justify-between">
           <span>* Transit times calculated via Haversine great-circle at designated cruising speed with Suez Canal maritime scheduling.</span>
-          <Link href="/workspace/mission-control" className="text-[#185382] font-bold hover:underline">
-            Brief Agents in Mission Control →
+          <Link href="/workspace/mission-control" className="inline-flex items-center gap-1 text-[#1677B8] font-bold hover:underline">
+            <span>Brief Agents in Mission Control</span>
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
           </Link>
         </div>
       </div>

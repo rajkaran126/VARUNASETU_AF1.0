@@ -67,13 +67,13 @@ export default function MissionControlPage() {
         <div className="flex items-center gap-2">
           <button
             onClick={resetAgentChat}
-            className="px-3 py-1.5 rounded-xl border border-[#D5CCBC] bg-white hover:bg-[#FAF7F1] text-xs font-semibold text-[#153B5B] shadow-2xs transition-all"
+            className="btn-outline text-xs"
           >
             Reset Thread
           </button>
           <button
             onClick={() => setRightDrawerOpen(!rightDrawerOpen)}
-            className="px-3 py-1.5 rounded-xl bg-[#0E2A47] hover:bg-[#153B5B] text-white text-xs font-semibold shadow-2xs transition-all"
+            className="btn-secondary text-xs"
           >
             {rightDrawerOpen ? 'Hide Dossier' : 'Show Dossier'}
           </button>
@@ -234,9 +234,12 @@ export default function MissionControlPage() {
                           <button
                             key={act.actionId}
                             onClick={() => sendAgentQuery(act.label)}
-                            className="px-2.5 py-1 rounded-lg bg-white hover:bg-[#F2ECE1] border border-[#DDD3C3] font-mono text-[10px] text-[#153B5B] font-semibold transition-colors"
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white hover:bg-[#F2ECE1] border border-[#CBDDEB] font-mono text-[10px] text-[#152D46] font-semibold transition-colors shadow-2xs"
                           >
-                            ⚡ {act.label}
+                            <svg className="w-3 h-3 text-[#1677B8]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                            </svg>
+                            <span>{act.label}</span>
                           </button>
                         ))}
                       </div>

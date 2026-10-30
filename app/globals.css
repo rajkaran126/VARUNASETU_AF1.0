@@ -206,6 +206,129 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
 
+  /* Global Workspace Button System */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.75rem;
+    background-color: #1677B8;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: all 0.15s ease;
+    cursor: pointer;
+  }
+  .btn-primary:hover {
+    background-color: #075B91;
+  }
+  .btn-primary:active {
+    transform: scale(0.98);
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.75rem;
+    background-color: #EDF3F7;
+    border: 1px solid #CBDDEB;
+    color: #152D46;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: all 0.15s ease;
+    cursor: pointer;
+  }
+  .btn-secondary:hover {
+    background-color: #E2EBF2;
+  }
+  .btn-secondary:active {
+    transform: scale(0.98);
+  }
+
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.75rem;
+    background-color: #ffffff;
+    border: 1px solid #D5CCBC;
+    color: #152D46;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: all 0.15s ease;
+    cursor: pointer;
+  }
+  .btn-outline:hover {
+    background-color: #F7F8F5;
+  }
+  .btn-outline:active {
+    transform: scale(0.98);
+  }
+
+  .btn-destructive {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.75rem;
+    background-color: #FFF1F2;
+    border: 1px solid #FECDD3;
+    color: #9F1239;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: all 0.15s ease;
+    cursor: pointer;
+  }
+  .btn-destructive:hover {
+    background-color: #FFE4E6;
+  }
+
+  .btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.75rem;
+    border: 1px solid #D5CCBC;
+    background-color: #ffffff;
+    color: #152D46;
+    transition: all 0.15s ease;
+    cursor: pointer;
+  }
+  .btn-icon:hover {
+    background-color: #F7F8F5;
+  }
+
+  .card-surface {
+    background-color: #ffffff;
+    border-radius: 1rem;
+    border: 1px solid #E2DBD0;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  }
+
+  .badge-cyan {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.375rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    font-weight: 700;
+    background-color: #DDF8FA;
+    color: #0E8B99;
+    border: 1px solid rgba(19, 191, 211, 0.35);
+  }
+
   /* Pure crisp white button */
   .btn-pure-white {
     background: #ffffff;

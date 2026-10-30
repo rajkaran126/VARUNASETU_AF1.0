@@ -159,7 +159,7 @@ export function CableDetailCard({ cable }: CableDetailCardProps) {
           <Link
             href="/workspace/operations"
             onClick={handleInjectFault}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0E2A47] hover:bg-[#153B5B] text-white text-xs font-semibold shadow-xs transition-all"
+            className="btn-primary"
           >
             <span>Simulate Disruption</span>
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -169,7 +169,7 @@ export function CableDetailCard({ cable }: CableDetailCardProps) {
 
           <Link
             href="/workspace/war-room"
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[#D5CCBC] bg-white hover:bg-[#FAF7F1] text-[#153B5B] text-xs font-semibold shadow-xs transition-all"
+            className="btn-secondary"
           >
             <span>Recovery War Room</span>
           </Link>

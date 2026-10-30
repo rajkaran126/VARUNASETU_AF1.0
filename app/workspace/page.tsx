@@ -62,14 +62,14 @@ export default function NetworkOverviewPage() {
                 : 'bg-white border-[#E0D7C9] text-[#0E2A47] hover:bg-[#FAF7F2]'
             }`}
           >
-            <span className={`w-2 h-2 rounded-full ${pendingNotificationsCount > 0 ? 'bg-rose-500 animate-ping' : 'bg-[#185382]'}`} />
+            <span className={`w-2 h-2 rounded-full ${pendingNotificationsCount > 0 ? 'bg-rose-500 animate-ping' : 'bg-[#1677B8]'}`} />
             <span>Fault Notifications:</span>
-            <strong className={pendingNotificationsCount > 0 ? 'text-rose-700' : 'text-[#0E2A47]'}>
+            <strong className={pendingNotificationsCount > 0 ? 'text-rose-700' : 'text-[#152D46]'}>
               {pendingNotificationsCount > 0 ? `${pendingNotificationsCount} PENDING` : 'All Clear'}
             </strong>
-            <span className="font-mono text-[10px] text-[#7A8E9F]">
-              {showNotificationSection ? '▲' : '▼'}
-            </span>
+            <svg className={`w-3.5 h-3.5 text-[#60758A] transition-transform ${showNotificationSection ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
           </button>
 
           <div className="px-3 py-1.5 rounded-xl bg-white border border-[#E0D7C9] font-mono text-xs shadow-2xs flex items-center gap-2">
@@ -144,8 +144,8 @@ export default function NetworkOverviewPage() {
                 onClick={() => setSelectedStatus(st)}
                 className={`px-2.5 py-1 rounded-lg text-[10px] font-mono uppercase tracking-wider transition-all ${
                   selectedStatus === st
-                    ? 'bg-[#0E2A47] text-white font-bold'
-                    : 'bg-[#F2ECE1] text-[#4A647D] hover:bg-[#EAE2D4]'
+                    ? 'bg-[#1677B8] text-white font-bold shadow-2xs'
+                    : 'bg-[#EDF3F7] text-[#152D46] hover:bg-[#E2EBF2]'
                 }`}
               >
                 {st}

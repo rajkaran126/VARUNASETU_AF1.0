@@ -16,20 +16,23 @@ export default function WorkspaceLayout({
   return (
     <WorkspaceProvider>
       {/* 
-        Solid light-theme backdrop ensuring the landing page's background video
-        does not bleed through into the light workspace environment.
+        Refined Workspace Shell:
+        - Midnight Navy Sidebar (#0B1D33)
+        - Clean Light Header (Strictly minimal: Notifications, Date/Time, User Profile)
+        - Warm Ivory & Soft Cream Base (#F7F8F5) with Pale Blue-Grey surfaces
+        - Strictly NO footers inside any workspace section
       */}
-      <div className="fixed inset-0 z-30 bg-[#FBF9F4] text-[#0E2A47] font-body flex overflow-hidden">
-        {/* Workspace Sidebar (7 agreed sections) */}
+      <div className="fixed inset-0 z-30 bg-[#F7F8F5] text-[#152D46] font-body flex overflow-hidden">
+        {/* Workspace Sidebar (Compact Icon Navigation by default) */}
         <Sidebar />
 
-        {/* Main Content Workspace Column */}
-        <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden bg-[#FAF7F1]">
-          {/* Workspace Global Header */}
+        {/* Main Content Column */}
+        <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden bg-[#F7F8F5]">
+          {/* Strictly Minimal Header */}
           <Header />
 
-          {/* Section Main Viewport Area (Strictly NO footer in workspace) */}
-          <main className="flex-1 overflow-y-auto px-6 py-6 lg:px-8 bg-[#FAF7F1]">
+          {/* Section Main Viewport Area */}
+          <main className="flex-1 overflow-y-auto px-6 py-6 lg:px-8 bg-[#F7F8F5]">
             <div className="max-w-[1600px] mx-auto pb-12">
               {children}
             </div>
@@ -39,4 +42,3 @@ export default function WorkspaceLayout({
     </WorkspaceProvider>
   );
 }
-

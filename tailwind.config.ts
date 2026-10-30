@@ -6,6 +6,55 @@ module.exports = {
   ],
   theme: {
     extend: {
+      colors: {
+        // Navigation (Midnight Navy System)
+        navy: {
+          midnight: "#0B1D33",
+          deep: "#102A46",
+          surface: "#153A5B",
+          light: "#1C4A73",
+        },
+        // Primary Interaction (Ocean Blue & Cyan)
+        ocean: {
+          DEFAULT: "#1677B8",
+          deep: "#075B91",
+          light: "#E8F3FA",
+        },
+        cyan: {
+          DEFAULT: "#13BFD3",
+          light: "#DDF8FA",
+          dark: "#0E8B99",
+        },
+        // Workspace Surfaces & Backgrounds
+        ivory: {
+          warm: "#F7F8F5",
+          soft: "#F1F4F2",
+          DEFAULT: "#F7F8F5",
+        },
+        surface: {
+          white: "#FFFFFF",
+          pale: "#EDF3F7",
+          card: "#FFFFFF",
+          subtle: "#FAFBF9",
+          border: "#E2DBD0",
+          "border-light": "#E9F0F5",
+        },
+        // Text
+        text: {
+          primary: "#152D46",
+          secondary: "#60758A",
+          muted: "#91A1AF",
+          onNavy: "#F5FAFF",
+        },
+        // Semantic Status
+        status: {
+          active: "#0D9488",
+          warning: "#D97706",
+          critical: "#DC2626",
+          unknown: "#6B7280",
+          info: "#1677B8",
+        },
+      },
       fontFamily: {
         display: [
           "'Space Grotesk'",
