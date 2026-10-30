@@ -129,24 +129,88 @@ precision highp float;
 uniform vec2 uViewport;
 uniform float uR;
 uniform float uMorph;
+uniform float uTime;
 out vec4 fragColor;
-float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-void main() {
-  vec2 px = gl_FragCoord.xy;
-  vec3 col = mix(vec3(0.014, 0.02, 0.045), vec3(0.035, 0.055, 0.11), px.y / uViewport.y);
-  vec2 cell = floor(px / 2.0);
-  float h = hash(cell);
-  if (h > 0.9982) {
-    float b = hash(cell + 43.0);
-    col += vec3(b * 0.55 + 0.35);
+
+float hash(vec2 p) {
+  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+}
+
+float noise(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(
+    mix(hash(i + vec2(0.0, 0.0)), hash(i + vec2(1.0, 0.0)), u.x),
+    mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x),
+    u.y
+  );
+}
+
+float fbm(vec2 p) {
+  float v = 0.0;
+  float a = 0.5;
+  mat2 rot = mat2(0.8, -0.6, 0.6, 0.8);
+  for (int i = 0; i < 4; i++) {
+    v += a * noise(p);
+    p = rot * p * 2.0 + vec2(100.0);
+    a *= 0.5;
   }
+  return v;
+}
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / uViewport;
+  vec2 p = (gl_FragCoord.xy - uViewport * 0.5) / min(uViewport.x, uViewport.y);
+
+  // Deep space 3D cosmic background with dark indigo gradients
+  vec3 col = mix(vec3(0.004, 0.007, 0.016), vec3(0.012, 0.018, 0.038), uv.y);
+
+  // Milky Way Galactic Dust Lane & Cosmic Nebulae
+  float mwBand = exp(-pow(p.x * 0.6 + p.y * 0.8, 2.0) * 4.0);
+  float neb = fbm(p * 2.2 + vec2(1.5, 3.2));
+  vec3 nebCol = mix(vec3(0.04, 0.06, 0.16), vec3(0.02, 0.10, 0.16), neb);
+  col += nebCol * mwBand * 0.5;
+
+  // Star Layer 1: Distant twinkling micro stars
+  vec2 cell1 = floor(gl_FragCoord.xy / 2.5);
+  float h1 = hash(cell1);
+  if (h1 > 0.9962) {
+    float b1 = hash(cell1 + 71.0);
+    float twinkle = sin(uTime * 2.5 + b1 * 6.28) * 0.35 + 0.65;
+    vec3 starTint = mix(vec3(0.7, 0.85, 1.0), vec3(1.0, 0.95, 0.8), hash(cell1 + 13.0));
+    col += starTint * (b1 * 0.65 + 0.35) * twinkle;
+  }
+
+  // Star Layer 2: Navigational bright stars with soft flare
+  vec2 cell2 = floor(gl_FragCoord.xy / 14.0);
+  float h2 = hash(cell2 + 91.0);
+  if (h2 > 0.993) {
+    vec2 starCenter = (cell2 + 0.5) * 14.0;
+    float dist = length(gl_FragCoord.xy - starCenter);
+    float starGlow = exp(-dist * 0.65) * 1.35;
+    vec3 starCol = mix(vec3(0.85, 0.95, 1.0), vec3(1.0, 0.88, 0.6), hash(cell2 + 55.0));
+    col += starCol * starGlow;
+  }
+
+  // 3D Atmospheric Rayleigh Limb Glow around Earth Sphere
   if (uMorph > 0.01) {
-    vec2 c = px - uViewport * 0.5;
+    vec2 c = gl_FragCoord.xy - uViewport * 0.5;
     float d = length(c);
     float edge = d - uR;
-    float glow = exp(-max(edge, 0.0) / (uR * 0.18)) * uMorph;
-    col += vec3(0.25, 0.55, 0.85) * (glow * 0.45);
+
+    // Atmospheric halo corona
+    float atmoGlow = exp(-max(edge, 0.0) / (uR * 0.14)) * uMorph;
+    vec3 atmoCol = vec3(0.16, 0.55, 0.95);
+
+    // Sunlit horizon limb illumination
+    vec2 sunDir = normalize(vec2(0.65, 0.75));
+    float sunFacing = dot(normalize(c), sunDir) * 0.5 + 0.5;
+    atmoCol += vec3(0.35, 0.45, 0.55) * pow(sunFacing, 3.5);
+
+    col += atmoCol * (atmoGlow * 0.7);
   }
+
   fragColor = vec4(col, 1.0);
 }`;
 
@@ -491,6 +555,7 @@ export const ContourlinesGlobe = forwardRef<ContourlinesGlobeHandle, Contourline
       gl.uniform2f(bgProg.u.uViewport, v.viewportWidth, v.viewportHeight);
       gl.uniform1f(bgProg.u.uR, v.scale * DEG_R);
       gl.uniform1f(bgProg.u.uMorph, v.morph);
+      if (bgProg.u.uTime) gl.uniform1f(bgProg.u.uTime, performance.now() * 0.001);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
 
       // Render Earth Topo Mesh
