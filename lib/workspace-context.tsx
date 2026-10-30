@@ -23,20 +23,9 @@ import {
   INITIAL_DATASETS,
   DETERMINED_REROUTE_PLANS
 } from './cable-data';
-import {
-  REAL_CABLE_ROUTES,
-  REAL_FAULT_INCIDENTS,
-} from './cable-data-real';
 import { runNetworkSimulation } from './simulation-engine';
-
-// Merge: real registry (692) + curated simulation cables (10).
-// Dedup by id — VERIFIED_CABLE_ROUTES take precedence for simulation fidelity.
-const REAL_ID_SET = new Set(REAL_CABLE_ROUTES.map(c => c.id));
-const CURATED_ONLY = VERIFIED_CABLE_ROUTES.filter(c => !REAL_ID_SET.has(c.id));
-export const ALL_CABLE_ROUTES: CableRoute[] = [...REAL_CABLE_ROUTES, ...CURATED_ONLY];
-
-// Real incidents + simulation incidents merged (real first)
-export const ALL_FAULT_INCIDENTS: FaultIncident[] = [...REAL_FAULT_INCIDENTS, ...ACTIVE_FAULT_INCIDENTS];
+import { ALL_CABLE_ROUTES, ALL_FAULT_INCIDENTS } from './cable-registry';
+export { ALL_CABLE_ROUTES, ALL_FAULT_INCIDENTS };
 
 interface WorkspaceContextType {
   // Canonical Cable & Fault State
@@ -480,12 +469,12 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     setSnapshots(prev => [snap, ...prev]);
   };
 
-  const sendAgentQuery = (promptText: string) => {
+  const sendAgentQuery = async (promptText: string) => {
     if (!promptText.trim()) return;
 
     // 1. Add User Message
     const userMsg: AgentMessage = {
-      id: `usr-${Date.now()}`,
+      id: 'usr-' + Date.now(),
       sender: 'user',
       agentName: 'Commander / Operator',
       agentRole: 'Chief Orchestrator',
@@ -495,98 +484,121 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     setAgentMessages(prev => [...prev, userMsg]);
     setIsAgentThinking(true);
 
-    // 2. Deterministic Agent Response Synthesis
-    setTimeout(() => {
-      const lower = promptText.toLowerCase();
-      let responseMsg: AgentMessage;
+    try {
+      const res = await fetch('/api/ai/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: promptText,
+          activeSimulation: simulationResult
+        })
+      });
 
-      if (lower.includes('vessel') || lower.includes('dispatch') || lower.includes('ship') || lower.includes('fleet')) {
-        responseMsg = {
-          id: `agt-${Date.now()}`,
-          sender: 'logistics_repair',
-          agentName: 'Logistics & Repair Agent',
-          agentRole: 'Logistics & Repair Agent',
-          content: `Logistics assessment complete for fault coordinates Lat: ${activeFault.lat}°N, Lon: ${activeFault.lon}°E (Depth: ${activeFault.depthMeters}m).\n\nNearest qualified DP2 vessel is **${repairFleet[4].name}** currently stationed at Port Said (${repairFleet[4].currentPort}). Transit distance is 1,280 nautical miles through Suez. At cruising speed of 15.2 knots, estimated ETA on station is **38.4 hours**. Universal jointing containers and Hector 6000 ROV are verified operational.`,
-          timestamp: new Date().toISOString(),
-          reasoningChain: [
-            'Scanned AIS status and geographic positions of 5 registered consortium cable ships.',
-            'Filtered by DP2 dynamic positioning and benthic ROV depth capability (>4,000m).',
-            'Calculated great-circle nautical distance and canal transit scheduling.',
-            'Confirmed universal joint stock levels at Port Said logistics base.'
-          ],
-          metrics: [
-            { label: 'Assigned Vessel', value: repairFleet[4].name },
-            { label: 'Transit ETA', value: '38.4 hrs' },
-            { label: 'ROV Rating', value: '6,500m' },
-            { label: 'Confidence', value: '98.5%' }
-          ],
-          suggestedActions: [
-            { label: 'Confirm Mobilization Order to Port Said', actionId: 'confirm-vessel-mob' },
-            { label: 'Calculate Weather Window & Wave State', actionId: 'calc-weather' }
-          ]
-        };
-      } else if (lower.includes('blast') || lower.includes('reroute') || lower.includes('capacity') || lower.includes('latency')) {
-        responseMsg = {
-          id: `agt-${Date.now()}`,
-          sender: 'network_analyst',
-          agentName: 'Network Analyst',
-          agentRole: 'Network Analyst',
-          content: `Simulation Kernel evaluated deterministic blast radius for **${selectedCable.name}**.\n\n- Baseline latency across corridor: **${simulationResult.baselineLatencyMs} ms**.\n- Post-rupture latency via AAE-1 & 2Africa: **${simulationResult.impactedLatencyMs} ms** (+${simulationResult.latencyDeltaMs} ms delta).\n- Unserved demand: **${simulationResult.unservedDemandTbps} Tbps** of ${simulationResult.totalOfferedDemandTbps} Tbps total demand.\n- Recommendation: Prioritize optical grooming at Fujairah CLS to relieve downstream transit nodes.`,
-          timestamp: new Date().toISOString(),
-          reasoningChain: [
-            'Parsed topology adjacency graph across Euro-Asia and Transpacific trunks.',
-            'Executed deterministic capacity flow model with 92% link headroom threshold.',
-            'Detected latency inflation on secondary carrier paths due to 4,200km route detour.',
-            'Verified BGP multi-exit discriminator (MED) policies with tier-1 peers.'
-          ],
-          metrics: [
-            { label: 'Latency Delta', value: `+${simulationResult.latencyDeltaMs} ms` },
-            { label: 'Served Demand', value: `${simulationResult.servedDemandTbps} Tbps` },
-            { label: 'Utilization', value: `${simulationResult.capacityUtilizationPct}%` }
-          ],
-          suggestedActions: [
-            { label: 'Apply Strategy Alpha (Optical Reroute)', actionId: 'apply-strat-alpha' },
-            { label: 'Export Telemetry Report (CSV)', actionId: 'export-csv' }
-          ]
-        };
-      } else if (lower.includes('risk') || lower.includes('geopolitical') || lower.includes('hazard')) {
-        responseMsg = {
-          id: `agt-${Date.now()}`,
-          sender: 'risk_scenario',
-          agentName: 'Risk & Scenario Agent',
-          agentRole: 'Risk & Scenario Agent',
-          content: `Risk analysis evaluates Bab el-Mandeb and Suez as **Critical Vulnerability Tier-1** due to corridor density (16 subsea cables traversing a 26km maritime passage). Secondary risk of anchor drag by commercial bulk carriers remains elevated due to regional navigational warnings. Recommend enforcing 5 nautical mile exclusion zones around active repair coordinates.`,
-          timestamp: new Date().toISOString(),
-          reasoningChain: [
-            'Queried global AIS vessel traffic density in shallow choke straits.',
-            'Computed redundancy coefficient: 3 surviving carriers have <15% remaining capacity headroom.',
-            'Assessed risk of cascading congestion if secondary cable faults occur within 72 hours.'
-          ],
-          metrics: [
-            { label: 'Chokepoint Risk', value: 'High (0.88)' },
-            { label: 'Corridor Redundancy', value: '2.1 Cables' },
-            { label: 'Cascade Risk', value: '34%' }
-          ]
-        };
-      } else {
-        responseMsg = {
-          id: `agt-${Date.now()}`,
-          sender: 'orchestrator',
-          agentName: 'Chief Orchestrator',
-          agentRole: 'Chief Orchestrator',
-          content: `Multi-agent consensus synthesized for query: "${promptText}".\n\nAll 5 specialist agents (Network, Risk, Logistics, Policy, Orchestrator) are synchronized with the active digital twin kernel. Current canonical target is **${selectedCable.name}** at fault location **${activeFault.nearestLandingStation}**.\n\nYou can inspect specific recommendations in the Recovery War Room or trigger a deterministic scenario run.`,
-          timestamp: new Date().toISOString(),
-          reasoningChain: [
-            'Cross-referenced operator prompt with canonical state context.',
-            'Verified data provenance: Active telemetry is classified as Observed.',
-            'Confirmed consensus convergence across specialist agents.'
-          ]
-        };
+      if (!res.ok) {
+        throw new Error('AI inference HTTP ' + res.status);
       }
 
-      setAgentMessages(prev => [...prev, responseMsg]);
-      setIsAgentThinking(false);
-    }, 700);
+      const data = await res.json();
+      if (Array.isArray(data.messages) && data.messages.length > 0) {
+        setAgentMessages(prev => [...prev, ...data.messages]);
+        setIsAgentThinking(false);
+        return;
+      }
+      throw new Error('No agent messages returned');
+    } catch (err) {
+      console.warn('[WorkspaceContext] Live AI API failed, utilizing deterministic fallback:', err);
+      setTimeout(() => {
+        const lower = promptText.toLowerCase();
+        let responseMsg: AgentMessage;
+
+        if (lower.includes('vessel') || lower.includes('dispatch') || lower.includes('ship') || lower.includes('fleet')) {
+          responseMsg = {
+            id: 'agt-' + Date.now(),
+            sender: 'logistics_repair',
+            agentName: 'Logistics & Repair Agent',
+            agentRole: 'Logistics & Repair Agent',
+            content: 'Logistics assessment complete for fault coordinates Lat: ' + activeFault.lat + '°N, Lon: ' + activeFault.lon + '°E (Depth: ' + activeFault.depthMeters + 'm).\n\nNearest qualified DP2 vessel is **' + repairFleet[4].name + '** currently stationed at Port Said (' + repairFleet[4].currentPort + '). Transit distance is 1,280 nautical miles through Suez. At cruising speed of 15.2 knots, estimated ETA on station is **38.4 hours**. Universal jointing containers and Hector 6000 ROV are verified operational.',
+            timestamp: new Date().toISOString(),
+            reasoningChain: [
+              'Scanned AIS status and geographic positions of 5 registered consortium cable ships.',
+              'Filtered by DP2 dynamic positioning and benthic ROV depth capability (>4,000m).',
+              'Calculated great-circle nautical distance and canal transit scheduling.',
+              'Confirmed universal joint stock levels at Port Said logistics base.'
+            ],
+            metrics: [
+              { label: 'Assigned Vessel', value: repairFleet[4].name },
+              { label: 'Transit ETA', value: '38.4 hrs' },
+              { label: 'ROV Rating', value: '6,500m' },
+              { label: 'Confidence', value: '98.5%' }
+            ],
+            suggestedActions: [
+              { label: 'Confirm Mobilization Order to Port Said', actionId: 'confirm-vessel-mob' },
+              { label: 'Calculate Weather Window & Wave State', actionId: 'calc-weather' }
+            ]
+          };
+        } else if (lower.includes('blast') || lower.includes('reroute') || lower.includes('capacity') || lower.includes('latency')) {
+          responseMsg = {
+            id: 'agt-' + Date.now(),
+            sender: 'network_analyst',
+            agentName: 'Network Analyst',
+            agentRole: 'Network Analyst',
+            content: 'Simulation Kernel evaluated deterministic blast radius for **' + selectedCable.name + '**.\n\n- Baseline latency across corridor: **' + simulationResult.baselineLatencyMs + ' ms**.\n- Post-rupture latency via AAE-1 & 2Africa: **' + simulationResult.impactedLatencyMs + ' ms** (+' + simulationResult.latencyDeltaMs + ' ms delta).\n- Unserved demand: **' + simulationResult.unservedDemandTbps + ' Tbps** of ' + simulationResult.totalOfferedDemandTbps + ' Tbps total demand.\n- Recommendation: Prioritize optical grooming at Fujairah CLS to relieve downstream transit nodes.',
+            timestamp: new Date().toISOString(),
+            reasoningChain: [
+              'Parsed topology adjacency graph across Euro-Asia and Transpacific trunks.',
+              'Executed deterministic capacity flow model with 92% link headroom threshold.',
+              'Detected latency inflation on secondary carrier paths due to 4,200km route detour.',
+              'Verified BGP multi-exit discriminator (MED) policies with tier-1 peers.'
+            ],
+            metrics: [
+              { label: 'Latency Delta', value: '+' + simulationResult.latencyDeltaMs + ' ms' },
+              { label: 'Served Demand', value: simulationResult.servedDemandTbps + ' Tbps' },
+              { label: 'Utilization', value: simulationResult.capacityUtilizationPct + '%' }
+            ],
+            suggestedActions: [
+              { label: 'Apply Strategy Alpha (Optical Reroute)', actionId: 'apply-strat-alpha' },
+              { label: 'Export Telemetry Report (CSV)', actionId: 'export-csv' }
+            ]
+          };
+        } else if (lower.includes('risk') || lower.includes('geopolitical') || lower.includes('hazard')) {
+          responseMsg = {
+            id: 'agt-' + Date.now(),
+            sender: 'risk_scenario',
+            agentName: 'Risk & Scenario Agent',
+            agentRole: 'Risk & Scenario Agent',
+            content: 'Risk analysis evaluates Bab el-Mandeb and Suez as **Critical Vulnerability Tier-1** due to corridor density (16 subsea cables traversing a 26km maritime passage). Secondary risk of anchor drag by commercial bulk carriers remains elevated due to regional navigational warnings. Recommend enforcing 5 nautical mile exclusion zones around active repair coordinates.',
+            timestamp: new Date().toISOString(),
+            reasoningChain: [
+              'Queried global AIS vessel traffic density in shallow choke straits.',
+              'Computed redundancy coefficient: 3 surviving carriers have <15% remaining capacity headroom.',
+              'Assessed risk of cascading congestion if secondary cable faults occur within 72 hours.'
+            ],
+            metrics: [
+              { label: 'Chokepoint Risk', value: 'High (0.88)' },
+              { label: 'Corridor Redundancy', value: '2.1 Cables' },
+              { label: 'Cascade Risk', value: '34%' }
+            ]
+          };
+        } else {
+          responseMsg = {
+            id: 'agt-' + Date.now(),
+            sender: 'orchestrator',
+            agentName: 'Chief Orchestrator',
+            agentRole: 'Chief Orchestrator',
+            content: 'Multi-agent consensus synthesized for query: "' + promptText + '".\n\nAll 5 specialist agents (Network, Risk, Logistics, Policy, Orchestrator) are synchronized with the active digital twin kernel. Current canonical target is **' + selectedCable.name + '** at fault location **' + activeFault.nearestLandingStation + '**.\n\nYou can inspect specific recommendations in the Recovery War Room or trigger a deterministic scenario run.',
+            timestamp: new Date().toISOString(),
+            reasoningChain: [
+              'Cross-referenced operator prompt with canonical state context.',
+              'Verified data provenance: Active telemetry is classified as Observed.',
+              'Confirmed consensus convergence across specialist agents.'
+            ]
+          };
+        }
+
+        setAgentMessages(prev => [...prev, responseMsg]);
+        setIsAgentThinking(false);
+      }, 500);
+    }
   };
 
   const resetAgentChat = () => {

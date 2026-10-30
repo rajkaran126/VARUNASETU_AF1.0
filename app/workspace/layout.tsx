@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { WorkspaceProvider } from '@/lib/workspace-context';
 import { Sidebar } from '@/components/workspace/Sidebar';
 import { Header } from '@/components/workspace/Header';
+import { GhostCopilot } from '@/components/workspace/GhostCopilot';
 
 export const metadata: Metadata = {
   title: 'Workspace — VARUNASETU Submarine Cable Digital Twin',
@@ -19,7 +20,7 @@ export default function WorkspaceLayout({
         Refined Workspace Shell:
         - Midnight Navy Sidebar (#0B1D33)
         - Clean Light Header (Strictly minimal: Notifications, Date/Time, User Profile)
-        - Warm Ivory & Soft Cream Base (#F7F8F5) with Pale Blue-Grey surfaces
+        - Warm Ivory & Soft Cream Base (#F7F3EA) with Pale Blue-Grey surfaces
         - Strictly NO footers inside any workspace section
       */}
       <div className="fixed inset-0 z-30 bg-[#F7F3EA] text-[#454640] font-body flex overflow-hidden">
@@ -38,6 +39,9 @@ export default function WorkspaceLayout({
             </div>
           </main>
         </div>
+
+        {/* Floating Digital Twin Ghost Copilot */}
+        <GhostCopilot />
       </div>
     </WorkspaceProvider>
   );

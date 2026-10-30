@@ -10,9 +10,11 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.118.0",
     "@types/three": "^0.186.0",
     "clsx": "^2.1.1",
     "framer-motion": "^11.15.0",
+    "groq-sdk": "^1.6.0",
     "html2canvas": "^1.4.1",
     "jspdf": "^4.2.1",
     "lucide-react": "^0.469.0",
