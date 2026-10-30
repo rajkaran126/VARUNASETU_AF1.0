@@ -6,20 +6,13 @@ import type * as THREE from 'three';
 
 /* =========================================================
    VARUNASETU — Submarine Cable Break & Recovery Simulation
-   Design Palette: Warm Ivory (#F7F3EA), Sand Beige (#E8D9BF),
-   Limestone (#D4C4A8), Terracotta (#C87954), Coral Orange (#E99A65),
-   Sage Green (#A8B99A), Sea Glass (#83B9A9), Deep Olive (#687B59),
-   Warm Charcoal (#454640), Soft Taupe (#A69B89).
+   Refined Dark Theme: Pure Black (#000000 / #080808)
+   Zero dark-blue palette.
+   Accents: Terracotta (#C87954), Coral Orange (#E99A65),
+   Emerald (#10B981), Sea Glass (#83B9A9), Warm Sand (#D4C4A8),
+   Crisp White (#FFFFFF), Neutral Gray (#8A8A8A).
 
-   Phase timeline:
-     0 → Normal operation (data flowing)
-     1 → Cable rupture + sparks (t=8s)
-     2 → AI fault detection scan (t=14s)
-     3 → Alternative route established (t=22s)
-     4 → Repair vessel sailing to site (t=30s)
-     5 → ROV deployed from ship (t=38s)
-     6 → ROV on-site, splice repair (t=48s)
-     7 → Full restoration (t=62s)
+   Typography: Space Grotesk / Plus Jakarta Sans & IBM Plex Mono.
    ========================================================= */
 
 const PHASE_TIMES = {
@@ -85,19 +78,19 @@ export default function CableBreakSim() {
       const gltfLoader = new GLTFLoader();
 
       /* ─── RENDERER ─── */
-      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
       renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
       renderer.setSize(mountRef.current!.clientWidth, mountRef.current!.clientHeight);
       renderer.shadowMap.enabled = true;
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 0.85;
+      renderer.toneMappingExposure = 0.95;
       mountRef.current!.appendChild(renderer.domElement);
 
-      /* ─── SCENE ─── */
+      /* ─── SCENE (PURE BLACK — NO DARK BLUE) ─── */
       const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x021424);
-      scene.fog = new THREE.FogExp2(0x03192c, 0.020);
+      scene.background = new THREE.Color(0x000000);
+      scene.fog = new THREE.FogExp2(0x000000, 0.022);
 
       /* ─── CAMERA ─── */
       const W = mountRef.current!.clientWidth;
@@ -115,28 +108,28 @@ export default function CableBreakSim() {
       controls.maxPolarAngle = Math.PI * 0.88;
       controls.update();
 
-      /* ─── LIGHTS ─── */
-      scene.add(new THREE.AmbientLight(0x0a1828, 2.4));
-      scene.add(new THREE.HemisphereLight(0x83b9a9, 0x060e1a, 1.8));
+      /* ─── LIGHTS (NEUTRAL WARM & CLEAN WHITE — NO BLUE) ─── */
+      scene.add(new THREE.AmbientLight(0x222222, 2.2));
+      scene.add(new THREE.HemisphereLight(0x3a3a3a, 0x0a0a0a, 1.8));
 
-      const sun = new THREE.DirectionalLight(0xfffbeb, 1.6);
+      const sun = new THREE.DirectionalLight(0xfffbeb, 1.8);
       sun.position.set(6, 30, 10);
       sun.castShadow = true;
       scene.add(sun);
 
-      const srcLight = new THREE.PointLight(0x83b9a9, 3.5, 14);
+      const srcLight = new THREE.PointLight(0xfff4e6, 3.2, 14);
       srcLight.position.set(-23, 2, 0);
       scene.add(srcLight);
 
-      const dstLight = new THREE.PointLight(0x83b9a9, 3.5, 14);
+      const dstLight = new THREE.PointLight(0xfff4e6, 3.2, 14);
       dstLight.position.set(23, 2, 0);
       scene.add(dstLight);
 
-      const faultLight = new THREE.PointLight(0xc87954, 0, 10);
+      const faultLight = new THREE.PointLight(0xc87954, 0, 12);
       faultLight.position.set(3, -8, 0);
       scene.add(faultLight);
 
-      /* ─── SEABED ─── */
+      /* ─── SEABED (VOLCANIC BASALT BLACK) ─── */
       const sbGeo = new THREE.PlaneGeometry(90, 45, 90, 45);
       sbGeo.rotateX(-Math.PI / 2);
       const sbPos = sbGeo.attributes.position as THREE.BufferAttribute;
@@ -150,12 +143,12 @@ export default function CableBreakSim() {
         );
       }
       sbGeo.computeVertexNormals();
-      const seabed = new THREE.Mesh(sbGeo, new THREE.MeshLambertMaterial({ color: 0x162432 }));
+      const seabed = new THREE.Mesh(sbGeo, new THREE.MeshLambertMaterial({ color: 0x111111 }));
       seabed.receiveShadow = true;
       scene.add(seabed);
 
-      // Rocks
-      const rockMat = new THREE.MeshLambertMaterial({ color: 0x243442 });
+      // Rocks (Dark Charcoal)
+      const rockMat = new THREE.MeshLambertMaterial({ color: 0x1a1a1a });
       [[-16,-10,3,1.3],[-8,-11,-2.5,0.9],[-3,-11,4.5,1.6],[5,-10,-3.5,1.0],[10,-10,2.5,1.2],[17,-10,-2.5,0.8],[-21,-9,-4.5,2.1],[0,-11,-5.5,1.4],[14,-9,5.5,1.9],[7,-10.5,5,1.1]].forEach(([x,y,z,s]) => {
         const r = new THREE.Mesh(new THREE.DodecahedronGeometry(s as number, 1), rockMat);
         r.position.set(x as number, y as number, z as number);
@@ -163,9 +156,9 @@ export default function CableBreakSim() {
         scene.add(r);
       });
 
-      // Floating bioluminescent particles
+      // Floating marine sediment dust (Warm Gold / Pale Sand)
       const bioGeo = new THREE.BufferGeometry();
-      const bioN = 200;
+      const bioN = 220;
       const bioPos = new Float32Array(bioN * 3);
       for (let i = 0; i < bioN; i++) {
         bioPos[i*3]   = (Math.random()-0.5)*70;
@@ -174,19 +167,19 @@ export default function CableBreakSim() {
       }
       bioGeo.setAttribute('position', new THREE.BufferAttribute(bioPos, 3));
       const bioMesh = new THREE.Points(bioGeo, new THREE.PointsMaterial({
-        size: 0.12, color: 0x83b9a9, transparent: true, opacity: 0.35,
+        size: 0.12, color: 0xd4c4a8, transparent: true, opacity: 0.45,
         blending: THREE.AdditiveBlending, depthWrite: false,
       }));
       scene.add(bioMesh);
 
-      /* ─── OCEAN SURFACE ─── */
+      /* ─── OCEAN SURFACE (NEUTRAL CHARCOAL WATER SPECULAR) ─── */
       const oceanGeo = new THREE.PlaneGeometry(90, 45, 90, 45);
       oceanGeo.rotateX(-Math.PI / 2);
       const oceanOrigY = new Float32Array(oceanGeo.attributes.position.count);
       for (let i = 0; i < oceanOrigY.length; i++) oceanOrigY[i] = 0;
       const oceanMat = new THREE.MeshPhongMaterial({
-        color: 0x0e2f47, emissive: 0x051a2a,
-        transparent: true, opacity: 0.72, shininess: 120,
+        color: 0x141414, emissive: 0x050505,
+        transparent: true, opacity: 0.75, shininess: 140,
         side: THREE.DoubleSide,
       });
       const ocean = new THREE.Mesh(oceanGeo, oceanMat);
@@ -200,13 +193,13 @@ export default function CableBreakSim() {
         oceanOrigZ[i] = oceanPos.getZ(i);
       }
 
-      /* ─── LANDING STATIONS ─── */
+      /* ─── LANDING STATIONS (PURE BLACK / GRAPHITE SURFACES) ─── */
       function buildStation(x: number) {
         const g = new THREE.Group();
-        const bldMat = new THREE.MeshPhongMaterial({ color: 0x454640, emissive: 0x222320 });
-        const winMat = new THREE.MeshPhongMaterial({ color: 0x83b9a9, emissive: 0x83b9a9, emissiveIntensity: 0.8 });
-        const metMat = new THREE.MeshPhongMaterial({ color: 0xa69b89 });
-        const yelMat = new THREE.MeshPhongMaterial({ color: 0xe99a65, emissive: 0x7a4020, emissiveIntensity: 0.4 });
+        const bldMat = new THREE.MeshPhongMaterial({ color: 0x1e1e1e, emissive: 0x0a0a0a });
+        const winMat = new THREE.MeshPhongMaterial({ color: 0xffffff, emissive: 0xd4c4a8, emissiveIntensity: 0.9 });
+        const metMat = new THREE.MeshPhongMaterial({ color: 0x333333 });
+        const yelMat = new THREE.MeshPhongMaterial({ color: 0xc87954, emissive: 0x4a2414, emissiveIntensity: 0.4 });
 
         const body = new THREE.Mesh(new THREE.BoxGeometry(3.5, 4, 3), bldMat);
         body.position.y = 2; g.add(body);
@@ -247,8 +240,8 @@ export default function CableBreakSim() {
 
       // Landmass
       function addLand(x: number) {
-        const lMat = new THREE.MeshLambertMaterial({ color: 0x687b59 });
-        const sMat = new THREE.MeshLambertMaterial({ color: 0xd4c4a8 });
+        const lMat = new THREE.MeshLambertMaterial({ color: 0x222222 });
+        const sMat = new THREE.MeshLambertMaterial({ color: 0x3a3a3a });
         const land = new THREE.Mesh(new THREE.BoxGeometry(14, 3.5, 22), lMat);
         land.position.set(x, -1, 0); scene.add(land);
         const shore = new THREE.Mesh(new THREE.BoxGeometry(5, 0.3, 22), sMat);
@@ -306,11 +299,11 @@ export default function CableBreakSim() {
 
       function makeTube(curve: THREE.CatmullRomCurve3, col: number, segments = 120) {
         const geo = new THREE.TubeGeometry(curve, segments, 0.13, 8, false);
-        const mat = new THREE.MeshPhongMaterial({ color: col, emissive: col, emissiveIntensity: 0.4, shininess: 90 });
+        const mat = new THREE.MeshPhongMaterial({ color: col, emissive: col, emissiveIntensity: 0.45, shininess: 90 });
         return new THREE.Mesh(geo, mat);
       }
 
-      // Normal cable: Sea Glass / Muted Tech (#83B9A9)
+      // Normal cable: Sea Glass Green (0x83B9A9)
       const cableFull = makeTube(fullCurve, 0x83b9a9);
       scene.add(cableFull);
 
@@ -321,37 +314,37 @@ export default function CableBreakSim() {
       // Alternative reroute: Coral Orange (#E99A65)
       const cableAlt = makeTube(altCurve, 0xe99a65); cableAlt.visible = false; scene.add(cableAlt);
 
-      /* ─── DATA PARTICLES ─── */
+      /* ─── DATA PARTICLES (WHITE / SEA GLASS GLOW) ─── */
       const PN = 70;
       const pGeo = new THREE.BufferGeometry();
       const pBuf = new Float32Array(PN * 3);
       const pTs  = Array.from({length: PN}, (_, i) => i / PN);
       pGeo.setAttribute('position', new THREE.BufferAttribute(pBuf, 3));
       const pMesh = new THREE.Points(pGeo, new THREE.PointsMaterial({
-        size: 0.38, color: 0x83b9a9, transparent: true, opacity: 0.92,
+        size: 0.40, color: 0xffffff, transparent: true, opacity: 0.95,
         blending: THREE.AdditiveBlending, depthWrite: false,
       }));
       scene.add(pMesh);
 
-      // Alt-route particles
+      // Alt-route particles (Coral Orange Glow)
       const apBuf = new Float32Array(PN * 3);
       const apGeo = new THREE.BufferGeometry();
       const apTs  = Array.from({length: PN}, (_, i) => i / PN);
       apGeo.setAttribute('position', new THREE.BufferAttribute(apBuf, 3));
       const apMat = new THREE.PointsMaterial({
-        size: 0.38, color: 0xe99a65, transparent: true, opacity: 0,
+        size: 0.40, color: 0xe99a65, transparent: true, opacity: 0,
         blending: THREE.AdditiveBlending, depthWrite: false,
       });
       const apMesh = new THREE.Points(apGeo, apMat);
       scene.add(apMesh);
 
-      /* ─── SPARKS AT BREAK ─── */
+      /* ─── SPARKS AT BREAK (TERRACOTTA / EMBER) ─── */
       const SN = 180;
       const sparkBuf = new Float32Array(SN * 3);
       const sparkGeo = new THREE.BufferGeometry();
       sparkGeo.setAttribute('position', new THREE.BufferAttribute(sparkBuf, 3));
       const sparkMat = new THREE.PointsMaterial({
-        size: 0.22, color: 0xc87954, transparent: true, opacity: 0,
+        size: 0.24, color: 0xc87954, transparent: true, opacity: 0,
         blending: THREE.AdditiveBlending, depthWrite: false,
       });
       const sparkMesh = new THREE.Points(sparkGeo, sparkMat);
@@ -361,7 +354,7 @@ export default function CableBreakSim() {
         life: Math.random(),
       }));
 
-      // Electrical arc (zig-zag line at break)
+      // Electrical arc (Coral Orange zig-zag line at break)
       const arcPts: THREE.Vector3[] = [];
       for (let i = 0; i < 12; i++) {
         arcPts.push(new THREE.Vector3(
@@ -382,7 +375,7 @@ export default function CableBreakSim() {
       ring.position.copy(breakPos);
       scene.add(ring);
 
-      /* ─── REPAIR SHIP (cargo-ship.glb) ─── */
+      /* ─── REPAIR SHIP (GLB ASSET) ─── */
       const ship = new THREE.Group();
       ship.position.set(-55, 0.4, 0); // starts off-screen
       scene.add(ship);
@@ -405,20 +398,20 @@ export default function CableBreakSim() {
         undefined,
         (err) => {
           console.warn('Fallback: cargo-ship.glb', err);
-          const hull = new THREE.Mesh(new THREE.BoxGeometry(7, 1.6, 3), new THREE.MeshPhongMaterial({ color: 0x454640 }));
+          const hull = new THREE.Mesh(new THREE.BoxGeometry(7, 1.6, 3), new THREE.MeshPhongMaterial({ color: 0x222222 }));
           hull.position.y = 0.8;
           ship.add(hull);
         }
       );
 
-      /* ─── ROV (one-person-submarine-0b9d14.glb) ─── */
+      /* ─── ROV (GLB ASSET) ─── */
       const rov = new THREE.Group();
       rov.position.set(breakPos.x, 0.4, 0);
       rov.visible = false;
       scene.add(rov);
 
-      // ROV spot headlight attached to rov group
-      const rovSpot = new THREE.SpotLight(0xfffbeb, 0, 15, Math.PI / 6, 0.5);
+      // ROV spotlight
+      const rovSpot = new THREE.SpotLight(0xffffff, 0, 16, Math.PI / 6, 0.5);
       rovSpot.position.set(0, 0.2, 0.9);
       rovSpot.target.position.set(0, -0.4, 4.0);
       rov.add(rovSpot);
@@ -441,7 +434,7 @@ export default function CableBreakSim() {
         undefined,
         (err) => {
           console.warn('Fallback: one-person-submarine-0b9d14.glb', err);
-          const fallback = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.65, 0.9), new THREE.MeshPhongMaterial({ color: 0xe99a65 }));
+          const fallback = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.65, 0.9), new THREE.MeshPhongMaterial({ color: 0xc87954 }));
           rov.add(fallback);
         }
       );
@@ -450,7 +443,7 @@ export default function CableBreakSim() {
       const tetherBuf = new Float32Array(6);
       const tetherGeo = new THREE.BufferGeometry();
       tetherGeo.setAttribute('position', new THREE.BufferAttribute(tetherBuf, 3));
-      const tetherLine = new THREE.Line(tetherGeo, new THREE.LineBasicMaterial({ color: 0xd4c4a8, transparent: true, opacity: 0 }));
+      const tetherLine = new THREE.Line(tetherGeo, new THREE.LineBasicMaterial({ color: 0x888888, transparent: true, opacity: 0 }));
       scene.add(tetherLine);
 
       /* ─── BUBBLES ─── */
@@ -458,7 +451,7 @@ export default function CableBreakSim() {
       const bubBuf = new Float32Array(BN * 3);
       const bubGeo = new THREE.BufferGeometry();
       bubGeo.setAttribute('position', new THREE.BufferAttribute(bubBuf, 3));
-      const bubMat = new THREE.PointsMaterial({ size: 0.14, color: 0x83b9a9, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false });
+      const bubMat = new THREE.PointsMaterial({ size: 0.14, color: 0xffffff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false });
       const bubMesh = new THREE.Points(bubGeo, bubMat);
       scene.add(bubMesh);
       const bubData = Array.from({length: BN}, () => ({
@@ -476,7 +469,7 @@ export default function CableBreakSim() {
       function dot(el: HTMLSpanElement | null, col: string) {
         if (!el) return;
         el.style.background = col;
-        el.style.boxShadow = `0 0 7px ${col}`;
+        el.style.boxShadow = `0 0 8px ${col}`;
       }
       function setBar(el: HTMLDivElement | null, pct: number, col: string) {
         if (!el) return;
@@ -488,9 +481,9 @@ export default function CableBreakSim() {
         setTimeout(() => {
           if (!h.aiLog.current) return;
           const d = document.createElement('div');
-          d.style.cssText = `font-size:10px;font-family:'IBM Plex Mono', monospace;line-height:1.8;opacity:0;transition:opacity .4s;`;
-          // ok -> Deep Olive (#687B59), crit -> Terracotta (#C87954), warn -> Coral Orange (#E99A65), info -> Warm Charcoal (#454640)
-          d.style.color = cls === 'ok' ? '#687B59' : cls === 'crit' ? '#C87954' : cls === 'warn' ? '#E99A65' : '#454640';
+          d.style.cssText = `font-size:10px;font-family:'IBM Plex Mono', monospace;line-height:1.8;opacity:0;transition:opacity .35s;`;
+          // ok -> Emerald (#10B981), crit -> Terracotta (#C87954), warn -> Coral Orange (#E99A65), info -> Crisp White/Gray (#E5E5E5)
+          d.style.color = cls === 'ok' ? '#10B981' : cls === 'crit' ? '#C87954' : cls === 'warn' ? '#E99A65' : '#D4D4D4';
           d.textContent = `> ${text}`;
           h.aiLog.current.appendChild(d);
           h.aiLog.current.scrollTop = 9999;
@@ -595,9 +588,9 @@ export default function CableBreakSim() {
       function triggerROVRepair() {
         phase = 6;
         setPhaseText('◈ PHASE 7: ROV ON-SITE — MECHANICAL SPLICE REPAIR UNDERWAY');
-        if (h.rovStatus.current) { h.rovStatus.current.textContent = 'ON-SITE'; h.rovStatus.current.style.color = '#687B59'; }
+        if (h.rovStatus.current) { h.rovStatus.current.textContent = 'ON-SITE'; h.rovStatus.current.style.color = '#10B981'; }
         if (h.rovTask.current) h.rovTask.current.textContent = 'SPLICE REPAIR';
-        rovSpot.intensity = 3;
+        rovSpot.intensity = 3.5;
         addAILine('ROV reached seabed (4,200m).', 'ok', 0);
         addAILine('Fault section located visually.', 'ok', 800);
         addAILine('Mechanical splice repair initiated...', 'info', 1600);
@@ -613,23 +606,23 @@ export default function CableBreakSim() {
         cable1.visible = false; cable2.visible = false;
         cableAlt.visible = false; apMat.opacity = 0;
         cableFull.visible = true;
-        (cableFull.material as THREE.MeshPhongMaterial).color.set(0x83b9a9);
-        (cableFull.material as THREE.MeshPhongMaterial).emissive.set(0x83b9a9);
+        (cableFull.material as THREE.MeshPhongMaterial).color.set(0x10b981);
+        (cableFull.material as THREE.MeshPhongMaterial).emissive.set(0x10b981);
         (cableFull.material as THREE.MeshPhongMaterial).emissiveIntensity = 0.55;
         sparkMat.opacity = 0; ringMat.opacity = 0; faultLight.intensity = 0;
         (arcLine.material as THREE.LineBasicMaterial).opacity = 0;
         if (h.faultTag.current) h.faultTag.current.style.opacity = '0';
 
-        if (h.throughput.current) { h.throughput.current.textContent = '4.8 Tbps'; h.throughput.current.style.color = '#687B59'; }
-        setBar(h.thruBar.current, 96, '#83b9a9');
-        if (h.latency.current) { h.latency.current.textContent = '12.3 ms'; h.latency.current.style.color = '#687B59'; }
-        if (h.pktLoss.current) { h.pktLoss.current.textContent = '0.02%'; h.pktLoss.current.style.color = '#687B59'; }
-        if (h.health.current) { h.health.current.textContent = 'RESTORED'; h.health.current.style.color = '#687B59'; }
-        setBar(h.healthBar.current, 100, '#83b9a9');
-        if (h.fibers.current) { h.fibers.current.textContent = '8 / 8'; h.fibers.current.style.color = '#687B59'; }
-        dot(h.cblDot.current, '#687B59'); if (h.cblLabel.current) h.cblLabel.current.textContent = 'CABLE: NOMINAL';
-        dot(h.dstDot.current, '#687B59'); if (h.dstLabel.current) h.dstLabel.current.textContent = 'DESTINATION: ONLINE';
-        if (h.dstCardStat.current) { h.dstCardStat.current.textContent = 'RECEIVING'; h.dstCardStat.current.style.color = '#687B59'; }
+        if (h.throughput.current) { h.throughput.current.textContent = '4.8 Tbps'; h.throughput.current.style.color = '#10B981'; }
+        setBar(h.thruBar.current, 96, '#10b981');
+        if (h.latency.current) { h.latency.current.textContent = '12.3 ms'; h.latency.current.style.color = '#10B981'; }
+        if (h.pktLoss.current) { h.pktLoss.current.textContent = '0.02%'; h.pktLoss.current.style.color = '#10B981'; }
+        if (h.health.current) { h.health.current.textContent = 'RESTORED'; h.health.current.style.color = '#10B981'; }
+        setBar(h.healthBar.current, 100, '#10b981');
+        if (h.fibers.current) { h.fibers.current.textContent = '8 / 8'; h.fibers.current.style.color = '#10B981'; }
+        dot(h.cblDot.current, '#10B981'); if (h.cblLabel.current) h.cblLabel.current.textContent = 'CABLE: NOMINAL';
+        dot(h.dstDot.current, '#10B981'); if (h.dstLabel.current) h.dstLabel.current.textContent = 'DESTINATION: ONLINE';
+        if (h.dstCardStat.current) { h.dstCardStat.current.textContent = 'RECEIVING'; h.dstCardStat.current.style.color = '#10B981'; }
         rovSpot.intensity = 0;
         addAILine('--- REPAIR COMPLETE ✓ ---', 'ok', 200);
         addAILine('Cable restored to full capacity.', 'ok', 1000);
@@ -785,7 +778,7 @@ export default function CableBreakSim() {
           rov.position.x = breakPos.x + Math.sin(t*1.2)*0.15;
           rov.position.y = breakPos.y + 1.0 + Math.sin(t*0.8)*0.08;
           rov.rotation.y = Math.sin(t*0.5)*0.1;
-          rovSpot.intensity = 3 + Math.sin(t*8)*0.8;
+          rovSpot.intensity = 3.5 + Math.sin(t*8)*0.8;
           // Tether update
           tetherBuf[0] = ship.position.x + 2; tetherBuf[1] = ship.position.y + 4.5; tetherBuf[2] = 0;
           tetherBuf[3] = rov.position.x;      tetherBuf[4] = rov.position.y + 0.4;  tetherBuf[5] = 0;
@@ -831,157 +824,431 @@ export default function CableBreakSim() {
 
   /* ─── JSX ─── */
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden select-none font-sans" style={{ background: '#021424' }}>
-
+    <div
+      className="fixed inset-0 z-50 overflow-hidden select-none"
+      style={{
+        background: '#000000',
+        fontFamily: "'Space Grotesk', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif",
+      }}
+    >
       {/* Three.js canvas mount */}
       <div ref={mountRef} className="absolute inset-0" />
 
-      {/* ── TOP BAR (PARJANYAH LIGHT PALETTE) ── */}
-      <div className="absolute top-0 left-0 right-0 h-13 flex items-center justify-between px-5 z-20"
-        style={{ background:'rgba(247, 243, 234, 0.94)', borderBottom:'1px solid #D4C4A8', backdropFilter:'blur(12px)', boxShadow:'0 2px 10px rgba(69,70,64,0.06)' }}>
+      {/* ── TOP BAR (BLACK GLASS · REFINED TYPOGRAPHY) ── */}
+      <div
+        className="absolute top-0 left-0 right-0 h-13 flex items-center justify-between px-6 z-20"
+        style={{
+          background: 'rgba(5, 5, 5, 0.92)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.10)',
+          backdropFilter: 'blur(16px)',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+        }}
+      >
         <div className="flex items-center gap-3">
-          <span style={{ width:9, height:9, borderRadius:'50%', background:'#C87954', display:'inline-block', boxShadow:'0 0 8px rgba(200,121,84,0.6)', animation:'pulse 2s infinite' }} />
-          <span style={{ fontSize:14, fontWeight:800, letterSpacing:3, color:'#454640' }}>VARUNASETU</span>
-          <span style={{ fontSize:10, color:'#A69B89', fontWeight:600, letterSpacing:1.5 }}>/ SUBMARINE CABLE DIGITAL TWIN</span>
+          <span
+            style={{
+              width: 8,
+              height: 8,
+              borderRadius: '50%',
+              background: '#C87954',
+              display: 'inline-block',
+              boxShadow: '0 0 10px rgba(200, 121, 84, 0.8)',
+              animation: 'pulse 2s infinite',
+            }}
+          />
+          <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: 3, color: '#FFFFFF' }}>
+            VARUNASETU
+          </span>
+          <span style={{ fontSize: 10, color: '#8A8A8A', fontWeight: 500, letterSpacing: 1.5 }}>
+            / SUBMARINE CABLE DIGITAL TWIN
+          </span>
         </div>
+
         <div className="flex items-center gap-6">
           {[
-            { dot: h.srcDot, label: h.srcLabel, initDot:'#687B59', initLabel:'SOURCE: ONLINE' },
-            { dot: h.cblDot, label: h.cblLabel, initDot:'#687B59', initLabel:'CABLE: NOMINAL' },
-            { dot: h.dstDot, label: h.dstLabel, initDot:'#687B59', initLabel:'DESTINATION: ONLINE' },
+            { dot: h.srcDot, label: h.srcLabel, initDot: '#10B981', initLabel: 'SOURCE: ONLINE' },
+            { dot: h.cblDot, label: h.cblLabel, initDot: '#10B981', initLabel: 'CABLE: NOMINAL' },
+            { dot: h.dstDot, label: h.dstLabel, initDot: '#10B981', initLabel: 'DESTINATION: ONLINE' },
           ].map((s, i) => (
-            <div key={i} className="flex items-center gap-2" style={{ fontSize:11, letterSpacing:0.5 }}>
-              <span ref={s.dot} style={{ width:7, height:7, borderRadius:'50%', display:'inline-block', background:s.initDot, boxShadow:`0 0 6px ${s.initDot}` }} />
-              <span ref={s.label} style={{ color:'#454640', fontWeight:600 }}>{s.initLabel}</span>
+            <div key={i} className="flex items-center gap-2" style={{ fontSize: 11, letterSpacing: 0.5 }}>
+              <span
+                ref={s.dot}
+                style={{
+                  width: 7,
+                  height: 7,
+                  borderRadius: '50%',
+                  display: 'inline-block',
+                  background: s.initDot,
+                  boxShadow: `0 0 6px ${s.initDot}`,
+                }}
+              />
+              <span ref={s.label} style={{ color: '#E5E5E5', fontWeight: 600 }}>
+                {s.initLabel}
+              </span>
             </div>
           ))}
-          <span ref={h.simTime} style={{ fontSize:11, color:'#454640', fontFamily:"'IBM Plex Mono', monospace", fontWeight:700 }}>SIMULATION TIME: 00:00:00</span>
+          <span
+            ref={h.simTime}
+            style={{
+              fontSize: 11,
+              color: '#F5F5F5',
+              fontFamily: "'IBM Plex Mono', monospace",
+              fontWeight: 600,
+              letterSpacing: 0.5,
+            }}
+          >
+            SIMULATION TIME: 00:00:00
+          </span>
         </div>
-        <Link href="/workspace" style={{ fontSize:11, fontWeight:700, color:'#454640', background:'#E8D9BF', border:'1px solid #D4C4A8', padding:'6px 14px', borderRadius:8, textDecoration:'none', transition:'all .2s' }}
-          onMouseEnter={e=>(e.currentTarget.style.background='#D4C4A8')}
-          onMouseLeave={e=>(e.currentTarget.style.background='#E8D9BF')}>
+
+        <Link
+          href="/workspace"
+          style={{
+            fontSize: 11,
+            fontWeight: 600,
+            color: '#FFFFFF',
+            background: 'rgba(255, 255, 255, 0.08)',
+            border: '1px solid rgba(255, 255, 255, 0.16)',
+            padding: '6px 14px',
+            borderRadius: 8,
+            textDecoration: 'none',
+            transition: 'all .2s ease',
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255, 255, 255, 0.16)')}
+          onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)')}
+        >
           ← EXIT SIM
         </Link>
       </div>
 
       {/* ── SCAN LINE (AI phase) ── */}
-      <div ref={h.scanLine} style={{ display:'none', position:'absolute', left:0, right:0, height:2, top:0, zIndex:15,
-        background:'linear-gradient(90deg, transparent, rgba(200, 121, 84, 0.7), transparent)',
-        animation:'scanDown 3.5s linear infinite' }} />
+      <div
+        ref={h.scanLine}
+        style={{
+          display: 'none',
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          height: 2,
+          top: 0,
+          zIndex: 15,
+          background: 'linear-gradient(90deg, transparent, rgba(200, 121, 84, 0.8), transparent)',
+          animation: 'scanDown 3.5s linear infinite',
+        }}
+      />
 
       {/* ── LEFT PANEL: NETWORK TELEMETRY ── */}
-      <div className="absolute z-20" style={{ top:62, left:16, width:225, background:'rgba(247, 243, 234, 0.94)', border:'1px solid #D4C4A8', borderRadius:12, padding:14, backdropFilter:'blur(12px)', boxShadow:'0 4px 16px rgba(69,70,64,0.08)' }}>
-        <div style={{ fontSize:10, letterSpacing:2, color:'#C87954', fontWeight:700, borderBottom:'1px solid #D4C4A8', paddingBottom:7, marginBottom:10 }}>{`// NETWORK TELEMETRY`}</div>
+      <div
+        className="absolute z-20"
+        style={{
+          top: 64,
+          left: 16,
+          width: 230,
+          background: 'rgba(8, 8, 8, 0.90)',
+          border: '1px solid rgba(255, 255, 255, 0.10)',
+          borderRadius: 12,
+          padding: 15,
+          backdropFilter: 'blur(16px)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
+        }}
+      >
+        <div
+          style={{
+            fontSize: 10,
+            letterSpacing: 2,
+            color: '#C87954',
+            fontWeight: 700,
+            borderBottom: '1px solid rgba(255, 255, 255, 0.10)',
+            paddingBottom: 8,
+            marginBottom: 12,
+          }}
+        >
+          {`// NETWORK TELEMETRY`}
+        </div>
+
         {[
-          { label:'THROUGHPUT', valRef:h.throughput, barRef:h.thruBar, initVal:'4.8 Tbps', initPct:96, initCol:'#83b9a9' },
-          { label:'LATENCY',    valRef:h.latency,    barRef:h.latBar,  initVal:'12.3 ms',  initPct:88, initCol:'#83b9a9' },
+          { label: 'THROUGHPUT', valRef: h.throughput, barRef: h.thruBar, initVal: '4.8 Tbps', initPct: 96, initCol: '#10B981' },
+          { label: 'LATENCY',    valRef: h.latency,    barRef: h.latBar,  initVal: '12.3 ms',  initPct: 88, initCol: '#10B981' },
         ].map((row, i) => (
-          <div key={i} style={{ marginTop: i ? 10 : 0 }}>
-            <div style={{ display:'flex', justifyContent:'space-between' }}>
-              <span style={{ fontSize:10, color:'#A69B89', fontWeight:600, letterSpacing:0.5 }}>{row.label}</span>
-              <span ref={row.valRef} style={{ fontSize:11, color:'#687B59', fontWeight:'bold', fontFamily:"'IBM Plex Mono', monospace" }}>{row.initVal}</span>
+          <div key={i} style={{ marginTop: i ? 11 : 0 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: 10, color: '#8A8A8A', fontWeight: 600, letterSpacing: 0.8 }}>{row.label}</span>
+              <span ref={row.valRef} style={{ fontSize: 11, color: '#10B981', fontWeight: 700, fontFamily: "'IBM Plex Mono', monospace" }}>{row.initVal}</span>
             </div>
-            <div style={{ height:5, background:'#E8D9BF', borderRadius:3, marginTop:4, overflow:'hidden' }}>
-              <div ref={row.barRef} style={{ height:'100%', borderRadius:3, background:row.initCol, width:`${row.initPct}%`, transition:'width .6s ease, background .6s ease' }} />
+            <div style={{ height: 4, background: 'rgba(255, 255, 255, 0.08)', borderRadius: 2, marginTop: 4, overflow: 'hidden' }}>
+              <div ref={row.barRef} style={{ height: '100%', borderRadius: 2, background: row.initCol, width: `${row.initPct}%`, transition: 'width .6s ease, background .6s ease' }} />
             </div>
           </div>
         ))}
+
         {[
-          { label:'PACKET LOSS', valRef:h.pktLoss, initVal:'0.02%' },
-          { label:'CABLE DEPTH', initVal:'4,200 m' },
+          { label: 'PACKET LOSS', valRef: h.pktLoss, initVal: '0.02%' },
+          { label: 'CABLE DEPTH', initVal: '4,200 m' },
         ].map((row, i) => (
-          <div key={i} style={{ display:'flex', justifyContent:'space-between', marginTop:10 }}>
-            <span style={{ fontSize:10, color:'#A69B89', fontWeight:600, letterSpacing:0.5 }}>{row.label}</span>
-            <span ref={'valRef' in row ? row.valRef : undefined} style={{ fontSize:11, color:'#454640', fontWeight:'bold', fontFamily:"'IBM Plex Mono', monospace" }}>{'initVal' in row ? row.initVal : ''}</span>
+          <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 11 }}>
+            <span style={{ fontSize: 10, color: '#8A8A8A', fontWeight: 600, letterSpacing: 0.8 }}>{row.label}</span>
+            <span ref={'valRef' in row ? row.valRef : undefined} style={{ fontSize: 11, color: '#FFFFFF', fontWeight: 700, fontFamily: "'IBM Plex Mono', monospace" }}>{'initVal' in row ? row.initVal : ''}</span>
           </div>
         ))}
-        <div style={{ marginTop:10 }}>
-          <div style={{ display:'flex', justifyContent:'space-between' }}>
-            <span style={{ fontSize:10, color:'#A69B89', fontWeight:600, letterSpacing:0.5 }}>CABLE HEALTH</span>
-            <span ref={h.health} style={{ fontSize:11, color:'#687B59', fontWeight:'bold', fontFamily:"'IBM Plex Mono', monospace" }}>NOMINAL</span>
+
+        <div style={{ marginTop: 11 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 10, color: '#8A8A8A', fontWeight: 600, letterSpacing: 0.8 }}>CABLE HEALTH</span>
+            <span ref={h.health} style={{ fontSize: 11, color: '#10B981', fontWeight: 700, fontFamily: "'IBM Plex Mono', monospace" }}>NOMINAL</span>
           </div>
-          <div style={{ height:5, background:'#E8D9BF', borderRadius:3, marginTop:4, overflow:'hidden' }}>
-            <div ref={h.healthBar} style={{ height:'100%', borderRadius:3, background:'#83b9a9', width:'100%', transition:'width .6s ease, background .6s ease' }} />
+          <div style={{ height: 4, background: 'rgba(255, 255, 255, 0.08)', borderRadius: 2, marginTop: 4, overflow: 'hidden' }}>
+            <div ref={h.healthBar} style={{ height: '100%', borderRadius: 2, background: '#10B981', width: '100%', transition: 'width .6s ease, background .6s ease' }} />
           </div>
         </div>
-        <div style={{ display:'flex', justifyContent:'space-between', marginTop:10 }}>
-          <span style={{ fontSize:10, color:'#A69B89', fontWeight:600, letterSpacing:0.5 }}>ACTIVE FIBERS</span>
-          <span ref={h.fibers} style={{ fontSize:11, color:'#454640', fontWeight:'bold', fontFamily:"'IBM Plex Mono', monospace" }}>8 / 8</span>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 11 }}>
+          <span style={{ fontSize: 10, color: '#8A8A8A', fontWeight: 600, letterSpacing: 0.8 }}>ACTIVE FIBERS</span>
+          <span ref={h.fibers} style={{ fontSize: 11, color: '#FFFFFF', fontWeight: 700, fontFamily: "'IBM Plex Mono', monospace" }}>8 / 8</span>
         </div>
-        <div style={{ display:'flex', justifyContent:'space-between', marginTop:10 }}>
-          <span style={{ fontSize:10, color:'#A69B89', fontWeight:600, letterSpacing:0.5 }}>SEA TEMP</span>
-          <span style={{ fontSize:11, color:'#454640', fontWeight:'bold', fontFamily:"'IBM Plex Mono', monospace" }}>2.4°C</span>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 11 }}>
+          <span style={{ fontSize: 10, color: '#8A8A8A', fontWeight: 600, letterSpacing: 0.8 }}>SEA TEMP</span>
+          <span style={{ fontSize: 11, color: '#FFFFFF', fontWeight: 700, fontFamily: "'IBM Plex Mono', monospace" }}>2.4°C</span>
         </div>
       </div>
 
       {/* ── RIGHT PANEL: AI LOG ── */}
-      <div ref={h.aiPanel} className="absolute z-20" style={{ top:62, right:16, width:285, background:'rgba(247, 243, 234, 0.94)', border:'1px solid #D4C4A8', borderRadius:12, padding:14, backdropFilter:'blur(12px)', opacity:0, transition:'opacity .5s', boxShadow:'0 4px 16px rgba(69,70,64,0.08)' }}>
-        <div style={{ fontSize:10, letterSpacing:2, color:'#C87954', fontWeight:700, borderBottom:'1px solid #D4C4A8', paddingBottom:7, marginBottom:10 }}>{`// AI FAULT ANALYSIS`}</div>
-        <div ref={h.aiLog} style={{ maxHeight:240, overflowY:'auto' }} />
+      <div
+        ref={h.aiPanel}
+        className="absolute z-20"
+        style={{
+          top: 64,
+          right: 16,
+          width: 290,
+          background: 'rgba(8, 8, 8, 0.90)',
+          border: '1px solid rgba(255, 255, 255, 0.10)',
+          borderRadius: 12,
+          padding: 15,
+          backdropFilter: 'blur(16px)',
+          opacity: 0,
+          transition: 'opacity .5s ease',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
+        }}
+      >
+        <div
+          style={{
+            fontSize: 10,
+            letterSpacing: 2,
+            color: '#C87954',
+            fontWeight: 700,
+            borderBottom: '1px solid rgba(255, 255, 255, 0.10)',
+            paddingBottom: 8,
+            marginBottom: 10,
+          }}
+        >
+          {`// AI FAULT ANALYSIS`}
+        </div>
+        <div ref={h.aiLog} style={{ maxHeight: 240, overflowY: 'auto' }} />
       </div>
 
       {/* ── CENTER ALERT ── */}
-      <div ref={h.alertBox} className="absolute z-20" style={{ top:'42%', left:'50%', transform:'translate(-50%,-50%)', textAlign:'center', opacity:0, transition:'opacity .35s', pointerEvents:'none', background:'rgba(247, 243, 234, 0.96)', border:'2px solid #C87954', borderRadius:12, padding:'16px 28px', boxShadow:'0 8px 32px rgba(200, 121, 84, 0.25)' }}>
-        <div style={{ fontSize:16, fontWeight:'bold', letterSpacing:1.5, color:'#C87954' }}>
+      <div
+        ref={h.alertBox}
+        className="absolute z-20"
+        style={{
+          top: '42%',
+          left: '50%',
+          transform: 'translate(-50%,-50%)',
+          textAlign: 'center',
+          opacity: 0,
+          transition: 'opacity .35s ease',
+          pointerEvents: 'none',
+          background: 'rgba(12, 6, 6, 0.95)',
+          border: '1px solid #C87954',
+          borderRadius: 12,
+          padding: '18px 30px',
+          boxShadow: '0 12px 40px rgba(200, 121, 84, 0.35)',
+        }}
+      >
+        <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: 1.5, color: '#C87954' }}>
           ⚠ CRITICAL ALERT: SUBMARINE CABLE FAILURE DETECTED
         </div>
-        <div style={{ fontSize:11, color:'#454640', fontFamily:"'IBM Plex Mono', monospace", fontWeight:600, letterSpacing:1, marginTop:8 }}>
+        <div style={{ fontSize: 11, color: '#FFFFFF', fontFamily: "'IBM Plex Mono', monospace", fontWeight: 600, letterSpacing: 1, marginTop: 8 }}>
           FAULT LOCATION: 12.31°N, 43.49°E &nbsp;|&nbsp; DEPTH: 4,200m
         </div>
       </div>
 
       {/* ── FAULT TAG (world-space approximation) ── */}
-      <div ref={h.faultTag} className="absolute z-20" style={{ top:'47%', left:'52%', opacity:0, transition:'opacity .5s', pointerEvents:'none' }}>
-        <div style={{ background:'rgba(247, 243, 234, 0.92)', border:'1px solid #C87954', borderRadius:8, padding:'6px 12px', fontSize:10, color:'#C87954', fontWeight:700, fontFamily:"'IBM Plex Mono', monospace", letterSpacing:0.5, whiteSpace:'nowrap', boxShadow:'0 4px 14px rgba(200,121,84,0.2)' }}>
-          ⊗ FAULT DETECTED<br/>12.31°N, 43.49°E<br/>DEPTH: 4,200m
+      <div ref={h.faultTag} className="absolute z-20" style={{ top: '47%', left: '52%', opacity: 0, transition: 'opacity .5s ease', pointerEvents: 'none' }}>
+        <div
+          style={{
+            background: 'rgba(15, 6, 6, 0.94)',
+            border: '1px solid #C87954',
+            borderRadius: 8,
+            padding: '7px 13px',
+            fontSize: 10,
+            color: '#C87954',
+            fontWeight: 700,
+            fontFamily: "'IBM Plex Mono', monospace",
+            letterSpacing: 0.5,
+            whiteSpace: 'nowrap',
+            boxShadow: '0 4px 16px rgba(200, 121, 84, 0.3)',
+          }}
+        >
+          ⊗ FAULT DETECTED<br />12.31°N, 43.49°E<br />DEPTH: 4,200m
         </div>
       </div>
 
       {/* ── STATION CARDS ── */}
-      <div ref={h.srcCard} className="absolute z-20" style={{ bottom:56, left:240, background:'rgba(247, 243, 234, 0.94)', border:'1px solid #D4C4A8', borderRadius:10, padding:'10px 14px', backdropFilter:'blur(10px)', minWidth:165, boxShadow:'0 4px 12px rgba(69,70,64,0.06)' }}>
-        <div style={{ fontSize:10, letterSpacing:1, color:'#454640', fontWeight:'bold', marginBottom:4 }}>◈ MUMBAI LANDING STN</div>
-        <div style={{ display:'flex', alignItems:'center', gap:5 }}>
-          <span ref={h.srcCardStat} style={{ fontSize:9, color:'#687B59', fontWeight:700, letterSpacing:0.5 }}>TRANSMITTING</span>
+      <div
+        ref={h.srcCard}
+        className="absolute z-20"
+        style={{
+          bottom: 56,
+          left: 250,
+          background: 'rgba(8, 8, 8, 0.90)',
+          border: '1px solid rgba(255, 255, 255, 0.10)',
+          borderRadius: 10,
+          padding: '10px 15px',
+          backdropFilter: 'blur(12px)',
+          minWidth: 170,
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+        }}
+      >
+        <div style={{ fontSize: 10, letterSpacing: 1, color: '#FFFFFF', fontWeight: 700, marginBottom: 4 }}>
+          ◈ MUMBAI LANDING STN
         </div>
-        <div style={{ marginTop:4, fontSize:9, color:'#A69B89', fontFamily:"'IBM Plex Mono', monospace" }}>19.07°N, 72.88°E</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          <span ref={h.srcCardStat} style={{ fontSize: 9, color: '#10B981', fontWeight: 700, letterSpacing: 0.6 }}>
+            TRANSMITTING
+          </span>
+        </div>
+        <div style={{ marginTop: 4, fontSize: 9, color: '#8A8A8A', fontFamily: "'IBM Plex Mono', monospace" }}>
+          19.07°N, 72.88°E
+        </div>
       </div>
 
-      <div ref={h.dstCard} className="absolute z-20" style={{ bottom:56, right:240, background:'rgba(247, 243, 234, 0.94)', border:'1px solid #D4C4A8', borderRadius:10, padding:'10px 14px', backdropFilter:'blur(10px)', minWidth:165, boxShadow:'0 4px 12px rgba(69,70,64,0.06)' }}>
-        <div style={{ fontSize:10, letterSpacing:1, color:'#454640', fontWeight:'bold', marginBottom:4 }}>◈ FUJAIRAH LANDING STN</div>
-        <div style={{ display:'flex', alignItems:'center', gap:5 }}>
-          <span ref={h.dstCardStat} style={{ fontSize:9, color:'#687B59', fontWeight:700, letterSpacing:0.5 }}>RECEIVING</span>
+      <div
+        ref={h.dstCard}
+        className="absolute z-20"
+        style={{
+          bottom: 56,
+          right: 250,
+          background: 'rgba(8, 8, 8, 0.90)',
+          border: '1px solid rgba(255, 255, 255, 0.10)',
+          borderRadius: 10,
+          padding: '10px 15px',
+          backdropFilter: 'blur(12px)',
+          minWidth: 170,
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+        }}
+      >
+        <div style={{ fontSize: 10, letterSpacing: 1, color: '#FFFFFF', fontWeight: 700, marginBottom: 4 }}>
+          ◈ FUJAIRAH LANDING STN
         </div>
-        <div style={{ marginTop:4, fontSize:9, color:'#A69B89', fontFamily:"'IBM Plex Mono', monospace" }}>25.13°N, 56.33°E</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          <span ref={h.dstCardStat} style={{ fontSize: 9, color: '#10B981', fontWeight: 700, letterSpacing: 0.6 }}>
+            RECEIVING
+          </span>
+        </div>
+        <div style={{ marginTop: 4, fontSize: 9, color: '#8A8A8A', fontFamily: "'IBM Plex Mono', monospace" }}>
+          25.13°N, 56.33°E
+        </div>
       </div>
 
       {/* ── ROV PANEL ── */}
-      <div ref={h.rovPanel} className="absolute z-20" style={{ bottom:56, right:16, width:210, background:'rgba(247, 243, 234, 0.94)', border:'1px solid #D4C4A8', borderRadius:10, padding:12, backdropFilter:'blur(12px)', opacity:0, transition:'opacity .5s', boxShadow:'0 4px 12px rgba(69,70,64,0.06)' }}>
-        <div style={{ fontSize:10, letterSpacing:2, color:'#687B59', fontWeight:700, borderBottom:'1px solid #D4C4A8', paddingBottom:6, marginBottom:8 }}>{`// ROV DEPLOYMENT`}</div>
+      <div
+        ref={h.rovPanel}
+        className="absolute z-20"
+        style={{
+          bottom: 56,
+          right: 16,
+          width: 215,
+          background: 'rgba(8, 8, 8, 0.90)',
+          border: '1px solid rgba(255, 255, 255, 0.10)',
+          borderRadius: 10,
+          padding: 13,
+          backdropFilter: 'blur(16px)',
+          opacity: 0,
+          transition: 'opacity .5s ease',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
+        }}
+      >
+        <div
+          style={{
+            fontSize: 10,
+            letterSpacing: 2,
+            color: '#10B981',
+            fontWeight: 700,
+            borderBottom: '1px solid rgba(255, 255, 255, 0.10)',
+            paddingBottom: 6,
+            marginBottom: 9,
+          }}
+        >
+          {`// ROV DEPLOYMENT`}
+        </div>
         {[
-          { label:'STATUS', ref:h.rovStatus, init:'DESCENDING', col:'#C87954' },
-          { label:'DEPTH',  ref:h.rovDepth,  init:'0 m',        col:'#454640' },
-          { label:'TASK',   ref:h.rovTask,   init:'LOCATING FAULT', col:'#A69B89' },
-        ].map((row,i) => (
-          <div key={i} style={{ display:'flex', justifyContent:'space-between', marginTop: i ? 7 : 0 }}>
-            <span style={{ fontSize:10, color:'#A69B89', fontWeight:600, letterSpacing:0.5 }}>{row.label}</span>
-            <span ref={row.ref} style={{ fontSize:10, color:row.col, fontWeight:'bold', fontFamily:"'IBM Plex Mono', monospace" }}>{row.init}</span>
+          { label: 'STATUS', ref: h.rovStatus, init: 'DESCENDING', col: '#C87954' },
+          { label: 'DEPTH',  ref: h.rovDepth,  init: '0 m',        col: '#FFFFFF' },
+          { label: 'TASK',   ref: h.rovTask,   init: 'LOCATING FAULT', col: '#8A8A8A' },
+        ].map((row, i) => (
+          <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: i ? 8 : 0 }}>
+            <span style={{ fontSize: 10, color: '#8A8A8A', fontWeight: 600, letterSpacing: 0.8 }}>{row.label}</span>
+            <span ref={row.ref} style={{ fontSize: 10, color: row.col, fontWeight: 700, fontFamily: "'IBM Plex Mono', monospace" }}>
+              {row.init}
+            </span>
           </div>
         ))}
       </div>
 
-      {/* ── PHASE INDICATOR ── */}
-      <div className="absolute z-20" style={{ bottom:14, left:'50%', transform:'translateX(-50%)', background:'rgba(247, 243, 234, 0.96)', border:'1px solid #D4C4A8', borderRadius:24, padding:'8px 24px', backdropFilter:'blur(12px)', whiteSpace:'nowrap', boxShadow:'0 4px 16px rgba(69,70,64,0.1)' }}>
-        <span ref={h.phase} style={{ fontSize:11, fontWeight:700, letterSpacing:1, color:'#454640' }}>◈ PHASE 1: NORMAL OPERATION — DATA FLOWING AT 4.8 TBPS</span>
+      {/* ── PHASE INDICATOR (BOTTOM CENTER) ── */}
+      <div
+        className="absolute z-20"
+        style={{
+          bottom: 14,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: 'rgba(8, 8, 8, 0.92)',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+          borderRadius: 24,
+          padding: '8px 26px',
+          backdropFilter: 'blur(16px)',
+          whiteSpace: 'nowrap',
+          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.6)',
+        }}
+      >
+        <span
+          ref={h.phase}
+          style={{
+            fontSize: 11,
+            fontWeight: 600,
+            letterSpacing: 1,
+            color: '#F5F5F5',
+            fontFamily: "'IBM Plex Mono', monospace",
+          }}
+        >
+          ◈ PHASE 1: NORMAL OPERATION — DATA FLOWING AT 4.8 TBPS
+        </span>
       </div>
 
       {/* ── CONTROLS ── */}
-      <div className="absolute z-20 flex gap-2" style={{ bottom:14, right:16 }}>
+      <div className="absolute z-20 flex gap-2" style={{ bottom: 14, right: 16 }}>
         {[
-          { label:'↺ RESTART', action: () => window.location.reload() },
-        ].map((btn,i) => (
-          <button key={i} onClick={btn.action} style={{ background:'#E8D9BF', border:'1px solid #D4C4A8', borderRadius:8, padding:'6px 14px', color:'#454640', fontWeight:700, fontSize:10, letterSpacing:1, cursor:'pointer', transition:'all .2s' }}
-            onMouseEnter={e=>(e.currentTarget.style.background='#D4C4A8')}
-            onMouseLeave={e=>(e.currentTarget.style.background='#E8D9BF')}>
+          { label: '↺ RESTART', action: () => window.location.reload() },
+        ].map((btn, i) => (
+          <button
+            key={i}
+            onClick={btn.action}
+            style={{
+              background: 'rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(255, 255, 255, 0.16)',
+              borderRadius: 8,
+              padding: '6px 14px',
+              color: '#FFFFFF',
+              fontWeight: 600,
+              fontSize: 10,
+              letterSpacing: 1,
+              cursor: 'pointer',
+              transition: 'all .2s ease',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255, 255, 255, 0.18)')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)')}
+          >
             {btn.label}
           </button>
         ))}
