@@ -86,6 +86,13 @@ interface WorkspaceContextType {
   addDatasetRecord: (record: DatasetRecord) => void;
   snapshots: SimulationSnapshot[];
   saveCurrentSnapshot: (name: string) => void;
+
+  // Incident Response & Operational Scenario State
+  demoStep: number;
+  setDemoStep: (step: number) => void;
+  isDemoActive: boolean;
+  setIsDemoActive: (active: boolean) => void;
+  resetDemoFlow: () => void;
 }
 
 const defaultScenario: ScenarioConfig = {
@@ -147,6 +154,14 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const [activeConfirmedNotification, setActiveConfirmedNotification] = useState<FaultNotification | null>(null);
   const [incomingWhatIfAlert, setIncomingWhatIfAlert] = useState<FaultNotification | null>(null);
   const [isWhatIfModalOpen, setIsWhatIfModalOpen] = useState<boolean>(false);
+  const [demoStep, setDemoStep] = useState<number>(1);
+  const [isDemoActive, setIsDemoActive] = useState<boolean>(true);
+
+  const resetDemoFlow = () => {
+    setDemoStep(1);
+    setIsDemoActive(true);
+  };
+
 
   const dismissIncomingWhatIfAlert = () => {
     setIncomingWhatIfAlert(null);
@@ -427,6 +442,8 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
 
     // 8. Set active confirmed notification for user navigation banner
     setActiveConfirmedNotification(notif);
+    setDemoStep(1);
+    setIsDemoActive(true);
   };
 
   const declineFaultNotification = (id: string) => {
@@ -652,7 +669,12 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
         datasets,
         addDatasetRecord,
         snapshots,
-        saveCurrentSnapshot
+        saveCurrentSnapshot,
+        demoStep,
+        setDemoStep,
+        isDemoActive,
+        setIsDemoActive,
+        resetDemoFlow
       }}
     >
       {children}

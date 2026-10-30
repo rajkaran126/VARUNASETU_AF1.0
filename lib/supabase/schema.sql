@@ -137,3 +137,4 @@ CREATE POLICY "Public Insert AgentFindings" ON public.agent_findings FOR INSERT 
 
 CREATE POLICY "Public Read AuditLogs" ON public.audit_logs FOR SELECT USING (true);
 CREATE POLICY "Public Insert AuditLogs" ON public.audit_logs FOR INSERT WITH CHECK (true);
+

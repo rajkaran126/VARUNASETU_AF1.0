@@ -309,3 +309,4 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
     </>
   );
 }
+

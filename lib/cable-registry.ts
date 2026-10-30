@@ -16,3 +16,4 @@ export const ALL_CABLE_ROUTES: CableRoute[] = [...REAL_CABLE_ROUTES, ...CURATED_
 
 // Real incidents + simulation incidents merged (real first)
 export const ALL_FAULT_INCIDENTS: FaultIncident[] = [...REAL_FAULT_INCIDENTS, ...ACTIVE_FAULT_INCIDENTS];
+

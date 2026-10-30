@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useWorkspace } from '@/lib/workspace-context';
 import type * as THREE from 'three';
 
 /* =========================================================
@@ -27,6 +28,11 @@ const PHASE_TIMES = {
 
 export default function CableBreakSim() {
   const mountRef = useRef<HTMLDivElement>(null);
+  const { activeFault, selectedCable } = useWorkspace();
+  const faultName = activeFault?.cableName || selectedCable?.name || 'SEA-ME-WE 4';
+  const faultStation = activeFault?.nearestLandingStation || 'Zafarana / Suez Transit Corridor';
+  const faultLoc = activeFault ? `${activeFault.lat.toFixed(2)}°N, ${activeFault.lon.toFixed(2)}°E` : '27.88°N, 34.28°E';
+  const faultDepth = activeFault ? `${activeFault.depthMeters.toLocaleString()}m` : '850m';
 
   // HUD DOM refs — updated directly to avoid React re-render cost
   const h = {
@@ -1182,7 +1188,7 @@ export default function CableBreakSim() {
           ⚠ CRITICAL ALERT: SUBMARINE CABLE FAILURE DETECTED
         </div>
         <div style={{ fontSize: 11, color: '#FFFFFF', fontFamily: "'IBM Plex Mono', monospace", fontWeight: 600, letterSpacing: 1, marginTop: 8 }}>
-          FAULT LOCATION: 12.31°N, 43.49°E &nbsp;|&nbsp; DEPTH: 4,200m
+          FAULT: {faultName.toUpperCase()} &nbsp;|&nbsp; {faultLoc} &nbsp;|&nbsp; DEPTH: {faultDepth}
         </div>
       </div>
 
@@ -1203,7 +1209,7 @@ export default function CableBreakSim() {
             boxShadow: '0 4px 16px rgba(200, 121, 84, 0.3)',
           }}
         >
-          ⊗ FAULT DETECTED<br />12.31°N, 43.49°E<br />DEPTH: 4,200m
+          ⊗ {faultName}<br />{faultLoc}<br />DEPTH: {faultDepth}
         </div>
       </div>
 

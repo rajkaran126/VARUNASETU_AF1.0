@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useWorkspace } from '@/lib/workspace-context';
 import { FaultNotificationTray } from './FaultNotificationTray';
 
@@ -20,6 +21,7 @@ export function Header() {
 
   const [formattedDateTime, setFormattedDateTime] = useState<string>('');
   const [justApproved, setJustApproved] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const updateDateTime = () => {
@@ -37,6 +39,7 @@ export function Header() {
   const handleApproveIncoming = (id: string, cableName: string) => {
     approveFaultNotification(id);
     setJustApproved(cableName);
+    router.push('/workspace');
     setTimeout(() => {
       setJustApproved(null);
     }, 6000);

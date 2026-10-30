@@ -30,7 +30,7 @@ export function CableGlobe3D({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [modelLoading, setModelLoading] = useState(true);
   const [modelLoaded, setModelLoaded] = useState(false);
-  const [autoRotate, setAutoRotate] = useState(true);
+  const [autoRotate, setAutoRotate] = useState(!activeFault);
 
   // Interaction tracking (Full Unconstrained 3D Trackball Rotation)
   const isDragging = useRef(false);
@@ -39,6 +39,8 @@ export function CableGlobe3D({
   const globeGroupRef = useRef<THREE.Group | null>(null);
   const rerouteCurveRef = useRef<THREE.CatmullRomCurve3 | null>(null);
   const pulseMeshesRef = useRef<THREE.Mesh[]>([]);
+  const pulseRingsRef = useRef<THREE.Mesh[]>([]);
+  const diamondPinRef = useRef<THREE.Mesh | null>(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -139,7 +141,8 @@ export function CableGlobe3D({
         // 1. rotation.x = -Math.PI / 2 brings North Pole to +Y (UP) and South Pole to -Y (DOWN).
         // 2. rotation.y brings the active fault (Djibouti / Red Sea / Indian Ocean) to face forward (+Z) toward the camera.
         cableModel.rotation.order = 'YXZ';
-        cableModel.rotation.x = -Math.PI / 2;
+        const targetLat = activeFault ? (activeFault.lat * Math.PI / 180) : 0;
+        cableModel.rotation.x = -Math.PI / 2 - targetLat;
         const targetLon = activeFault ? (activeFault.lon * Math.PI / 180) : (43.49 * Math.PI / 180);
         cableModel.rotation.y = -(targetLon + Math.PI / 2);
 
@@ -148,7 +151,7 @@ export function CableGlobe3D({
           const markerGroup = new THREE.Group();
           const latRad = activeFault.lat * (Math.PI / 180);
           const lonRad = activeFault.lon * (Math.PI / 180);
-          const r = 2965; // Sits flush right on the ocean surface / cable ribbons
+          const r = 2970; // Flush right on the ocean surface / cable ribbons
           const fx = r * Math.cos(latRad) * Math.cos(lonRad);
           const fy = r * Math.cos(latRad) * Math.sin(lonRad);
           const fz = r * Math.sin(latRad);
@@ -158,25 +161,111 @@ export function CableGlobe3D({
           const normal = new THREE.Vector3(fx, fy, fz).normalize();
           markerGroup.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
 
-          // Core fault dot
-          const dot = new THREE.Mesh(
-            new THREE.SphereGeometry(32, 16, 16),
-            new THREE.MeshBasicMaterial({ color: 0xc87954 })
+          // 1. Core Pulsating Glowing Red Dot (#FF0033)
+          const outerDot = new THREE.Mesh(
+            new THREE.SphereGeometry(48, 24, 24),
+            new THREE.MeshBasicMaterial({ color: 0xFF0033 })
           );
-          markerGroup.add(dot);
+          markerGroup.add(outerDot);
 
-          // Radar pulse ring
-          const ring = new THREE.Mesh(
-            new THREE.RingGeometry(38, 90, 32),
-            new THREE.MeshBasicMaterial({
-              color: 0xe99a65,
-              side: THREE.DoubleSide,
-              transparent: true,
-              opacity: 0.85,
-            })
+          // White-hot inner core
+          const innerDot = new THREE.Mesh(
+            new THREE.SphereGeometry(22, 16, 16),
+            new THREE.MeshBasicMaterial({ color: 0xFFFFFF })
           );
-          ring.position.z = 2;
-          markerGroup.add(ring);
+          innerDot.position.z = 10;
+          markerGroup.add(innerDot);
+
+          // 2. Dynamic Expanding Concentric Radar Shockwave Rings
+          pulseRingsRef.current = [];
+          const ringConfigs = [
+            { inner: 55, outer: 95, color: 0xFF1744 },
+            { inner: 105, outer: 155, color: 0xFF5252 },
+            { inner: 165, outer: 225, color: 0xFF8A80 },
+          ];
+
+          ringConfigs.forEach((cfg, idx) => {
+            const rMesh = new THREE.Mesh(
+              new THREE.RingGeometry(cfg.inner, cfg.outer, 36),
+              new THREE.MeshBasicMaterial({
+                color: cfg.color,
+                side: THREE.DoubleSide,
+                transparent: true,
+                opacity: 0.85,
+              })
+            );
+            rMesh.position.z = 3 + idx * 2;
+            markerGroup.add(rMesh);
+            pulseRingsRef.current.push(rMesh);
+          });
+
+          // 3. Vertical Laser Beacon Cylinder (Pointing directly out of the Earth into space)
+          const laserGeo = new THREE.CylinderGeometry(6, 16, 450, 16);
+          const laserMat = new THREE.MeshBasicMaterial({
+            color: 0xFF1744,
+            transparent: true,
+            opacity: 0.85,
+          });
+          const laser = new THREE.Mesh(laserGeo, laserMat);
+          laser.rotation.x = Math.PI / 2;
+          laser.position.z = 225; // Project outward
+          markerGroup.add(laser);
+
+          // 4. Floating Diamond / Pin on Top of Laser Beacon
+          const diamondGeo = new THREE.OctahedronGeometry(36, 0);
+          const diamondMat = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
+          const diamond = new THREE.Mesh(diamondGeo, diamondMat);
+          diamond.position.z = 460;
+          markerGroup.add(diamond);
+          diamondPinRef.current = diamond;
+
+          // 5. Intense Red PointLight illuminating the ocean and cable ribbons
+          const redLight = new THREE.PointLight(0xFF0033, 5.0, 2500, 1.2);
+          redLight.position.z = 80;
+          markerGroup.add(redLight);
+
+          // 6. High-Visibility 3D Floating HUD Billboard Sprite
+          const canvas = document.createElement('canvas');
+          canvas.width = 512;
+          canvas.height = 256;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.fillStyle = 'rgba(14, 42, 71, 0.94)';
+            ctx.strokeStyle = '#FF1744';
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.roundRect(10, 10, 492, 236, 24);
+            ctx.fill();
+            ctx.stroke();
+
+            // Header Banner
+            ctx.fillStyle = '#FF1744';
+            ctx.fillRect(10, 10, 492, 52);
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = 'bold 24px monospace';
+            ctx.fillText('CRITICAL SEVERANCE DETECTED', 30, 46);
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = 'bold 28px sans-serif';
+            ctx.fillText(activeFault.cableName.slice(0, 30), 30, 110);
+
+            ctx.fillStyle = '#CBD5E1';
+            ctx.font = '20px monospace';
+            ctx.fillText('Loc: ' + activeFault.nearestLandingStation, 30, 150);
+            ctx.fillText('Lat: ' + activeFault.lat.toFixed(2) + 'N | Lon: ' + activeFault.lon.toFixed(2) + 'E', 30, 185);
+
+            ctx.fillStyle = '#F87171';
+            ctx.font = 'bold 20px monospace';
+            ctx.fillText('Loss: ' + activeFault.opticalLossDb + ' dB | Depth: -' + activeFault.depthMeters + 'm', 30, 222);
+
+            const texture = new THREE.CanvasTexture(canvas);
+            const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
+            const sprite = new THREE.Sprite(spriteMat);
+            sprite.scale.set(700, 350, 1);
+            sprite.position.set(0, 0, 620);
+            markerGroup.add(sprite);
+          }
 
           cableModel.add(markerGroup);
           faultMarker = markerGroup;
@@ -447,10 +536,27 @@ export function CableGlobe3D({
         starField.rotation.y += 0.00008;
       }
 
-      // Animate active fault marker pulse
+      // Animate active fault marker pulse & radar shockwaves
       if (faultMarker) {
-        const pulse = Math.sin(timeMs * 0.005) * 0.2 + 1.0;
-        faultMarker.scale.setScalar(pulse);
+        const pulse = Math.sin(timeMs * 0.007) * 0.25 + 1.1;
+        faultMarker.scale.set(pulse, pulse, 1.0);
+      }
+
+      if (pulseRingsRef.current.length > 0) {
+        const timeSec = timeMs * 0.001;
+        pulseRingsRef.current.forEach((rMesh, i) => {
+          const t = (timeSec * 0.85 + i * 0.33) % 1;
+          const scale = 1.0 + t * 2.2;
+          rMesh.scale.set(scale, scale, 1);
+          if (rMesh.material && !Array.isArray(rMesh.material)) {
+            (rMesh.material as THREE.MeshBasicMaterial).opacity = Math.max(0, (1 - t) * 0.85);
+          }
+        });
+      }
+
+      if (diamondPinRef.current) {
+        diamondPinRef.current.rotation.z += 0.02;
+        diamondPinRef.current.rotation.y += 0.015;
       }
 
       // Animate active reroute pulse photons

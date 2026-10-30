@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useWorkspace } from '@/lib/workspace-context';
 
 interface FaultNotificationTrayProps {
@@ -18,6 +19,7 @@ export function FaultNotificationTray({ onClose }: FaultNotificationTrayProps) {
     dismissConfirmedNotification
   } = useWorkspace();
 
+  const router = useRouter();
   const [filter, setFilter] = useState<'Pending' | 'Approved' | 'Declined' | 'All'>('Pending');
 
   const filteredNotifications = notifications.filter(n => {
