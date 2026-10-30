@@ -61,7 +61,7 @@ function ScenarioCard({
               {scenarioLabel}
             </div>
             <div>
-              <p className="font-sans font-bold text-xs text-[#0E2A47]">{preset.title}</p>
+              <p className="font-sans font-bold text-xs text-[#1C1917]">{preset.title}</p>
               {isSynthetic && (
                 <span className="text-[9px] font-mono text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200">
                   ⚠ SYNTHETIC DATA
@@ -96,7 +96,7 @@ function ScenarioCard({
         {result && (
           <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#F0EBE0]">
             <div className="text-center">
-              <p className="font-mono text-lg font-bold text-[#0E2A47]">
+              <p className="font-mono text-lg font-bold text-[#1C1917]">
                 {result.allocationResult.totalServedTbps.toFixed(1)}
               </p>
               <p className="text-[9px] text-[#59738A] font-mono">Tbps Served</p>
@@ -108,7 +108,7 @@ function ScenarioCard({
               <p className="text-[9px] text-[#59738A] font-mono">Tbps Unserved</p>
             </div>
             <div className="text-center">
-              <p className="font-mono text-sm font-bold text-[#0E2A47]">
+              <p className="font-mono text-sm font-bold text-[#1C1917]">
                 {result.networkRecoveryTimeHours}h
               </p>
               <p className="text-[9px] text-[#59738A] font-mono">Recovery Time</p>
@@ -156,7 +156,7 @@ function ComparisonPanel({ results }: { results: Map<string, CorrelatedFailureRe
     <div className="bg-white rounded-2xl border border-[#E2DBD0] overflow-hidden">
       <div className="px-5 py-3 border-b border-[#F0EBE0] bg-[#FAF7F2] flex items-center justify-between">
         <div>
-          <h3 className="font-sans font-bold text-sm text-[#0E2A47]">Strategy Comparison</h3>
+          <h3 className="font-sans font-bold text-sm text-[#1C1917]">Strategy Comparison</h3>
           <p className="text-[10px] text-[#59738A] font-mono">Same seed ({entries[0][1].config.seed}) · Same dataset version · Identical starting conditions</p>
         </div>
         <EvidenceBadge label="Derived" />
@@ -185,10 +185,10 @@ function ComparisonPanel({ results }: { results: Map<string, CorrelatedFailureRe
               return (
                 <tr key={type} className="hover:bg-[#FAF7F2] transition-colors">
                   <td className="py-2.5 px-3">
-                    <p className="font-bold text-[#0E2A47]">{preset?.title ?? type}</p>
+                    <p className="font-bold text-[#1C1917]">{preset?.title ?? type}</p>
                     <p className="text-[10px] text-[#59738A]">{result.allocationResult.policy.policy}</p>
                   </td>
-                  <td className="py-2.5 px-3 text-right font-mono text-[#0E2A47]">
+                  <td className="py-2.5 px-3 text-right font-mono text-[#1C1917]">
                     {result.allocationResult.totalOfferedTbps.toFixed(1)}
                   </td>
                   <td className="py-2.5 px-3 text-right font-mono text-emerald-700 font-bold">
@@ -202,7 +202,7 @@ function ComparisonPanel({ results }: { results: Map<string, CorrelatedFailureRe
                       {utilPct}%
                     </span>
                   </td>
-                  <td className="py-2.5 px-3 text-right font-mono text-[#0E2A47]">
+                  <td className="py-2.5 px-3 text-right font-mono text-[#1C1917]">
                     {result.networkRecoveryTimeHours}h
                   </td>
                   <td className="py-2.5 px-3 text-right font-mono">
@@ -264,7 +264,7 @@ export default function FalseRedundancyLabPage() {
               ENGINEERING CHALLENGE
             </span>
           </div>
-          <h1 className="font-sans font-bold text-2xl lg:text-3xl text-[#0E2A47] tracking-tight mt-1">
+          <h1 className="font-sans font-bold text-2xl lg:text-3xl text-[#1C1917] tracking-tight mt-1">
             False Redundancy Lab
           </h1>
           <div className="mt-2 p-3 rounded-xl bg-amber-50 border border-amber-200 max-w-2xl">
@@ -295,7 +295,7 @@ export default function FalseRedundancyLabPage() {
           </div>
           <div className="px-4 py-3 bg-white rounded-xl border border-[#E2DBD0] shadow-xs text-right">
             <p className="font-mono text-[10px] text-[#59738A]">Scenarios Available</p>
-            <p className="font-mono text-xl font-bold text-[#0E2A47]">{FALSE_REDUNDANCY_SCENARIO_PRESETS.length}</p>
+            <p className="font-mono text-xl font-bold text-[#1C1917]">{FALSE_REDUNDANCY_SCENARIO_PRESETS.length}</p>
           </div>
           <div className="px-4 py-3 bg-white rounded-xl border border-[#E2DBD0] shadow-xs text-right">
             <p className="font-mono text-[10px] text-[#59738A]">Scenarios Executed</p>
@@ -351,7 +351,7 @@ export default function FalseRedundancyLabPage() {
               <div className="bg-white rounded-2xl border border-[#E2DBD0] p-5">
                 <div className="flex items-center justify-between pb-3 border-b border-[#F0EBE0] mb-4">
                   <div>
-                    <h2 className="font-sans font-bold text-base text-[#0E2A47]">{activePreset.title}</h2>
+                    <h2 className="font-sans font-bold text-base text-[#1C1917]">{activePreset.title}</h2>
                     <p className="text-[10px] text-[#59738A] font-mono">
                       Run ID: {activeResult.runId} · Seed: {activeResult.config.seed} · Engine: {activeResult.engineVersion}
                     </p>
@@ -366,12 +366,12 @@ export default function FalseRedundancyLabPage() {
                   {[
                     { label: 'Affected Cables', value: activeResult.affectedCables.length.toString(), sub: activeResult.affectedCables.join(', '), colour: 'text-rose-700' },
                     { label: 'Surviving Cables', value: activeResult.survivingCables.length.toString(), sub: `${activeResult.connectivity.remainingCapacityTbps.toFixed(1)} Tbps available`, colour: 'text-emerald-700' },
-                    { label: 'Served Demand', value: `${activeResult.allocationResult.totalServedTbps.toFixed(1)} Tbps`, sub: `of ${activeResult.allocationResult.totalOfferedTbps.toFixed(1)} Tbps offered`, colour: 'text-[#0E2A47]' },
+                    { label: 'Served Demand', value: `${activeResult.allocationResult.totalServedTbps.toFixed(1)} Tbps`, sub: `of ${activeResult.allocationResult.totalOfferedTbps.toFixed(1)} Tbps offered`, colour: 'text-[#1C1917]' },
                     { label: 'Network Recovery', value: `${activeResult.networkRecoveryTimeHours}h`, sub: 'ASSUMED — repair duration', colour: 'text-amber-700' },
                   ].map((m) => (
                     <div key={m.label} className="text-center p-3 bg-[#FAF7F2] rounded-xl border border-[#E8E1D5]">
                       <p className={`font-mono text-xl font-bold ${m.colour}`}>{m.value}</p>
-                      <p className="text-[10px] font-semibold text-[#0E2A47] mt-0.5">{m.label}</p>
+                      <p className="text-[10px] font-semibold text-[#1C1917] mt-0.5">{m.label}</p>
                       <p className="text-[9px] text-[#69829A] mt-0.5 truncate" title={m.sub}>{m.sub}</p>
                     </div>
                   ))}
@@ -380,7 +380,7 @@ export default function FalseRedundancyLabPage() {
 
               {/* Traffic Classes */}
               <div className="bg-white rounded-2xl border border-[#E2DBD0] p-5">
-                <h3 className="font-sans font-bold text-sm text-[#0E2A47] mb-3 pb-2 border-b border-[#F0EBE0]">
+                <h3 className="font-sans font-bold text-sm text-[#1C1917] mb-3 pb-2 border-b border-[#F0EBE0]">
                   Traffic Priority Allocation — Policy: <span className="text-[#C87954]">{activeResult.allocationResult.policy.policy}</span>
                 </h3>
                 <div className="space-y-2">
@@ -395,7 +395,7 @@ export default function FalseRedundancyLabPage() {
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center justify-between mb-0.5">
-                            <span className="text-xs font-semibold text-[#0E2A47]">{cls.name}</span>
+                            <span className="text-xs font-semibold text-[#1C1917]">{cls.name}</span>
                             <span className="text-[10px] font-mono text-[#59738A]">
                               {(cls.servedDemandTbps ?? 0).toFixed(2)} / {cls.offeredDemandTbps.toFixed(2)} Tbps
                             </span>
@@ -423,7 +423,7 @@ export default function FalseRedundancyLabPage() {
 
               {/* Recovery Timeline */}
               <div className="bg-white rounded-2xl border border-[#E2DBD0] p-5">
-                <h3 className="font-sans font-bold text-sm text-[#0E2A47] mb-3 pb-2 border-b border-[#F0EBE0]">Recovery Milestones</h3>
+                <h3 className="font-sans font-bold text-sm text-[#1C1917] mb-3 pb-2 border-b border-[#F0EBE0]">Recovery Milestones</h3>
                 <div className="relative">
                   <div className="absolute left-3 top-0 bottom-0 w-px bg-[#E2DBD0]" />
                   <div className="space-y-3">
@@ -432,7 +432,7 @@ export default function FalseRedundancyLabPage() {
                         <div className="absolute left-1.5 top-1.5 w-3 h-3 rounded-full bg-white border-2 border-[#C87954]" />
                         <div className="flex items-start justify-between">
                           <div>
-                            <p className="text-xs font-bold text-[#0E2A47]">{m.phase}</p>
+                            <p className="text-xs font-bold text-[#1C1917]">{m.phase}</p>
                             <p className="text-[10px] text-[#59738A] mt-0.5">{m.description}</p>
                           </div>
                           <div className="flex items-center gap-1.5 flex-shrink-0 ml-3">
@@ -450,7 +450,7 @@ export default function FalseRedundancyLabPage() {
               {activeResult.repairSchedule && (
                 <div className="bg-white rounded-2xl border border-[#E2DBD0] p-5">
                   <div className="flex items-center justify-between pb-3 border-b border-[#F0EBE0] mb-4">
-                    <h3 className="font-sans font-bold text-sm text-[#0E2A47]">Repair Schedule</h3>
+                    <h3 className="font-sans font-bold text-sm text-[#1C1917]">Repair Schedule</h3>
                     <div className="flex gap-2 items-center">
                       <span className="text-[10px] font-mono text-[#59738A]">
                         All durations: ASSUMED · Sources: {activeResult.repairSchedule.assumptionSources.join(' | ')}
@@ -462,7 +462,7 @@ export default function FalseRedundancyLabPage() {
                       <div key={a.faultId} className={`p-3 rounded-xl border ${a.feasible ? 'border-[#E2DBD0] bg-[#FAF7F2]' : 'border-rose-200 bg-rose-50'}`}>
                         <div className="flex items-center justify-between mb-2">
                           <div>
-                            <p className="text-xs font-bold text-[#0E2A47]">{a.vesselName}</p>
+                            <p className="text-xs font-bold text-[#1C1917]">{a.vesselName}</p>
                             <p className="text-[10px] text-[#59738A] font-mono">Fault: {a.faultId}</p>
                           </div>
                           {!a.feasible && (
@@ -479,7 +479,7 @@ export default function FalseRedundancyLabPage() {
                             { v: `${a.repairCompleteHours}h`, l: 'Complete' },
                           ].map((s) => (
                             <div key={s.l}>
-                              <p className="font-mono text-sm font-bold text-[#0E2A47]">{s.v}</p>
+                              <p className="font-mono text-sm font-bold text-[#1C1917]">{s.v}</p>
                               <p className="text-[9px] text-[#59738A]">{s.l}</p>
                             </div>
                           ))}
@@ -508,7 +508,7 @@ export default function FalseRedundancyLabPage() {
               {activeResult.weatherWindows && activeResult.weatherWindows.length > 0 && (
                 <div className="bg-white rounded-2xl border border-[#E2DBD0] p-5">
                   <div className="flex items-center justify-between pb-3 border-b border-[#F0EBE0] mb-4">
-                    <h3 className="font-sans font-bold text-sm text-[#0E2A47]">Weather Windows</h3>
+                    <h3 className="font-sans font-bold text-sm text-[#1C1917]">Weather Windows</h3>
                     <span className="px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-purple-50 text-purple-700 border border-purple-200">
                       ⚠ SYNTHETIC WEATHER — Not for operational use
                     </span>

@@ -59,7 +59,7 @@ function SRLGGroupCard({ group, onClick, selected }: { group: SRLGGroup; onClick
           {group.confidence}
         </span>
       </div>
-      <p className="text-xs font-bold text-[#0E2A47] leading-snug">{group.name}</p>
+      <p className="text-xs font-bold text-[#1C1917] leading-snug">{group.name}</p>
       {isSynthetic && (
         <p className="text-[9px] text-purple-600 font-mono mt-0.5">⚠ SYNTHETIC DATA</p>
       )}
@@ -85,9 +85,9 @@ function FRARow({ assessment }: { assessment: FalseRedundancyAssessment }) {
         <div className="flex items-center gap-3 text-left">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-[#0E2A47]">{assessment.cableNameA}</span>
+              <span className="text-xs font-bold text-[#1C1917]">{assessment.cableNameA}</span>
               <span className="text-[10px] text-[#59738A]">↔</span>
-              <span className="text-xs font-bold text-[#0E2A47]">{assessment.cableNameB}</span>
+              <span className="text-xs font-bold text-[#1C1917]">{assessment.cableNameB}</span>
             </div>
           </div>
         </div>
@@ -177,7 +177,7 @@ export default function SRLGPage() {
             </span>
             <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-100 text-amber-800 border border-amber-300">SRLG</span>
           </div>
-          <h1 className="font-sans font-bold text-2xl lg:text-3xl text-[#0E2A47] tracking-tight mt-1">
+          <h1 className="font-sans font-bold text-2xl lg:text-3xl text-[#1C1917] tracking-tight mt-1">
             SRLG Analysis
           </h1>
           <p className="text-xs text-[#4A647D] mt-0.5 max-w-2xl">
@@ -262,7 +262,7 @@ export default function SRLGPage() {
           <div className="lg:col-span-2 space-y-4">
             {/* Type breakdown */}
             <div className="bg-white rounded-2xl border border-[#E2DBD0] p-5">
-              <h2 className="font-sans font-bold text-sm text-[#0E2A47] pb-3 border-b border-[#F0EBE0] mb-4">
+              <h2 className="font-sans font-bold text-sm text-[#1C1917] pb-3 border-b border-[#F0EBE0] mb-4">
                 SRLG Group Summary
               </h2>
               <div className="space-y-3">
@@ -276,7 +276,7 @@ export default function SRLGPage() {
                         <span className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold border ${GROUP_TYPE_COLOURS[type as SRLGGroupType]}`}>
                           {label}
                         </span>
-                        <span className="text-xs font-mono font-bold text-[#0E2A47]">{count}</span>
+                        <span className="text-xs font-mono font-bold text-[#1C1917]">{count}</span>
                       </div>
                       <div className="h-2 bg-[#F0EBE0] rounded-full overflow-hidden">
                         <div className="h-full bg-[#C87954] rounded-full" style={{ width: `${pct}%` }} />
@@ -289,7 +289,7 @@ export default function SRLGPage() {
 
             {/* Shared landing stations critical list */}
             <div className="bg-white rounded-2xl border border-[#E2DBD0] p-5">
-              <h2 className="font-sans font-bold text-sm text-[#0E2A47] pb-3 border-b border-[#F0EBE0] mb-4">
+              <h2 className="font-sans font-bold text-sm text-[#1C1917] pb-3 border-b border-[#F0EBE0] mb-4">
                 Critical Landing Station Dependencies
               </h2>
               <div className="space-y-2">
@@ -299,7 +299,7 @@ export default function SRLGPage() {
                   .map((g) => (
                     <div key={g.id} className="flex items-center justify-between p-3 rounded-xl bg-[#FAF7F2] border border-[#E2DBD0]">
                       <div>
-                        <p className="text-xs font-bold text-[#0E2A47]">{g.sharedLandingStationIds?.[0]}</p>
+                        <p className="text-xs font-bold text-[#1C1917]">{g.sharedLandingStationIds?.[0]}</p>
                         <div className="flex flex-wrap gap-1 mt-1">
                           {g.memberCableIds.map((id) => (
                             <span key={id} className="px-1 py-0.5 bg-rose-50 border border-rose-200 text-rose-700 rounded text-[9px] font-mono">{id}</span>
@@ -380,7 +380,7 @@ export default function SRLGPage() {
                   {selectedGroup.evidenceClass}
                 </span>
               </div>
-              <h2 className="font-sans font-bold text-lg text-[#0E2A47]">{selectedGroup.name}</h2>
+              <h2 className="font-sans font-bold text-lg text-[#1C1917]">{selectedGroup.name}</h2>
               <p className="text-[10px] text-[#59738A] font-mono mt-0.5">
                 ID: {selectedGroup.id} · Dataset: {selectedGroup.datasetVersion} · Detected: {new Date(selectedGroup.createdAt).toLocaleString()}
               </p>

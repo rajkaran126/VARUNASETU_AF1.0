@@ -52,7 +52,7 @@ export default function NetworkOverviewPage() {
               CANONICAL ACTIVE
             </span>
           </div>
-          <h1 className="font-sans font-bold text-2xl lg:text-3xl font-bold text-[#0E2A47] tracking-tight mt-1">
+          <h1 className="font-sans font-bold text-2xl lg:text-3xl font-bold text-[#1C1917] tracking-tight mt-1">
             Network Overview & Global Cable Explorer
           </h1>
           <p className="text-xs text-[#4A647D] mt-0.5 max-w-2xl">
@@ -313,7 +313,7 @@ export default function NetworkOverviewPage() {
         {/* Left Column: Search & Filterable Cable List (5 cols) */}
         <div className="lg:col-span-5 bg-white rounded-2xl border border-[#D4C4A8] p-5 shadow-xs space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="font-sans font-bold text-base font-bold text-[#0E2A47]">
+            <h2 className="font-sans font-bold text-base font-bold text-[#1C1917]">
               Submarine Cable Directory
             </h2>
             <span className="font-mono text-[11px] text-[#5A738A]">
@@ -351,7 +351,7 @@ export default function NetworkOverviewPage() {
                 onClick={() => setSelectedStatus(status)}
                 className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold transition-all ${
                   selectedStatus === status
-                    ? 'bg-[#152D46] text-white shadow-2xs'
+                    ? 'bg-[#C87954] text-white shadow-2xs'
                     : 'bg-[#EDF3F7] text-[#A69B89] hover:bg-[#E2EBF2]'
                 }`}
               >
@@ -389,7 +389,7 @@ export default function NetworkOverviewPage() {
                             : 'bg-amber-500'
                         }`}
                       />
-                      <span className="font-sans font-bold font-bold text-xs text-[#0E2A47]">
+                      <span className="font-sans font-bold font-bold text-xs text-[#1C1917]">
                         {cable.name}
                       </span>
                     </div>

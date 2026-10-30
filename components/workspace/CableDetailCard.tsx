@@ -48,7 +48,7 @@ export function CableDetailCard({ cable }: CableDetailCardProps) {
               PROVENANCE: {cable.provenance}
             </span>
           </div>
-          <h2 className="font-grotesk text-xl font-bold text-[#0E2A47] tracking-tight">
+          <h2 className="font-grotesk text-xl font-bold text-[#1C1917] tracking-tight">
             {cable.name}
           </h2>
         </div>
@@ -72,28 +72,28 @@ export function CableDetailCard({ cable }: CableDetailCardProps) {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-4 border-b border-[#F0EBE0]">
         <div>
           <p className="font-mono text-[10px] text-[#69829A] uppercase tracking-wider">Route Length</p>
-          <p className="font-mono text-base font-bold text-[#0E2A47] mt-0.5">
+          <p className="font-mono text-base font-bold text-[#1C1917] mt-0.5">
             {typeof cable.lengthKm === 'number' ? `${cable.lengthKm.toLocaleString()} km` : 'Unmeasured'}
           </p>
         </div>
 
         <div>
           <p className="font-mono text-[10px] text-[#69829A] uppercase tracking-wider">Lit Capacity</p>
-          <p className="font-mono text-base font-bold text-[#0E2A47] mt-0.5">
+          <p className="font-mono text-base font-bold text-[#1C1917] mt-0.5">
             {typeof cable.litCapacityTbps === 'number' ? `${cable.litCapacityTbps} Tbps` : 'Unknown'}
           </p>
         </div>
 
         <div>
           <p className="font-mono text-[10px] text-[#69829A] uppercase tracking-wider">Fiber Pairs</p>
-          <p className="font-mono text-base font-bold text-[#0E2A47] mt-0.5">
+          <p className="font-mono text-base font-bold text-[#1C1917] mt-0.5">
             {typeof cable.fiberPairs === 'number' ? `${cable.fiberPairs} Pairs` : 'Unmeasured'}
           </p>
         </div>
 
         <div>
           <p className="font-mono text-[10px] text-[#69829A] uppercase tracking-wider">RFS Year</p>
-          <p className="font-mono text-base font-bold text-[#0E2A47] mt-0.5">
+          <p className="font-mono text-base font-bold text-[#1C1917] mt-0.5">
             {typeof cable.rfsYear === 'number' ? cable.rfsYear : 'Unknown'}
           </p>
         </div>

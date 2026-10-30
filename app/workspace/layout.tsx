@@ -18,7 +18,7 @@ export default function WorkspaceLayout({
     <WorkspaceProvider>
       {/* 
         Refined Workspace Shell:
-        - Midnight Navy Sidebar (#0B1D33)
+        - Warm Sand & Stone Sidebar (#E8D9BF)
         - Clean Light Header (Strictly minimal: Notifications, Date/Time, User Profile)
         - Warm Ivory & Soft Cream Base (#F7F3EA) with Pale Blue-Grey surfaces
         - Strictly NO footers inside any workspace section

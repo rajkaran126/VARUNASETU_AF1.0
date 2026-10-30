@@ -83,7 +83,7 @@ export function CableExplorerMap({
               onClick={() => setActiveRegionFilter(reg)}
               className={`px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all ${
                 activeRegionFilter === reg
-                  ? 'bg-[#1E4E79] text-white font-bold shadow-xs'
+                  ? 'bg-[#C87954] text-white font-bold shadow-xs'
                   : 'text-white/60 hover:text-white hover:bg-white/5'
               }`}
             >

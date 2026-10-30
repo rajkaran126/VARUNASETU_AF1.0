@@ -52,7 +52,7 @@ export default function RecoveryWarRoomPage() {
               WAR ROOM ACTIVE
             </span>
           </div>
-          <h1 className="font-sans font-bold text-2xl lg:text-3xl font-bold text-[#0E2A47] tracking-tight mt-1">
+          <h1 className="font-sans font-bold text-2xl lg:text-3xl font-bold text-[#1C1917] tracking-tight mt-1">
             Recovery War Room
           </h1>
           <p className="text-xs text-[#4A647D] mt-0.5 max-w-2xl">
@@ -74,11 +74,11 @@ export default function RecoveryWarRoomPage() {
       {/* Recovery Strategies Comparison Matrix */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="font-sans font-bold text-lg font-bold text-[#0E2A47]">
+          <h2 className="font-sans font-bold text-lg font-bold text-[#1C1917]">
             Recovery Strategy Evaluation Matrix
           </h2>
           <span className="font-mono text-xs text-[#59738A]">
-            Selected: <strong className="text-[#0E2A47]">{selectedStrategy.title.split(':')[0]}</strong>
+            Selected: <strong className="text-[#1C1917]">{selectedStrategy.title.split(':')[0]}</strong>
           </span>
         </div>
 
@@ -108,7 +108,7 @@ export default function RecoveryWarRoomPage() {
                     )}
                   </div>
 
-                  <h3 className="font-sans font-bold text-base font-bold text-[#0E2A47] leading-snug">
+                  <h3 className="font-sans font-bold text-base font-bold text-[#1C1917] leading-snug">
                     {strat.title}
                   </h3>
 
@@ -120,7 +120,7 @@ export default function RecoveryWarRoomPage() {
                   <div className="grid grid-cols-2 gap-2 my-4 p-3 rounded-xl bg-[#FAF7F2] border border-[#E8E1D5] font-mono text-xs">
                     <div>
                       <p className="text-[9px] text-[#69829A] uppercase">Execution Window</p>
-                      <p className="font-bold text-[#0E2A47]">{strat.timeToExecute}</p>
+                      <p className="font-bold text-[#1C1917]">{strat.timeToExecute}</p>
                     </div>
 
                     <div>
@@ -135,7 +135,7 @@ export default function RecoveryWarRoomPage() {
 
                     <div>
                       <p className="text-[9px] text-[#69829A] uppercase">Est. Cost</p>
-                      <p className="font-bold text-[#0E2A47]">${(strat.estimatedCostUsd / 1000).toFixed(0)}k USD</p>
+                      <p className="font-bold text-[#1C1917]">${(strat.estimatedCostUsd / 1000).toFixed(0)}k USD</p>
                     </div>
                   </div>
 
@@ -164,7 +164,7 @@ export default function RecoveryWarRoomPage() {
                     className={`w-full py-2 px-3 rounded-xl text-xs font-semibold font-mono tracking-wider transition-all ${
                       isSelected
                         ? 'bg-[#83B9A9] text-[#454640] shadow-xs'
-                        : 'border border-[#CBDDEB] bg-[#EDF3F7] text-[#152D46] hover:bg-white'
+                        : 'border border-[#CBDDEB] bg-[#EDF3F7] text-[#1C1917] hover:bg-white'
                     }`}
                   >
                     {isSelected ? (
@@ -189,7 +189,7 @@ export default function RecoveryWarRoomPage() {
       <div className="bg-white rounded-2xl border border-[#E2DBD0] p-6 shadow-xs space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#F0EBE0]">
           <div>
-            <h2 className="font-sans font-bold text-lg font-bold text-[#0E2A47]">
+            <h2 className="font-sans font-bold text-lg font-bold text-[#1C1917]">
               Subsea Cable Repair Fleet Inventory
             </h2>
             <p className="font-mono text-[10px] text-[#59738A]">
@@ -234,7 +234,7 @@ export default function RecoveryWarRoomPage() {
                   <tr key={vessel.id} className="hover:bg-[#FAF7F2] transition-colors">
                     <td className="py-3 px-3">
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-[#0E2A47]">{vessel.name}</span>
+                        <span className="font-bold text-[#1C1917]">{vessel.name}</span>
                         {isClosest && (
                           <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-amber-100 text-amber-800">
                             CLOSEST
@@ -251,20 +251,20 @@ export default function RecoveryWarRoomPage() {
                       <p className="text-[10px] text-[#59738A] mt-0.5">{vessel.vesselType}</p>
                     </td>
 
-                    <td className="py-3 px-3 font-mono text-[#0E2A47]">
+                    <td className="py-3 px-3 font-mono text-[#1C1917]">
                       {vessel.currentPort}
                       <p className="text-[9px] text-[#7A8E9F]">{vessel.lat.toFixed(2)}°N, {vessel.lon.toFixed(2)}°E</p>
                     </td>
 
-                    <td className="py-3 px-3 font-mono text-[#0E2A47]">
+                    <td className="py-3 px-3 font-mono text-[#1C1917]">
                       -{vessel.rovDepthRatingM}m
                     </td>
 
-                    <td className="py-3 px-3 font-mono text-[#0E2A47]">
+                    <td className="py-3 px-3 font-mono text-[#1C1917]">
                       {vessel.cableTankCapacityTonnes.toLocaleString()} Tonnes
                     </td>
 
-                    <td className="py-3 px-3 font-mono font-bold text-[#0E2A47]">
+                    <td className="py-3 px-3 font-mono font-bold text-[#1C1917]">
                       {distanceNm.toLocaleString()} NM
                     </td>
 

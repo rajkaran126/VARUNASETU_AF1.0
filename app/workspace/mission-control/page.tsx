@@ -59,7 +59,7 @@ export default function MissionControlPage() {
               5 SPECIALIST AGENTS ONLINE
             </span>
           </div>
-          <h1 className="font-sans font-bold text-xl lg:text-2xl font-bold text-[#0E2A47] tracking-tight">
+          <h1 className="font-sans font-bold text-xl lg:text-2xl font-bold text-[#1C1917] tracking-tight">
             Multi-Agent Mission Control
           </h1>
         </div>
@@ -113,7 +113,7 @@ export default function MissionControlPage() {
             <div className="space-y-2 text-xs">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-indigo-500" />
-                <span className="font-bold text-[#0E2A47]">Chief Orchestrator</span>
+                <span className="font-bold text-[#1C1917]">Chief Orchestrator</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-[#83B9A9]" />
@@ -177,8 +177,8 @@ export default function MissionControlPage() {
                   <div
                     className={`p-4 rounded-2xl text-xs leading-relaxed font-body shadow-2xs ${
                       isUser
-                        ? 'bg-[#0E2A47] text-white rounded-tr-none'
-                        : 'bg-[#FAF7F2] text-[#0E2A47] border border-[#E8E1D5] rounded-tl-none'
+                        ? 'bg-[#C87954] text-white rounded-tr-none'
+                        : 'bg-[#FAF7F2] text-[#1C1917] border border-[#E8E1D5] rounded-tl-none'
                     }`}
                   >
                     {/* Render content with simple line breaks */}
@@ -192,7 +192,7 @@ export default function MissionControlPage() {
                         {msg.metrics.map((m, i) => (
                           <div key={i} className="px-2.5 py-1 rounded-lg bg-white border border-[#DDD3C3] font-mono text-[10px]">
                             <span className="text-[#69829A]">{m.label}: </span>
-                            <strong className="text-[#0E2A47]">{m.value}</strong>
+                            <strong className="text-[#1C1917]">{m.value}</strong>
                           </div>
                         ))}
                       </div>
@@ -234,7 +234,7 @@ export default function MissionControlPage() {
                           <button
                             key={act.actionId}
                             onClick={() => sendAgentQuery(act.label)}
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white hover:bg-[#F2ECE1] border border-[#CBDDEB] font-mono text-[10px] text-[#152D46] font-semibold transition-colors shadow-2xs"
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white hover:bg-[#F2ECE1] border border-[#CBDDEB] font-mono text-[10px] text-[#1C1917] font-semibold transition-colors shadow-2xs"
                           >
                             <svg className="w-3 h-3 text-[#C87954]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                               <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
@@ -280,12 +280,12 @@ export default function MissionControlPage() {
               placeholder="Ask the 5 specialist agents anything about subsea topology, blast radius, vessel logistics, or SLAs..."
               value={inputQuery}
               onChange={(e) => setInputQuery(e.target.value)}
-              className="flex-1 px-4 py-2.5 bg-[#FAF7F2] border border-[#DDD3C3] rounded-xl text-xs text-[#0E2A47] placeholder-[#7990A4] focus:outline-none focus:border-[#1E4E79] font-body"
+              className="flex-1 px-4 py-2.5 bg-[#FAF7F2] border border-[#DDD3C3] rounded-xl text-xs text-[#1C1917] placeholder-[#7990A4] focus:outline-none focus:border-[#C87954] font-body"
             />
             <button
               type="submit"
               disabled={isAgentThinking || !inputQuery.trim()}
-              className="px-5 py-2.5 rounded-xl bg-[#0E2A47] hover:bg-[#153B5B] disabled:opacity-50 text-white text-xs font-semibold font-mono tracking-wider shadow-xs transition-all"
+              className="px-5 py-2.5 rounded-xl bg-[#C87954] hover:bg-[#B36845] disabled:opacity-50 text-white text-xs font-semibold font-mono tracking-wider shadow-xs transition-all"
             >
               TRANSMIT
             </button>
@@ -307,7 +307,7 @@ export default function MissionControlPage() {
             {/* Target Cable Info */}
             <div className="p-3 rounded-xl bg-[#FAF7F2] border border-[#E8E1D5]">
               <p className="font-mono text-[9px] uppercase tracking-wider text-[#69829A]">Target Conduit</p>
-              <h4 className="font-bold text-xs text-[#0E2A47] mt-0.5">{selectedCable.name}</h4>
+              <h4 className="font-bold text-xs text-[#1C1917] mt-0.5">{selectedCable.name}</h4>
               <p className="font-mono text-[10px] text-[#59738A] mt-1">
                 Lit: {selectedCable.litCapacityTbps} Tbps · Length: {selectedCable.lengthKm} km
               </p>
@@ -316,7 +316,7 @@ export default function MissionControlPage() {
             {/* Active Fault Position */}
             <div className="p-3 rounded-xl bg-[#FAF7F2] border border-[#E8E1D5]">
               <p className="font-mono text-[9px] uppercase tracking-wider text-[#69829A]">Benthic Coordinates</p>
-              <p className="font-mono text-xs font-bold text-[#0E2A47] mt-0.5">
+              <p className="font-mono text-xs font-bold text-[#1C1917] mt-0.5">
                 {activeFault.lat.toFixed(4)}°N, {activeFault.lon.toFixed(4)}°E
               </p>
               <p className="font-mono text-[10px] text-rose-700 font-semibold mt-1">
@@ -342,7 +342,7 @@ export default function MissionControlPage() {
                 </div>
                 <div>
                   <span className="text-[9px] text-[#7A8E9F]">Resilience:</span>
-                  <p className="font-bold text-[#0E2A47]">{simulationResult.capacityUtilizationPct}%</p>
+                  <p className="font-bold text-[#1C1917]">{simulationResult.capacityUtilizationPct}%</p>
                 </div>
               </div>
             </div>

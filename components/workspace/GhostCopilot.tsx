@@ -190,7 +190,7 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-5 right-5 z-40 px-3.5 py-2.5 rounded-2xl bg-[#0E2A47] hover:bg-[#153B5B] text-white shadow-xl flex items-center gap-2 font-grotesk text-xs font-bold transition-all active:scale-95 border border-[#DDD3C3]"
+          className="fixed bottom-5 right-5 z-40 px-3.5 py-2.5 rounded-2xl bg-[#E06D3B] hover:bg-[#C85D2D] text-white shadow-xl flex items-center gap-2 font-grotesk text-xs font-bold transition-all active:scale-95 border border-orange-400/80 shadow-orange-500/20"
           title="Open Ghost Copilot AI"
         >
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -201,16 +201,16 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
 
       {/* Slide-out / Floating Copilot Panel */}
       {isOpen && (
-        <div className="fixed bottom-5 right-5 z-50 w-[380px] sm:w-[420px] max-w-[calc(100vw-2rem)] h-[560px] bg-white rounded-2xl border-2 border-[#C87954]/40 shadow-2xl flex flex-col overflow-hidden text-[#454640] animate-in slide-in-from-bottom duration-200">
+        <div className="fixed bottom-5 right-5 z-50 w-[380px] sm:w-[420px] max-w-[calc(100vw-2rem)] h-[560px] bg-white rounded-2xl border-2 border-[#E06D3B] ring-1 ring-[#E06D3B]/20 shadow-2xl shadow-orange-500/15 flex flex-col overflow-hidden text-[#454640] animate-in slide-in-from-bottom duration-200">
           {/* Header */}
-          <div className="p-3 px-4 bg-[#F7F3EA] border-b border-[#D4C4A8] flex items-center justify-between flex-shrink-0">
+          <div className="p-3 px-4 bg-[#F7F3EA] border-b-2 border-[#E06D3B]/30 flex items-center justify-between flex-shrink-0">
             <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-[#0E2A47] flex items-center justify-center text-white text-xs font-mono font-bold">
+              <div className="w-7 h-7 rounded-lg bg-[#E06D3B] flex items-center justify-center text-white text-xs font-mono font-bold shadow-xs">
                 GC
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <h3 className="font-grotesk font-bold text-xs text-[#0E2A47]">
+                  <h3 className="font-grotesk font-bold text-xs text-[#1C1917]">
                     Ghost Copilot
                   </h3>
                   <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-emerald-100 text-emerald-800">
@@ -252,7 +252,7 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
                 <div
                   className={`max-w-[90%] p-3 rounded-xl shadow-2xs leading-relaxed ${
                     msg.role === 'user'
-                      ? 'bg-[#0E2A47] text-white rounded-br-none'
+                      ? 'bg-[#E06D3B] text-white rounded-br-none'
                       : 'bg-white border border-[#E8E1D5] text-[#36506A] rounded-bl-none'
                   }`}
                 >
@@ -289,7 +289,7 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
                       ) : (
                         <button
                           onClick={() => handleExecuteAction(msg.id, msg.action!.actionType)}
-                          className="w-full py-1.5 px-2.5 rounded-lg bg-[#C87954] hover:bg-[#B36845] text-white font-mono text-[10px] font-bold shadow-xs transition-all active:scale-95 flex items-center justify-center gap-1.5"
+                          className="w-full py-1.5 px-2.5 rounded-lg bg-[#E06D3B] hover:bg-[#C85D2D] text-white font-mono text-[10px] font-bold shadow-xs transition-all active:scale-95 flex items-center justify-center gap-1.5"
                         >
                           <span>{msg.action.label}</span>
                         </button>
@@ -305,7 +305,7 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
 
             {isLoading && (
               <div className="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-[#E8E1D5] text-xs text-[#59738A] w-fit">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#C87954] animate-ping" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#E06D3B] animate-ping" />
                 <span className="font-mono text-[10px]">Ghost Copilot synthesizing digital twin telemetry…</span>
               </div>
             )}
@@ -326,7 +326,7 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
                     onClick={() => setPromptLangTab(tab)}
                     className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold transition-all ${
                       promptLangTab === tab
-                        ? 'bg-[#0E2A47] text-white shadow-xs'
+                        ? 'bg-[#E06D3B] text-white shadow-xs'
                         : 'bg-white border border-[#DDD3C3] text-[#59738A] hover:bg-[#F0EBE0]'
                     }`}
                   >
@@ -344,7 +344,7 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
                   onClick={() => {
                     setInput(item.query);
                   }}
-                  className="whitespace-nowrap px-2 py-1 rounded-lg bg-white border border-[#DDD3C3] hover:border-[#C87954] text-[10px] font-mono text-[#59738A] hover:text-[#0E2A47] transition-all"
+                  className="whitespace-nowrap px-2 py-1 rounded-lg bg-white border border-[#DDD3C3] hover:border-[#E06D3B] text-[10px] font-mono text-[#59738A] hover:text-[#E06D3B] transition-all"
                 >
                   {item.label}
                 </button>
@@ -359,12 +359,12 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
               value={input}
               onChange={e => setInput(e.target.value)}
               placeholder="Ask Ghost Copilot about active digital twin..."
-              className="flex-1 px-3 py-1.5 rounded-xl bg-[#FAF7F2] border border-[#DDD3C3] text-xs text-[#0E2A47] placeholder-[#A69B89] focus:outline-none focus:border-[#C87954]"
+              className="flex-1 px-3 py-1.5 rounded-xl bg-[#FAF7F2] border border-[#DDD3C3] text-xs text-[#1C1917] placeholder-[#A69B89] focus:outline-none focus:border-[#E06D3B]"
             />
             <button
               type="submit"
               disabled={isLoading || !input.trim()}
-              className="p-2 rounded-xl bg-[#0E2A47] hover:bg-[#153B5B] text-white disabled:opacity-40 transition-colors"
+              className="p-2 rounded-xl bg-[#E06D3B] hover:bg-[#C85D2D] text-white disabled:opacity-40 transition-colors shadow-xs"
               title="Send"
             >
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

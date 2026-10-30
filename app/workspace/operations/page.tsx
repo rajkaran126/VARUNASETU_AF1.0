@@ -202,7 +202,7 @@ export default function NetworkOperationsPage() {
               DETERMINISTIC SIMKERNEL 2.4
             </span>
           </div>
-          <h1 className="font-grotesk text-2xl lg:text-3xl font-bold text-[#0E2A47] tracking-tight mt-1">
+          <h1 className="font-grotesk text-2xl lg:text-3xl font-bold text-[#1C1917] tracking-tight mt-1">
             Network Operations & What-If Simulation
           </h1>
           <p className="text-xs text-[#4A647D] mt-0.5 max-w-2xl">
@@ -214,7 +214,7 @@ export default function NetworkOperationsPage() {
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-[#DDD3C3] shadow-2xs font-mono text-xs">
           <span className="w-2 h-2 rounded-full bg-emerald-500" />
           <span className="text-[#59738A]">Seed:</span>
-          <span className="font-bold text-[#0E2A47]">{simulationResult.randomSeed}</span>
+          <span className="font-bold text-[#1C1917]">{simulationResult.randomSeed}</span>
           <span className="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded text-[10px] font-semibold">
             DETERMINISTIC
           </span>
@@ -236,7 +236,7 @@ export default function NetworkOperationsPage() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="font-grotesk text-base font-bold text-[#0E2A47]">
+                <h2 className="font-grotesk text-base font-bold text-[#1C1917]">
                   What-If Breakage Scene Studio
                 </h2>
                 <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#C87954] text-white">
@@ -269,10 +269,10 @@ export default function NetworkOperationsPage() {
                 className={`p-3 rounded-xl border cursor-pointer transition-all hover:scale-[1.02] hover:shadow-md ${p.color} relative group`}
               >
                 <div className="flex items-start justify-between gap-1 mb-1.5">
-                  <span className="font-sans font-bold text-xs text-[#0E2A47] group-hover:text-[#C87954] transition-colors">
+                  <span className="font-sans font-bold text-xs text-[#1C1917] group-hover:text-[#C87954] transition-colors">
                     {p.title}
                   </span>
-                  <span className="font-mono text-[9px] font-bold px-1.5 py-0.5 rounded bg-white/80 text-[#0E2A47] border border-black/10">
+                  <span className="font-mono text-[9px] font-bold px-1.5 py-0.5 rounded bg-white/80 text-[#1C1917] border border-black/10">
                     {p.badge}
                   </span>
                 </div>
@@ -285,7 +285,7 @@ export default function NetworkOperationsPage() {
                 </div>
                 <button
                   type="button"
-                  className="w-full mt-2 py-1 px-2 rounded-lg bg-[#0E2A47] group-hover:bg-[#C87954] text-white font-mono text-[10px] font-bold transition-colors flex items-center justify-center gap-1"
+                  className="w-full mt-2 py-1 px-2 rounded-lg bg-[#C87954] hover:bg-[#B36845] text-white font-mono text-[10px] font-bold transition-colors flex items-center justify-center gap-1 shadow-xs"
                 >
                   <span>⚡ Simulate Break</span>
                 </button>
@@ -312,7 +312,7 @@ export default function NetworkOperationsPage() {
               <select
                 value={whatIfCableId}
                 onChange={(e) => setWhatIfCableId(e.target.value)}
-                className="w-full px-2.5 py-1.5 bg-white border border-[#DDD3C3] rounded-xl text-xs font-mono text-[#0E2A47]"
+                className="w-full px-2.5 py-1.5 bg-white border border-[#DDD3C3] rounded-xl text-xs font-mono text-[#1C1917]"
               >
                 {cables.slice(0, 40).map((c) => (
                   <option key={c.id} value={c.id}>
@@ -328,7 +328,7 @@ export default function NetworkOperationsPage() {
               <select
                 value={whatIfFaultType}
                 onChange={(e) => setWhatIfFaultType(e.target.value as FaultType)}
-                className="w-full px-2.5 py-1.5 bg-white border border-[#DDD3C3] rounded-xl text-xs font-mono text-[#0E2A47]"
+                className="w-full px-2.5 py-1.5 bg-white border border-[#DDD3C3] rounded-xl text-xs font-mono text-[#1C1917]"
               >
                 {faultTypes.map(ft => (
                   <option key={ft} value={ft}>{ft}</option>
@@ -345,7 +345,7 @@ export default function NetworkOperationsPage() {
                 max="8000"
                 value={whatIfDepthM}
                 onChange={(e) => setWhatIfDepthM(Number(e.target.value))}
-                className="w-full px-2.5 py-1.5 bg-white border border-[#DDD3C3] rounded-xl text-xs font-mono text-[#0E2A47]"
+                className="w-full px-2.5 py-1.5 bg-white border border-[#DDD3C3] rounded-xl text-xs font-mono text-[#1C1917]"
               />
             </div>
 
@@ -359,7 +359,7 @@ export default function NetworkOperationsPage() {
                 step="0.5"
                 value={whatIfLossDb}
                 onChange={(e) => setWhatIfLossDb(Number(e.target.value))}
-                className="w-full px-2.5 py-1.5 bg-white border border-[#DDD3C3] rounded-xl text-xs font-mono text-[#0E2A47]"
+                className="w-full px-2.5 py-1.5 bg-white border border-[#DDD3C3] rounded-xl text-xs font-mono text-[#1C1917]"
               />
             </div>
 
@@ -381,7 +381,7 @@ export default function NetworkOperationsPage() {
         <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#F0EBE0] mb-4">
           <div className="flex items-center gap-2">
             <span className={`w-2.5 h-2.5 rounded-full ${isRerouteActive ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500 animate-pulse'}`} />
-            <h2 className="font-grotesk text-base font-bold text-[#0E2A47]">
+            <h2 className="font-grotesk text-base font-bold text-[#1C1917]">
               Optical DWDM Layer Telemetry Diagnostics
             </h2>
             {isRerouteActive && (
@@ -418,7 +418,7 @@ export default function NetworkOperationsPage() {
 
           <div className="p-3 rounded-xl bg-[#FAF7F2] border border-[#E8E1D5]">
             <p className="font-mono text-[10px] text-[#69829A] uppercase tracking-wider">Chromatic Dispersion</p>
-            <p className="font-mono text-lg font-bold text-[#0E2A47] mt-0.5">17.8 ps/nm</p>
+            <p className="font-mono text-lg font-bold text-[#1C1917] mt-0.5">17.8 ps/nm</p>
             <p className="font-mono text-[9px] text-emerald-700 mt-1">DSP compensated</p>
           </div>
 
@@ -457,7 +457,7 @@ export default function NetworkOperationsPage() {
 
           <Link
             href="/workspace/digital-twin"
-            className="px-2.5 py-1 rounded bg-[#0E2A47] text-white font-mono text-[10px] font-bold whitespace-nowrap hover:bg-[#153B5B] transition-colors"
+            className="px-2.5 py-1 rounded bg-[#C87954] text-white font-mono text-[10px] font-bold whitespace-nowrap hover:bg-[#B36845] transition-colors"
           >
             Inspect 3D Twin & ROV →
           </Link>
@@ -470,7 +470,7 @@ export default function NetworkOperationsPage() {
         <form onSubmit={handleRunSimulation} className="lg:col-span-5 bg-white rounded-2xl border border-[#E2DBD0] p-6 shadow-xs space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-[#F0EBE0]">
             <div>
-              <h2 className="font-grotesk text-base font-bold text-[#0E2A47]">
+              <h2 className="font-grotesk text-base font-bold text-[#1C1917]">
                 Failure Scenario Injection
               </h2>
               <p className="font-mono text-[10px] text-[#59738A]">
@@ -519,7 +519,7 @@ export default function NetworkOperationsPage() {
             <select
               value={faultType}
               onChange={(e) => setFaultType(e.target.value as FaultType)}
-              className="w-full px-3 py-2 bg-[#FAF7F2] border border-[#DDD3C3] rounded-xl text-xs text-[#0E2A47] focus:outline-none focus:border-[#1E4E79] font-body"
+              className="w-full px-3 py-2 bg-[#FAF7F2] border border-[#DDD3C3] rounded-xl text-xs text-[#1C1917] focus:outline-none focus:border-[#C87954] font-body"
             >
               {faultTypes.map((ft) => (
                 <option key={ft} value={ft}>{ft}</option>
@@ -533,7 +533,7 @@ export default function NetworkOperationsPage() {
               <label className="font-mono text-[10px] uppercase tracking-wider text-[#69829A]">
                 Offered Traffic Demand Assumption
               </label>
-              <span className="font-mono text-xs font-bold text-[#0E2A47]">
+              <span className="font-mono text-xs font-bold text-[#1C1917]">
                 {trafficDemand} Tbps
               </span>
             </div>
@@ -544,7 +544,7 @@ export default function NetworkOperationsPage() {
               step="5"
               value={trafficDemand}
               onChange={(e) => setTrafficDemand(Number(e.target.value))}
-              className="w-full accent-[#0E2A47]"
+              className="w-full accent-[#C87954]"
             />
             <div className="flex justify-between text-[10px] font-mono text-[#7A8E9F]">
               <span>10 Tbps</span>
@@ -559,7 +559,7 @@ export default function NetworkOperationsPage() {
               <label className="font-mono text-[10px] uppercase tracking-wider text-[#69829A]">
                 Estimated Outage Duration
               </label>
-              <span className="font-mono text-xs font-bold text-[#0E2A47]">
+              <span className="font-mono text-xs font-bold text-[#1C1917]">
                 {durationHours} Hours ({Math.round(durationHours / 24)} Days)
               </span>
             </div>
@@ -570,7 +570,7 @@ export default function NetworkOperationsPage() {
               step="24"
               value={durationHours}
               onChange={(e) => setDurationHours(Number(e.target.value))}
-              className="w-full accent-[#0E2A47]"
+              className="w-full accent-[#C87954]"
             />
           </div>
 
@@ -607,7 +607,7 @@ export default function NetworkOperationsPage() {
               placeholder="Snapshot label..."
               value={snapshotName}
               onChange={(e) => setSnapshotName(e.target.value)}
-              className="flex-1 px-3 py-1.5 bg-[#FAF7F2] border border-[#DDD3C3] rounded-lg text-xs text-[#0E2A47] placeholder-[#7990A4]"
+              className="flex-1 px-3 py-1.5 bg-[#FAF7F2] border border-[#DDD3C3] rounded-lg text-xs text-[#1C1917] placeholder-[#7990A4]"
             />
             <button
               type="button"
@@ -634,14 +634,14 @@ export default function NetworkOperationsPage() {
           <div className="bg-white rounded-2xl border border-[#E2DBD0] p-6 shadow-xs space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-[#F0EBE0]">
               <div>
-                <h3 className="font-grotesk text-base font-bold text-[#0E2A47]">
+                <h3 className="font-grotesk text-base font-bold text-[#1C1917]">
                   Deterministic Capacity & Latency Impact
                 </h3>
                 <p className="font-mono text-[10px] text-[#59738A]">
                   Mathematical model output from network graph topology
                 </p>
               </div>
-              <span className="font-mono text-xs font-bold text-[#1E5685] bg-[#E9F0F6] px-2.5 py-1 rounded-lg">
+              <span className="font-mono text-xs font-bold text-[#7A6146] bg-[#F2EDE4] px-2.5 py-1 rounded-lg">
                 Engine: {simulationResult.engineVersion}
               </span>
             </div>
@@ -649,10 +649,10 @@ export default function NetworkOperationsPage() {
             {/* Demand Served vs Unserved Bar Gauge */}
             <div>
               <div className="flex items-center justify-between text-xs mb-1.5">
-                <span className="font-medium text-[#0E2A47]">
+                <span className="font-medium text-[#1C1917]">
                   Served Demand: <strong className="text-emerald-700">{simulationResult.servedDemandTbps} Tbps</strong>
                 </span>
-                <span className="font-medium text-[#0E2A47]">
+                <span className="font-medium text-[#1C1917]">
                   Unserved Demand: <strong className="text-rose-700">{simulationResult.unservedDemandTbps} Tbps</strong>
                 </span>
               </div>
@@ -677,7 +677,7 @@ export default function NetworkOperationsPage() {
             <div className="grid grid-cols-3 gap-3 p-3.5 rounded-xl bg-[#FAF7F2] border border-[#E8E1D5]">
               <div>
                 <p className="font-mono text-[10px] text-[#69829A] uppercase">Baseline Latency</p>
-                <p className="font-mono text-lg font-bold text-[#0E2A47] mt-0.5">
+                <p className="font-mono text-lg font-bold text-[#1C1917] mt-0.5">
                   {simulationResult.baselineLatencyMs} ms
                 </p>
                 <p className="text-[10px] text-[#7A8E9F]">Direct Subsea Path</p>
@@ -703,7 +703,7 @@ export default function NetworkOperationsPage() {
 
           {/* Alternate Routes Load Matrix */}
           <div className="bg-white rounded-2xl border border-[#E2DBD0] p-6 shadow-xs space-y-4">
-            <h3 className="font-grotesk text-base font-bold text-[#0E2A47]">
+            <h3 className="font-grotesk text-base font-bold text-[#1C1917]">
               Alternate Route Absorption & Headroom Analysis
             </h3>
 
@@ -711,7 +711,7 @@ export default function NetworkOperationsPage() {
               {simulationResult.affectedRoutes.map((route) => (
                 <div key={route.routeId} className="p-3 rounded-xl bg-[#FAF7F2] border border-[#E8E1D5]">
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="font-bold text-xs text-[#0E2A47] truncate max-w-[280px]">
+                    <span className="font-bold text-xs text-[#1C1917] truncate max-w-[280px]">
                       {route.routeName}
                     </span>
                     <span
@@ -728,7 +728,7 @@ export default function NetworkOperationsPage() {
                   <div className="w-full h-2 rounded-full bg-[#E2DBD0] overflow-hidden mb-1.5">
                     <div
                       className={`h-full transition-all duration-500 ${
-                        route.congested ? 'bg-rose-600' : 'bg-[#185382]'
+                        route.congested ? 'bg-rose-600' : 'bg-[#83B9A9]'
                       }`}
                       style={{ width: `${route.postFailureLoadPct}%` }}
                     />
@@ -747,7 +747,7 @@ export default function NetworkOperationsPage() {
             <div className="pt-2 flex justify-end">
               <Link
                 href="/workspace/war-room"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0E2A47] hover:bg-[#153B5B] text-white text-xs font-semibold shadow-xs"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#C87954] hover:bg-[#B36845] text-white text-xs font-semibold shadow-xs"
               >
                 <span>Formulate Recovery Strategy in War Room</span>
                 <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

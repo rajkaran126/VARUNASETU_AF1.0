@@ -88,7 +88,7 @@ export function IncidentResponsePipeline() {
   };
 
   return (
-    <div className="bg-[#0E2A47] text-white rounded-2xl border-2 border-rose-500/80 shadow-2xl p-4 lg:p-5 mb-6 animate-in slide-in-from-top-2 duration-300">
+    <div className="bg-[#1C1917] text-white rounded-2xl border-2 border-[#E06D3B] shadow-2xl p-4 lg:p-5 mb-6 animate-in slide-in-from-top-2 duration-300">
       {/* Top Header: Scenario Title & Fast Controls */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-white/15">
         <div className="flex items-center gap-3">

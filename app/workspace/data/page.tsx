@@ -24,7 +24,7 @@ function SeedRow({ entry }: { entry: { key: string; file: string; exists: boolea
     <div className={`flex items-center justify-between px-3 py-2 rounded-lg border text-xs ${colour}`}>
       <div className="flex items-center gap-2">
         <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${entry.exists && entry.count > 0 ? 'bg-emerald-500' : entry.exists ? 'bg-amber-500' : 'bg-rose-500'}`} />
-        <span className="font-mono text-[#0E2A47] font-medium">{entry.file}</span>
+        <span className="font-mono text-[#1C1917] font-medium">{entry.file}</span>
       </div>
       <div className="flex items-center gap-4 font-mono text-[10px] text-[#59738A]">
         <span>{entry.exists ? `${entry.count.toLocaleString()} rows` : 'MISSING'}</span>
@@ -215,7 +215,7 @@ export default function RealTimeDataPage() {
               </span>
             )}
           </div>
-          <h1 className="font-sans font-bold text-2xl lg:text-3xl text-[#0E2A47] tracking-tight mt-1">
+          <h1 className="font-sans font-bold text-2xl lg:text-3xl text-[#1C1917] tracking-tight mt-1">
             Data & Infrastructure Hub
           </h1>
           <p className="text-xs text-[#4A647D] mt-0.5 max-w-2xl">
@@ -257,7 +257,7 @@ export default function RealTimeDataPage() {
         ].map(s => (
           <div key={s.l} className="bg-white rounded-xl border border-[#E2DBD0] p-3 text-center shadow-xs">
             <p className={`font-mono text-xl font-bold ${s.c}`}>{s.v.toLocaleString()}</p>
-            <p className="text-[10px] font-semibold text-[#0E2A47]">{s.l}</p>
+            <p className="text-[10px] font-semibold text-[#1C1917]">{s.l}</p>
             <p className="text-[9px] font-mono text-[#A69B89]">{s.src}</p>
           </div>
         ))}
@@ -295,7 +295,7 @@ export default function RealTimeDataPage() {
           <div className="bg-white rounded-2xl border border-[#E2DBD0] p-5 shadow-xs space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-[#F0EBE0]">
               <div>
-                <h2 className="font-grotesk text-base font-bold text-[#0E2A47]">
+                <h2 className="font-grotesk text-base font-bold text-[#1C1917]">
                   1-Click Real-Time Data Injections
                 </h2>
                 <p className="font-mono text-[10px] text-[#59738A]">
@@ -374,7 +374,7 @@ export default function RealTimeDataPage() {
           <div className="bg-white rounded-2xl border border-[#E2DBD0] p-5 shadow-xs space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-[#F0EBE0]">
               <div>
-                <h3 className="font-grotesk text-base font-bold text-[#0E2A47]">
+                <h3 className="font-grotesk text-base font-bold text-[#1C1917]">
                   Custom Real-Time Payload Injection Studio
                 </h3>
                 <p className="font-mono text-[10px] text-[#59738A]">
@@ -388,7 +388,7 @@ export default function RealTimeDataPage() {
                 <select
                   value={injectDataset}
                   onChange={(e) => handleDatasetChange(e.target.value)}
-                  className="px-3 py-1.5 bg-[#FAF7F2] border border-[#DDD3C3] rounded-xl text-xs font-mono font-bold text-[#0E2A47]"
+                  className="px-3 py-1.5 bg-[#FAF7F2] border border-[#DDD3C3] rounded-xl text-xs font-mono font-bold text-[#1C1917]"
                 >
                   <option value="incidents">incidents (GeoCables)</option>
                   <option value="telemetry">telemetry (DWDM/OTDR)</option>
@@ -420,7 +420,7 @@ export default function RealTimeDataPage() {
                 value={injectJson}
                 onChange={(e) => setInjectJson(e.target.value)}
                 rows={10}
-                className="w-full p-3 font-mono text-xs bg-[#FAF7F2] border border-[#DDD3C3] rounded-xl text-[#0E2A47] focus:outline-none focus:border-[#C87954]"
+                className="w-full p-3 font-mono text-xs bg-[#FAF7F2] border border-[#DDD3C3] rounded-xl text-[#1C1917] focus:outline-none focus:border-[#C87954]"
                 placeholder="Enter valid JSON payload or array of records..."
               />
 
@@ -431,7 +431,7 @@ export default function RealTimeDataPage() {
                 <button
                   type="submit"
                   disabled={injectLoading}
-                  className="px-5 py-2.5 rounded-xl bg-[#0E2A47] hover:bg-[#153B5B] text-white font-mono text-xs font-bold transition-all shadow-xs flex items-center gap-2 disabled:opacity-50"
+                  className="px-5 py-2.5 rounded-xl bg-[#C87954] hover:bg-[#B36845] text-white font-mono text-xs font-bold transition-all shadow-xs flex items-center gap-2 disabled:opacity-50"
                 >
                   {injectLoading ? (
                     <>
@@ -456,15 +456,15 @@ export default function RealTimeDataPage() {
           {/* Live Event Feed */}
           <div className="bg-white rounded-2xl border border-[#E2DBD0] p-5 shadow-xs">
             <div className="flex items-center justify-between pb-3 border-b border-[#F0EBE0] mb-3">
-              <h2 className="font-sans font-bold text-sm text-[#0E2A47]">Live Sync Stream</h2>
+              <h2 className="font-sans font-bold text-sm text-[#1C1917]">Live Sync Stream</h2>
               <LiveDot connected={connected} />
             </div>
             <div className="space-y-2 font-mono text-[10px]">
               <div className="p-2 rounded-lg bg-[#F5F0E6] border border-[#E2DBD0]">
-                <p className="text-[#59738A]">SSE Endpoint: <span className="text-[#0E2A47] font-bold">/api/stream</span></p>
+                <p className="text-[#59738A]">SSE Endpoint: <span className="text-[#1C1917] font-bold">/api/stream</span></p>
               </div>
               <div className="p-2 rounded-lg bg-[#F5F0E6] border border-[#E2DBD0]">
-                <p className="text-[#59738A]">Data API: <span className="text-[#0E2A47] font-bold">/api/data/[dataset]</span></p>
+                <p className="text-[#59738A]">Data API: <span className="text-[#1C1917] font-bold">/api/data/[dataset]</span></p>
               </div>
               {lastEvent && (
                 <div className="p-2 rounded-lg bg-emerald-50 border border-emerald-200">
@@ -481,7 +481,7 @@ export default function RealTimeDataPage() {
 
           {/* Provenance Breakdown */}
           <div className="bg-white rounded-2xl border border-[#E2DBD0] p-5 shadow-xs">
-            <h2 className="font-sans font-bold text-sm text-[#0E2A47] pb-3 border-b border-[#F0EBE0] mb-3">Data Provenance</h2>
+            <h2 className="font-sans font-bold text-sm text-[#1C1917] pb-3 border-b border-[#F0EBE0] mb-3">Data Provenance</h2>
             <div className="space-y-2">
               {[
                 { label: 'Group A — Observed/Derived', note: 'TeleGeography-style cable map. Public-source-derived. Licence: PENDING.', count: cables.length + landingPoints.length, colour: 'bg-emerald-500' },
@@ -491,7 +491,7 @@ export default function RealTimeDataPage() {
               ].map(p => (
                 <div key={p.label}>
                   <div className="flex items-center justify-between mb-0.5">
-                    <span className="text-xs font-semibold text-[#0E2A47]">{p.label}</span>
+                    <span className="text-xs font-semibold text-[#1C1917]">{p.label}</span>
                     <span className="text-[10px] font-mono text-[#59738A]">{p.count.toLocaleString()} records</span>
                   </div>
                   <div className="h-1.5 bg-[#F0EBE0] rounded-full overflow-hidden mb-1">
@@ -535,7 +535,7 @@ export default function RealTimeDataPage() {
                   {filteredCables.map((c, i) => (
                     <tr key={c.cable_id || i} className="hover:bg-[#FAF7F2] transition-colors">
                       <td className="py-2 px-3 font-mono text-[10px] text-[#185382] font-bold">{c.cable_id}</td>
-                      <td className="py-2 px-3 font-semibold text-[#0E2A47]">{c.cable_name}</td>
+                      <td className="py-2 px-3 font-semibold text-[#1C1917]">{c.cable_name}</td>
                       <td className="py-2 px-3 text-right font-mono">{c.length_km ? Number(c.length_km).toLocaleString() : '—'}</td>
                       <td className="py-2 px-3 text-right font-mono">{c.rfs_year || '—'}</td>
                       <td className="py-2 px-3 text-right font-mono">{c.landing_point_count || '—'}</td>
@@ -562,7 +562,7 @@ export default function RealTimeDataPage() {
                 key={filter}
                 onClick={() => setIncidentFilter(filter)}
                 className={`px-3 py-1 rounded-lg text-xs font-mono transition-all ${
-                  incidentFilter === filter ? 'bg-[#0E2A47] text-white' : 'bg-white border border-[#DDD3C3] text-[#59738A]'
+                  incidentFilter === filter ? 'bg-[#C87954] text-white shadow-xs' : 'bg-white border border-[#DDD3C3] text-[#59738A]'
                 }`}
               >
                 {filter === 'all' ? `All (${incidents.length})` : `${filter} (${incidents.filter(i => i.status === filter).length})`}
@@ -587,7 +587,7 @@ export default function RealTimeDataPage() {
                   {filteredIncidents.map((inc, i) => (
                     <tr key={inc.alert_number || i} className="hover:bg-[#FAF7F2] transition-colors">
                       <td className="py-2 px-3 font-mono text-[10px] text-[#185382] font-bold">{inc.alert_number}</td>
-                      <td className="py-2 px-3 font-semibold text-[#0E2A47]">{inc.cable_name}</td>
+                      <td className="py-2 px-3 font-semibold text-[#1C1917]">{inc.cable_name}</td>
                       <td className="py-2 px-3">
                         <span className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold ${
                           inc.severity === 'Critical' ? 'bg-rose-100 text-rose-800' :
@@ -636,7 +636,7 @@ export default function RealTimeDataPage() {
                 {vessels.map((v, i) => (
                   <tr key={v.vessel_id || i} className="hover:bg-[#FAF7F2] transition-colors">
                     <td className="py-2 px-3 font-mono text-[10px] text-[#185382] font-bold">{v.vessel_id}</td>
-                    <td className="py-2 px-3 font-semibold text-[#0E2A47]">{v.vessel_name}</td>
+                    <td className="py-2 px-3 font-semibold text-[#1C1917]">{v.vessel_name}</td>
                     <td className="py-2 px-3 text-[#59738A]">{v.current_region}</td>
                     <td className="py-2 px-3 text-right font-mono">{v.speed_knots_synthetic || '—'}</td>
                     <td className="py-2 px-3 text-right font-mono">{v.mobilization_hours_synthetic || '—'}h</td>
@@ -678,7 +678,7 @@ export default function RealTimeDataPage() {
                   {traffic.slice(0, 50).map((t, i) => (
                     <tr key={i} className="hover:bg-[#FAF7F2] transition-colors">
                       <td className="py-2 px-3 font-mono text-[10px] text-[#7A8E9F]">{t.timestamp_utc_synthetic}</td>
-                      <td className="py-2 px-3 font-semibold text-[#0E2A47]">{t.source_region}</td>
+                      <td className="py-2 px-3 font-semibold text-[#1C1917]">{t.source_region}</td>
                       <td className="py-2 px-3 text-[#59738A]">{t.target_region}</td>
                       <td className="py-2 px-3 text-right font-mono font-bold text-[#185382]">{t.demand_tbps_synthetic}</td>
                       <td className="py-2 px-3 text-right font-mono">{t.surge_factor || '1.0'}</td>
@@ -695,7 +695,7 @@ export default function RealTimeDataPage() {
       {activeTab === 'seeds' && (
         <div className="space-y-3">
           <div className="p-3 rounded-xl bg-[#F5F0E6] border border-[#E2DBD0]">
-            <p className="text-xs font-semibold text-[#0E2A47] mb-1">Seed File Registry — <code>data/seeds/</code></p>
+            <p className="text-xs font-semibold text-[#1C1917] mb-1">Seed File Registry — <code>data/seeds/</code></p>
             <p className="text-[10px] font-mono text-[#59738A]">
               Files are watched by the SSE stream. Editing or replacing a seed file instantly triggers a push event and the platform re-fetches.
             </p>

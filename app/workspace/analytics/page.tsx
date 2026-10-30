@@ -73,7 +73,7 @@ export default function AnalyticsReportsPage() {
               ANALYTICS ENGINE 2.4
             </span>
           </div>
-          <h1 className="font-sans font-bold text-2xl lg:text-3xl font-bold text-[#0E2A47] tracking-tight mt-1">
+          <h1 className="font-sans font-bold text-2xl lg:text-3xl font-bold text-[#1C1917] tracking-tight mt-1">
             Analytics & Reports
           </h1>
           <p className="text-xs text-[#4A647D] mt-0.5 max-w-2xl">
@@ -154,7 +154,7 @@ export default function AnalyticsReportsPage() {
 
           {/* FRA Classification Breakdown */}
           <div className="bg-white rounded-2xl border border-[#E2DBD0] p-6 shadow-xs">
-            <h2 className="font-sans font-bold text-base text-[#0E2A47] pb-3 border-b border-[#F0EBE0] mb-4">
+            <h2 className="font-sans font-bold text-base text-[#1C1917] pb-3 border-b border-[#F0EBE0] mb-4">
               False Redundancy Classification Matrix
             </h2>
             <p className="text-[10px] text-[#59738A] font-mono mb-4">
@@ -180,7 +180,7 @@ export default function AnalyticsReportsPage() {
                     <div className="flex-1 h-2 bg-[#F0EBE0] rounded-full overflow-hidden">
                       <div className="h-full bg-[#C87954] rounded-full" style={{ width: `${pct}%` }} />
                     </div>
-                    <span className="text-xs font-mono font-bold text-[#0E2A47] w-8 text-right">{count}</span>
+                    <span className="text-xs font-mono font-bold text-[#1C1917] w-8 text-right">{count}</span>
                   </div>
                 );
               })}
@@ -189,7 +189,7 @@ export default function AnalyticsReportsPage() {
 
           {/* Critical Landing Dependencies */}
           <div className="bg-white rounded-2xl border border-[#E2DBD0] p-6 shadow-xs">
-            <h2 className="font-sans font-bold text-base text-[#0E2A47] pb-3 border-b border-[#F0EBE0] mb-4">
+            <h2 className="font-sans font-bold text-base text-[#1C1917] pb-3 border-b border-[#F0EBE0] mb-4">
               Critical Single-Point Landing Station Dependencies
             </h2>
             <div className="space-y-2">
@@ -198,7 +198,7 @@ export default function AnalyticsReportsPage() {
                 .map((g) => (
                   <div key={g.id} className="flex items-center justify-between p-3 rounded-xl bg-[#FAF7F2] border border-[#E2DBD0]">
                     <div>
-                      <p className="text-xs font-bold text-[#0E2A47]">{g.sharedLandingStationIds?.[0]}</p>
+                      <p className="text-xs font-bold text-[#1C1917]">{g.sharedLandingStationIds?.[0]}</p>
                       <p className="text-[10px] text-[#59738A] font-mono">{g.memberCableIds.join(' · ')}</p>
                     </div>
                     <div className="text-right">
@@ -226,7 +226,7 @@ export default function AnalyticsReportsPage() {
             {srlgGroups.map((g) => (
               <div key={g.id} className="bg-white rounded-xl border border-[#E2DBD0] p-4">
                 <div className="flex items-start justify-between mb-2">
-                  <p className="text-xs font-bold text-[#0E2A47] flex-1 pr-2">{g.name}</p>
+                  <p className="text-xs font-bold text-[#1C1917] flex-1 pr-2">{g.name}</p>
                   <span className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold border flex-shrink-0 ${
                     g.confidence === 'High' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
                     g.confidence === 'Medium' ? 'bg-amber-50 text-amber-700 border-amber-200' :
@@ -251,7 +251,7 @@ export default function AnalyticsReportsPage() {
         <div className="space-y-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
-              { v: manifestStats.total, l: 'Total Datasets', c: 'text-[#0E2A47]' },
+              { v: manifestStats.total, l: 'Total Datasets', c: 'text-[#1C1917]' },
               { v: manifestStats.readyCount, l: 'Ready to Ingest', c: 'text-emerald-700' },
               { v: manifestStats.pendingLicence, l: 'Pending Licence', c: 'text-amber-700' },
               { v: manifestStats.syntheticCount, l: 'Synthetic Only', c: 'text-purple-700' },
@@ -263,7 +263,7 @@ export default function AnalyticsReportsPage() {
             ))}
           </div>
           <div className="bg-white rounded-2xl border border-[#E2DBD0] p-6 shadow-xs">
-            <h2 className="font-sans font-bold text-base text-[#0E2A47] pb-3 border-b border-[#F0EBE0] mb-4">
+            <h2 className="font-sans font-bold text-base text-[#1C1917] pb-3 border-b border-[#F0EBE0] mb-4">
               Dataset Provenance Breakdown
             </h2>
             <div className="space-y-3">
@@ -275,7 +275,7 @@ export default function AnalyticsReportsPage() {
               ].map((p) => (
                 <div key={p.label}>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-mono font-bold text-[#0E2A47]">{p.label}</span>
+                    <span className="text-xs font-mono font-bold text-[#1C1917]">{p.label}</span>
                     <span className="text-xs font-mono text-[#59738A]">{p.count} datasets</span>
                   </div>
                   <div className="h-2 bg-[#F0EBE0] rounded-full overflow-hidden mb-1">
@@ -314,7 +314,7 @@ export default function AnalyticsReportsPage() {
       <div className="bg-white rounded-2xl border border-[#E2DBD0] p-6 shadow-xs space-y-4">
         <div className="flex items-center justify-between pb-3 border-b border-[#F0EBE0]">
           <div>
-            <h2 className="font-sans font-bold text-base font-bold text-[#0E2A47]">
+            <h2 className="font-sans font-bold text-base font-bold text-[#1C1917]">
               Regional Subsea Corridor Vulnerability Matrix
             </h2>
             <p className="font-mono text-[10px] text-[#59738A]">
@@ -330,7 +330,7 @@ export default function AnalyticsReportsPage() {
           {regionalRisks.map((item, idx) => (
             <div key={idx} className="p-3.5 rounded-xl bg-[#FAF7F2] border border-[#E8E1D5]">
               <div className="flex items-center justify-between mb-1.5">
-                <span className="font-bold text-xs text-[#0E2A47]">{item.region}</span>
+                <span className="font-bold text-xs text-[#1C1917]">{item.region}</span>
                 <span
                   className={`font-mono text-[10px] font-bold px-2 py-0.5 rounded ${
                     item.level === 'Critical'
@@ -371,7 +371,7 @@ export default function AnalyticsReportsPage() {
         {/* Left Column: Historical Root Cause Distribution (5 cols) */}
         <div className="lg:col-span-5 bg-white rounded-2xl border border-[#E2DBD0] p-6 shadow-xs space-y-4">
           <div className="pb-3 border-b border-[#F0EBE0]">
-            <h3 className="font-sans font-bold text-base font-bold text-[#0E2A47]">
+            <h3 className="font-sans font-bold text-base font-bold text-[#1C1917]">
               Subsea Failure Root Cause Breakdown
             </h3>
             <p className="font-mono text-[10px] text-[#59738A]">
@@ -383,8 +383,8 @@ export default function AnalyticsReportsPage() {
             {incidentCauses.map((item, idx) => (
               <div key={idx} className="space-y-1">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-[#0E2A47] font-medium">{item.cause}</span>
-                  <span className="font-mono font-bold text-[#0E2A47]">{item.share} ({item.count})</span>
+                  <span className="text-[#1C1917] font-medium">{item.cause}</span>
+                  <span className="font-mono font-bold text-[#1C1917]">{item.share} ({item.count})</span>
                 </div>
                 <div className="w-full h-2 rounded-full bg-[#EAE4D7] overflow-hidden">
                   <div className={`h-full ${item.color}`} style={{ width: item.share }} />
@@ -404,14 +404,14 @@ export default function AnalyticsReportsPage() {
         <div className="lg:col-span-7 bg-white rounded-2xl border border-[#E2DBD0] p-6 shadow-xs space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-[#F0EBE0]">
             <div>
-              <h3 className="font-sans font-bold text-base font-bold text-[#0E2A47]">
+              <h3 className="font-sans font-bold text-base font-bold text-[#1C1917]">
                 Simulation Snapshot History & Audit Trail
               </h3>
               <p className="font-mono text-[10px] text-[#59738A]">
                 Immutable, deterministic simulation checkpoints
               </p>
             </div>
-            <span className="font-mono text-xs font-bold text-[#0E2A47] bg-[#F5F0E6] px-2.5 py-1 rounded-lg">
+            <span className="font-mono text-xs font-bold text-[#1C1917] bg-[#F5F0E6] px-2.5 py-1 rounded-lg">
               {snapshots.length} Snapshots
             </span>
           </div>
@@ -428,7 +428,7 @@ export default function AnalyticsReportsPage() {
                 }`}
               >
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="font-bold text-xs text-[#0E2A47]">{snap.name}</span>
+                  <span className="font-bold text-xs text-[#1C1917]">{snap.name}</span>
                   <span className="font-mono text-[10px] text-[#59738A]">
                     {new Date(snap.createdAt).toLocaleDateString()}
                   </span>
@@ -455,7 +455,7 @@ export default function AnalyticsReportsPage() {
           {/* Printable Executive Summary Card */}
           <div className="p-4 rounded-xl bg-[#F5F0E6] border border-[#DDD3C3] space-y-2 mt-4">
             <div className="flex items-center justify-between">
-              <span className="font-mono text-[10px] uppercase font-bold text-[#0E2A47]">
+              <span className="font-mono text-[10px] uppercase font-bold text-[#1C1917]">
                 Active Briefing Summary
               </span>
               <span className="font-mono text-[9px] text-[#69829A]">CLASSIFICATION: RESTRICTED</span>
