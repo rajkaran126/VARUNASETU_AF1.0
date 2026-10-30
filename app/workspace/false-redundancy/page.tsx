@@ -260,31 +260,16 @@ export default function FalseRedundancyLabPage() {
             <span className="font-mono text-[11px] text-[#4A647D] uppercase tracking-widest">
               SECTION 08 // RESILIENCE ENGINEERING LAB
             </span>
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-100 text-amber-800 border border-amber-300">
-              ENGINEERING CHALLENGE
+            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#E8D9BF] text-[#454640] border border-[#D4C4A8]">
+              SRLG INTELLIGENCE LAB
             </span>
           </div>
           <h1 className="font-sans font-bold text-2xl lg:text-3xl text-[#1C1917] tracking-tight mt-1">
             False Redundancy Lab
           </h1>
-          <div className="mt-2 p-3 rounded-xl bg-amber-50 border border-amber-200 max-w-2xl">
-            <p className="text-xs font-semibold text-amber-900 mb-1">Hurdle Brief</p>
-            <p className="text-xs text-amber-800 leading-relaxed italic">
-              &ldquo;Two cables that share a corridor or landing station are not real backups: one earthquake or dragged anchor cuts both. Repairs depend on ships, weather and permits, and rerouted traffic congests the surviving routes.&rdquo;
-            </p>
-          </div>
-          <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-2 max-w-2xl">
-            {[
-              { hint: 'Hint 1', text: 'Two cables aren\'t really backups for each other if one event can cut both.' },
-              { hint: 'Hint 2', text: 'Fixing a cable needs a ship, time and weather. None of those are unlimited.' },
-              { hint: 'Hint 3', text: 'When traffic moves to surviving routes, not all of it is equally urgent.' },
-            ].map((h) => (
-              <div key={h.hint} className="p-2 bg-[#F7F3EA] rounded-lg border border-[#E2DBD0]">
-                <p className="text-[9px] font-mono font-bold text-[#C87954] uppercase mb-0.5">{h.hint}</p>
-                <p className="text-[10px] text-[#59738A] leading-snug">{h.text}</p>
-              </div>
-            ))}
-          </div>
+          <p className="text-xs text-[#59738A] mt-1 max-w-2xl leading-relaxed">
+            Multi-dimensional analysis of Shared Risk Link Groups (SRLGs), pairwise physical independence classification, and correlated failure cascading dynamics.
+          </p>
         </div>
 
         {/* Stats */}
