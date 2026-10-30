@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --font-display: 'Times New Roman', Times, 'Newsreader', 'Playfair Display', 'Cormorant Garamond', Georgia, Cambria, serif;
+  --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-body: 'Manrope', system-ui, -apple-system, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 }

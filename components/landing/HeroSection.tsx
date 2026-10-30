@@ -40,19 +40,19 @@ export default function HeroSection() {
               </div>
             </div>
 
-            {/* Headline - Refined, authoritative editorial serif */}
+            {/* Headline - Bold Geometric Space Grotesk matching reference style */}
             <div
               className={`transition-all duration-800 ${
                 visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
               }`}
               style={{ transitionDelay: "150ms" }}
             >
-              <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-normal text-white leading-[1.06] tracking-[-0.02em]">
+              <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-[4.5rem] font-bold text-white leading-[1.05] tracking-tight">
                 The intelligence
                 <br />
                 layer for global
                 <br />
-                <em className="font-serif italic font-light text-white/95">submarine</em>
+                submarine
                 <br />
                 connectivity.
               </h1>
