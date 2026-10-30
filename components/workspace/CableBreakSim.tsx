@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import Link from 'next/link';
+import type * as THREE from 'three';
 
 /* =========================================================
    VARUNASETU — Submarine Cable Break & Recovery Simulation
@@ -877,7 +878,7 @@ export default function CableBreakSim() {
 
       {/* ── LEFT PANEL: NETWORK TELEMETRY ── */}
       <div className="absolute z-20" style={{ top:58, left:14, width:215, background:'rgba(1,10,21,.88)', border:'1px solid rgba(0,200,255,.22)', borderRadius:8, padding:14, backdropFilter:'blur(12px)' }}>
-        <div style={{ fontSize:9, letterSpacing:3, color:'#4DD0E1', borderBottom:'1px solid rgba(0,200,255,.18)', paddingBottom:7, marginBottom:10 }}>// NETWORK TELEMETRY</div>
+        <div style={{ fontSize:9, letterSpacing:3, color:'#4DD0E1', borderBottom:'1px solid rgba(0,200,255,.18)', paddingBottom:7, marginBottom:10 }}>{`// NETWORK TELEMETRY`}</div>
         {[
           { label:'THROUGHPUT', valRef:h.throughput, barRef:h.thruBar, initVal:'4.8 Tbps', initPct:96, initCol:'#00E676' },
           { label:'LATENCY',    valRef:h.latency,    barRef:h.latBar,  initVal:'12.3 ms',  initPct:88, initCol:'#00E676' },
@@ -922,7 +923,7 @@ export default function CableBreakSim() {
 
       {/* ── RIGHT PANEL: AI LOG ── */}
       <div ref={h.aiPanel} className="absolute z-20" style={{ top:58, right:14, width:270, background:'rgba(1,10,21,.88)', border:'1px solid rgba(0,200,255,.22)', borderRadius:8, padding:14, backdropFilter:'blur(12px)', opacity:0, transition:'opacity .5s' }}>
-        <div style={{ fontSize:9, letterSpacing:3, color:'#4DD0E1', borderBottom:'1px solid rgba(0,200,255,.18)', paddingBottom:7, marginBottom:10 }}>// AI FAULT ANALYSIS</div>
+        <div style={{ fontSize:9, letterSpacing:3, color:'#4DD0E1', borderBottom:'1px solid rgba(0,200,255,.18)', paddingBottom:7, marginBottom:10 }}>{`// AI FAULT ANALYSIS`}</div>
         <div ref={h.aiLog} style={{ maxHeight:240, overflowY:'auto' }} />
       </div>
 
@@ -962,7 +963,7 @@ export default function CableBreakSim() {
 
       {/* ── ROV PANEL ── */}
       <div ref={h.rovPanel} className="absolute z-20" style={{ bottom:56, right:14, width:200, background:'rgba(1,10,21,.88)', border:'1px solid rgba(0,230,118,.28)', borderRadius:8, padding:12, backdropFilter:'blur(12px)', opacity:0, transition:'opacity .5s' }}>
-        <div style={{ fontSize:9, letterSpacing:3, color:'#00E676', borderBottom:'1px solid rgba(0,230,118,.2)', paddingBottom:6, marginBottom:8 }}>// ROV DEPLOYMENT</div>
+        <div style={{ fontSize:9, letterSpacing:3, color:'#00E676', borderBottom:'1px solid rgba(0,230,118,.2)', paddingBottom:6, marginBottom:8 }}>{`// ROV DEPLOYMENT`}</div>
         {[
           { label:'STATUS', ref:h.rovStatus, init:'DESCENDING', col:'#4DD0E1' },
           { label:'DEPTH',  ref:h.rovDepth,  init:'0 m',        col:'#00E5FF' },
