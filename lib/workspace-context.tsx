@@ -1,0 +1,315 @@
+'use client';
+
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { 
+  CableRoute, 
+  FaultIncident, 
+  ScenarioConfig, 
+  SimulationResult, 
+  RepairVessel, 
+  RecoveryStrategy, 
+  DatasetRecord, 
+  SimulationSnapshot,
+  AgentMessage 
+} from './types';
+import { 
+  VERIFIED_CABLE_ROUTES, 
+  ACTIVE_FAULT_INCIDENTS, 
+  REPAIR_FLEET, 
+  INITIAL_RECOVERY_STRATEGIES, 
+  INITIAL_DATASETS 
+} from './cable-data';
+import { runNetworkSimulation } from './simulation-engine';
+
+interface WorkspaceContextType {
+  // Canonical Cable & Fault State
+  cables: CableRoute[];
+  selectedCable: CableRoute;
+  setSelectedCable: (cable: CableRoute) => void;
+  activeFault: FaultIncident;
+  setActiveFault: (fault: FaultIncident) => void;
+  
+  // Scenario & Simulation Engine State
+  activeScenario: ScenarioConfig;
+  setActiveScenario: (scenario: ScenarioConfig) => void;
+  simulationResult: SimulationResult;
+  executeSimulation: (customScenario?: ScenarioConfig) => void;
+
+  // Recovery War Room State
+  strategies: RecoveryStrategy[];
+  selectedStrategy: RecoveryStrategy;
+  setSelectedStrategy: (strategy: RecoveryStrategy) => void;
+  repairFleet: RepairVessel[];
+
+  // Multi-Agent Mission Control State
+  agentMessages: AgentMessage[];
+  sendAgentQuery: (promptText: string) => void;
+  resetAgentChat: () => void;
+  isAgentThinking: boolean;
+
+  // Data & Infrastructure State
+  datasets: DatasetRecord[];
+  addDatasetRecord: (record: DatasetRecord) => void;
+  snapshots: SimulationSnapshot[];
+  saveCurrentSnapshot: (name: string) => void;
+}
+
+const defaultScenario: ScenarioConfig = {
+  id: 'scen-smw4-red-sea-rupture',
+  name: 'Red Sea Chokepoint Dual Severance',
+  selectedCableIds: ['smw4', 'smw5'],
+  faultType: 'Physical Anchor Drag',
+  faultLocation: {
+    lat: 12.3081,
+    lon: 43.4892,
+    depthM: 4120,
+    description: 'Bab el-Mandeb Benthic Slope (Segment 4)'
+  },
+  trafficDemandAssumptionTbps: 45.0,
+  failureDurationHours: 336,
+  availableAlternateRoutes: ['aae1', '2africa', 'faster', 'marea'],
+  notes: 'Commercial cargo ship dragged dragging anchor during gale conditions across subsea corridor.'
+};
+
+const initialSimulationResult = runNetworkSimulation(defaultScenario, VERIFIED_CABLE_ROUTES);
+
+const initialAgentConversation: AgentMessage[] = [
+  {
+    id: 'msg-sys-1',
+    sender: 'orchestrator',
+    agentName: 'Chief Orchestrator',
+    agentRole: 'Chief Orchestrator',
+    content: 'VARUNASETU Multi-Agent Coordination Bus online. Telemetry monitoring active across 426 subsea systems. Anomaly detected in Red Sea corridor on SEA-ME-WE 4 & SEA-ME-WE 5. How shall we prioritize the response?',
+    timestamp: '2026-10-30T09:00:10Z',
+    reasoningChain: [
+      'Ingested optical loss telemetry from Djibouti and Suez landing stations.',
+      'Correlated Loss of Signal (LOS) on SMW4 Segment 4 with OTDR reflection at 640km mark.',
+      'Synthesized multi-agent readiness across Network, Risk, Logistics, and Policy domains.'
+    ],
+    metrics: [
+      { label: 'Active Cables', value: '426' },
+      { label: 'Network Integrity', value: '96.4%' },
+      { label: 'Corridor Load', value: '88.2%' }
+    ],
+    suggestedActions: [
+      { label: 'Run Corridor Blast-Radius Simulation', actionId: 'run-blast-radius' },
+      { label: 'Dispatch Nearest DP2 Repair Vessel', actionId: 'dispatch-vessel' },
+      { label: 'Evaluate Dynamic Optical Reroute', actionId: 'eval-reroute' }
+    ]
+  }
+];
+
+const WorkspaceContext = createContext<WorkspaceContextType | undefined>(undefined);
+
+export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
+  const [cables, setCables] = useState<CableRoute[]>(VERIFIED_CABLE_ROUTES);
+  const [selectedCable, setSelectedCable] = useState<CableRoute>(VERIFIED_CABLE_ROUTES[0]);
+  const [activeFault, setActiveFault] = useState<FaultIncident>(ACTIVE_FAULT_INCIDENTS[0]);
+  
+  const [activeScenario, setActiveScenario] = useState<ScenarioConfig>(defaultScenario);
+  const [simulationResult, setSimulationResult] = useState<SimulationResult>(initialSimulationResult);
+
+  const [strategies, setStrategies] = useState<RecoveryStrategy[]>(INITIAL_RECOVERY_STRATEGIES);
+  const [selectedStrategy, setSelectedStrategy] = useState<RecoveryStrategy>(INITIAL_RECOVERY_STRATEGIES[0]);
+  const [repairFleet] = useState<RepairVessel[]>(REPAIR_FLEET);
+
+  const [agentMessages, setAgentMessages] = useState<AgentMessage[]>(initialAgentConversation);
+  const [isAgentThinking, setIsAgentThinking] = useState<boolean>(false);
+
+  const [datasets, setDatasets] = useState<DatasetRecord[]>(INITIAL_DATASETS);
+  const [snapshots, setSnapshots] = useState<SimulationSnapshot[]>([
+    {
+      snapshotId: 'snap-baseline-2026',
+      name: 'Baseline Red Sea Double Severance Snapshot',
+      createdAt: '2026-10-30T09:05:00Z',
+      seed: 20261030,
+      engineVersion: 'vSetu-SimKernel-2.4-Deterministic',
+      scenario: defaultScenario,
+      result: initialSimulationResult,
+      provenance: 'Derived'
+    }
+  ]);
+
+  // Keep selected cable in sync when fault changes
+  useEffect(() => {
+    const matched = cables.find(c => c.id === activeFault.cableId);
+    if (matched) {
+      setSelectedCable(matched);
+    }
+  }, [activeFault, cables]);
+
+  const executeSimulation = (customScenario?: ScenarioConfig) => {
+    const sc = customScenario || activeScenario;
+    const result = runNetworkSimulation(sc, cables);
+    setSimulationResult(result);
+  };
+
+  const addDatasetRecord = (record: DatasetRecord) => {
+    setDatasets(prev => [record, ...prev]);
+  };
+
+  const saveCurrentSnapshot = (name: string) => {
+    const snap: SimulationSnapshot = {
+      snapshotId: `snap-${Date.now()}`,
+      name: name || `Snapshot ${new Date().toLocaleTimeString()}`,
+      createdAt: new Date().toISOString(),
+      seed: simulationResult.randomSeed,
+      engineVersion: simulationResult.engineVersion,
+      scenario: activeScenario,
+      result: simulationResult,
+      provenance: 'Derived'
+    };
+    setSnapshots(prev => [snap, ...prev]);
+  };
+
+  const sendAgentQuery = (promptText: string) => {
+    if (!promptText.trim()) return;
+
+    // 1. Add User Message
+    const userMsg: AgentMessage = {
+      id: `usr-${Date.now()}`,
+      sender: 'user',
+      agentName: 'Commander / Operator',
+      agentRole: 'Chief Orchestrator',
+      content: promptText,
+      timestamp: new Date().toISOString()
+    };
+    setAgentMessages(prev => [...prev, userMsg]);
+    setIsAgentThinking(true);
+
+    // 2. Deterministic Agent Response Synthesis
+    setTimeout(() => {
+      const lower = promptText.toLowerCase();
+      let responseMsg: AgentMessage;
+
+      if (lower.includes('vessel') || lower.includes('dispatch') || lower.includes('ship') || lower.includes('fleet')) {
+        responseMsg = {
+          id: `agt-${Date.now()}`,
+          sender: 'logistics_repair',
+          agentName: 'Logistics & Repair Agent',
+          agentRole: 'Logistics & Repair Agent',
+          content: `Logistics assessment complete for fault coordinates Lat: ${activeFault.lat}°N, Lon: ${activeFault.lon}°E (Depth: ${activeFault.depthMeters}m).\n\nNearest qualified DP2 vessel is **${repairFleet[4].name}** currently stationed at Port Said (${repairFleet[4].currentPort}). Transit distance is 1,280 nautical miles through Suez. At cruising speed of 15.2 knots, estimated ETA on station is **38.4 hours**. Universal jointing containers and Hector 6000 ROV are verified operational.`,
+          timestamp: new Date().toISOString(),
+          reasoningChain: [
+            'Scanned AIS status and geographic positions of 5 registered consortium cable ships.',
+            'Filtered by DP2 dynamic positioning and benthic ROV depth capability (>4,000m).',
+            'Calculated great-circle nautical distance and canal transit scheduling.',
+            'Confirmed universal joint stock levels at Port Said logistics base.'
+          ],
+          metrics: [
+            { label: 'Assigned Vessel', value: repairFleet[4].name },
+            { label: 'Transit ETA', value: '38.4 hrs' },
+            { label: 'ROV Rating', value: '6,500m' },
+            { label: 'Confidence', value: '98.5%' }
+          ],
+          suggestedActions: [
+            { label: 'Confirm Mobilization Order to Port Said', actionId: 'confirm-vessel-mob' },
+            { label: 'Calculate Weather Window & Wave State', actionId: 'calc-weather' }
+          ]
+        };
+      } else if (lower.includes('blast') || lower.includes('reroute') || lower.includes('capacity') || lower.includes('latency')) {
+        responseMsg = {
+          id: `agt-${Date.now()}`,
+          sender: 'network_analyst',
+          agentName: 'Network Analyst',
+          agentRole: 'Network Analyst',
+          content: `Simulation Kernel evaluated deterministic blast radius for **${selectedCable.name}**.\n\n- Baseline latency across corridor: **${simulationResult.baselineLatencyMs} ms**.\n- Post-rupture latency via AAE-1 & 2Africa: **${simulationResult.impactedLatencyMs} ms** (+${simulationResult.latencyDeltaMs} ms delta).\n- Unserved demand: **${simulationResult.unservedDemandTbps} Tbps** of ${simulationResult.totalOfferedDemandTbps} Tbps total demand.\n- Recommendation: Prioritize optical grooming at Fujairah CLS to relieve downstream transit nodes.`,
+          timestamp: new Date().toISOString(),
+          reasoningChain: [
+            'Parsed topology adjacency graph across Euro-Asia and Transpacific trunks.',
+            'Executed deterministic capacity flow model with 92% link headroom threshold.',
+            'Detected latency inflation on secondary carrier paths due to 4,200km route detour.',
+            'Verified BGP multi-exit discriminator (MED) policies with tier-1 peers.'
+          ],
+          metrics: [
+            { label: 'Latency Delta', value: `+${simulationResult.latencyDeltaMs} ms` },
+            { label: 'Served Demand', value: `${simulationResult.servedDemandTbps} Tbps` },
+            { label: 'Utilization', value: `${simulationResult.capacityUtilizationPct}%` }
+          ],
+          suggestedActions: [
+            { label: 'Apply Strategy Alpha (Optical Reroute)', actionId: 'apply-strat-alpha' },
+            { label: 'Export Telemetry Report (CSV)', actionId: 'export-csv' }
+          ]
+        };
+      } else if (lower.includes('risk') || lower.includes('geopolitical') || lower.includes('hazard')) {
+        responseMsg = {
+          id: `agt-${Date.now()}`,
+          sender: 'risk_scenario',
+          agentName: 'Risk & Scenario Agent',
+          agentRole: 'Risk & Scenario Agent',
+          content: `Risk analysis evaluates Bab el-Mandeb and Suez as **Critical Vulnerability Tier-1** due to corridor density (16 subsea cables traversing a 26km maritime passage). Secondary risk of anchor drag by commercial bulk carriers remains elevated due to regional navigational warnings. Recommend enforcing 5 nautical mile exclusion zones around active repair coordinates.`,
+          timestamp: new Date().toISOString(),
+          reasoningChain: [
+            'Queried global AIS vessel traffic density in shallow choke straits.',
+            'Computed redundancy coefficient: 3 surviving carriers have <15% remaining capacity headroom.',
+            'Assessed risk of cascading congestion if secondary cable faults occur within 72 hours.'
+          ],
+          metrics: [
+            { label: 'Chokepoint Risk', value: 'High (0.88)' },
+            { label: 'Corridor Redundancy', value: '2.1 Cables' },
+            { label: 'Cascade Risk', value: '34%' }
+          ]
+        };
+      } else {
+        responseMsg = {
+          id: `agt-${Date.now()}`,
+          sender: 'orchestrator',
+          agentName: 'Chief Orchestrator',
+          agentRole: 'Chief Orchestrator',
+          content: `Multi-agent consensus consensus synthesized for query: "${promptText}".\n\nAll 5 specialist agents (Network, Risk, Logistics, Policy, Orchestrator) are synchronized with the active digital twin kernel. Current canonical target is **${selectedCable.name}** at fault location **${activeFault.nearestLandingStation}**.\n\nYou can inspect specific recommendations in the Recovery War Room or trigger a deterministic scenario run.`,
+          timestamp: new Date().toISOString(),
+          reasoningChain: [
+            'Cross-referenced operator prompt with canonical state context.',
+            'Verified data provenance: Active telemetry is classified as Observed.',
+            'Confirmed consensus convergence across specialist agents.'
+          ]
+        };
+      }
+
+      setAgentMessages(prev => [...prev, responseMsg]);
+      setIsAgentThinking(false);
+    }, 700);
+  };
+
+  const resetAgentChat = () => {
+    setAgentMessages(initialAgentConversation);
+  };
+
+  return (
+    <WorkspaceContext.Provider
+      value={{
+        cables,
+        selectedCable,
+        setSelectedCable,
+        activeFault,
+        setActiveFault,
+        activeScenario,
+        setActiveScenario,
+        simulationResult,
+        executeSimulation,
+        strategies,
+        selectedStrategy,
+        setSelectedStrategy,
+        repairFleet,
+        agentMessages,
+        sendAgentQuery,
+        resetAgentChat,
+        isAgentThinking,
+        datasets,
+        addDatasetRecord,
+        snapshots,
+        saveCurrentSnapshot
+      }}
+    >
+      {children}
+    </WorkspaceContext.Provider>
+  );
+}
+
+export function useWorkspace() {
+  const context = useContext(WorkspaceContext);
+  if (!context) {
+    throw new Error('useWorkspace must be used within a WorkspaceProvider');
+  }
+  return context;
+}

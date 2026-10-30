@@ -27,6 +27,7 @@ module.exports = {
           "Cambria",
           "serif",
         ],
+        grotesk: ["'Space Grotesk'", "sans-serif"],
         body: ["'Manrope'", "system-ui", "-apple-system", "sans-serif"],
         mono: ["'IBM Plex Mono'", "ui-monospace", "monospace"],
         sans: ["'Manrope'", "system-ui", "-apple-system", "sans-serif"],
