@@ -211,7 +211,7 @@ const UnderwaterScene = forwardRef<UnderwaterSceneHandle, UnderwaterSceneProps>(
       scene.add(downwellingLight);
 
       // D. Deep trench benthic key spotlight illuminating repair area
-      const benthicKeyLight = new THREE.SpotLight(0xebf8ff, 7.0, 45, Math.PI / 3.2, 0.45, 1.1);
+      const benthicKeyLight = new THREE.SpotLight(0xfff7ed, 6.8, 45, Math.PI / 3.2, 0.45, 1.1);
       benthicKeyLight.position.set(0, -11, 6);
       benthicKeyLight.target.position.set(0, -19.2, 0);
       benthicKeyLight.castShadow = true;
@@ -219,13 +219,13 @@ const UnderwaterScene = forwardRef<UnderwaterSceneHandle, UnderwaterSceneProps>(
       scene.add(benthicKeyLight.target);
 
       // E. Wide-angle backdrop wash lights highlighting the underlying sea environment
-      const backdropWashLeft = new THREE.SpotLight(0x13bfd3, 4.5, 55, Math.PI / 2.8, 0.5);
+      const backdropWashLeft = new THREE.SpotLight(0x83b9a9, 4.0, 55, Math.PI / 2.8, 0.5);
       backdropWashLeft.position.set(-18, -10, -5);
       backdropWashLeft.target.position.set(-15, -19.5, -15);
       scene.add(backdropWashLeft);
       scene.add(backdropWashLeft.target);
 
-      const backdropWashRight = new THREE.SpotLight(0x0284c7, 4.2, 55, Math.PI / 2.8, 0.5);
+      const backdropWashRight = new THREE.SpotLight(0xa8b99a, 3.8, 55, Math.PI / 2.8, 0.5);
       backdropWashRight.position.set(18, -10, -5);
       backdropWashRight.target.position.set(15, -19.5, -15);
       scene.add(backdropWashRight);
@@ -298,7 +298,7 @@ const UnderwaterScene = forwardRef<UnderwaterSceneHandle, UnderwaterSceneProps>(
         new THREE.Vector3(-4, -19.6, -0.4),
         new THREE.Vector3(-0.5, -19.2, 0),
       ];
-      const leftCable = createSeafloorCable(leftCablePoints, 0x1677b8);
+      const leftCable = createSeafloorCable(leftCablePoints, 0x454640);
       scene.add(leftCable);
 
       // Right cable segment (transoceanic route towards fault)
@@ -309,13 +309,13 @@ const UnderwaterScene = forwardRef<UnderwaterSceneHandle, UnderwaterSceneProps>(
         new THREE.Vector3(25, -19.5, 3),
         new THREE.Vector3(45, -19.4, 6),
       ];
-      const rightCable = createSeafloorCable(rightCablePoints, 0x1677b8);
+      const rightCable = createSeafloorCable(rightCablePoints, 0x454640);
       scene.add(rightCable);
 
       // Optical Data Continuity Laser Pulse (glowing photon wave traveling along cable)
       const pulseGeo = new THREE.SphereGeometry(0.18, 16, 16);
       const pulseMat = new THREE.MeshBasicMaterial({
-        color: 0x00ffff,
+        color: 0x83b9a9,
         transparent: true,
         opacity: 0.85,
         blending: THREE.AdditiveBlending,
@@ -354,7 +354,7 @@ const UnderwaterScene = forwardRef<UnderwaterSceneHandle, UnderwaterSceneProps>(
       // Titanium Structural Spaceframe Chassis (Midnight Navy)
       const chassisGeo = new THREE.BoxGeometry(1.36, 0.72, 1.76);
       const chassisMat = new THREE.MeshStandardMaterial({
-        color: 0x0b1d33,
+        color: 0x454640,
         roughness: 0.3,
         metalness: 0.8,
       });
@@ -711,9 +711,9 @@ const UnderwaterScene = forwardRef<UnderwaterSceneHandle, UnderwaterSceneProps>(
       <div ref={containerRef} className="relative w-full h-full min-h-[580px] bg-[#03182b] overflow-hidden select-none">
         <canvas ref={canvasRef} className="w-full h-full block" />
 
-        {/* Top-Left Perspective Navigation Toolbar */}
-        <div className="absolute top-4 left-4 z-20 flex flex-wrap items-center gap-2 bg-[#0b1d33]/90 backdrop-blur-md px-3 py-2 rounded-xl border border-white/10 shadow-2xl">
-          <span className="font-mono text-[10px] uppercase tracking-wider text-cyan-400 font-bold px-1.5 py-0.5 rounded bg-cyan-950/60 border border-cyan-800/50">
+        {/* Top-Left Perspective Navigation Toolbar (PARJANYAḤ Light Theme) */}
+        <div className="absolute top-4 left-4 z-20 flex flex-wrap items-center gap-2 bg-[#F7F3EA]/95 backdrop-blur-md px-3 py-2 rounded-xl border border-[#D4C4A8] shadow-md">
+          <span className="font-mono text-[10px] uppercase tracking-wider text-[#454640] font-bold px-2 py-0.5 rounded bg-[#E8D9BF] border border-[#D4C4A8]">
             VIEW CAM
           </span>
           {(['ROV Cam', 'Macro Splice', 'Orbit', 'Surface Vessel'] as CameraPerspective[]).map((persp) => (
@@ -723,10 +723,10 @@ const UnderwaterScene = forwardRef<UnderwaterSceneHandle, UnderwaterSceneProps>(
                 setPerspectiveState(persp);
                 updateCameraTargets(persp);
               }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all ${
                 perspectiveState === persp
-                  ? 'bg-cyan-500 text-[#0b1d33] font-bold shadow-lg shadow-cyan-500/30'
-                  : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white border border-white/5'
+                  ? 'bg-[#83B9A9] text-[#454640] font-bold shadow-xs'
+                  : 'bg-white/90 text-[#454640] hover:bg-[#E8D9BF] border border-[#D4C4A8]'
               }`}
             >
               {persp}
@@ -735,37 +735,37 @@ const UnderwaterScene = forwardRef<UnderwaterSceneHandle, UnderwaterSceneProps>(
         </div>
 
         {/* Top-Right Telemetry & Environment HUD */}
-        <div className="absolute top-4 right-4 z-20 flex flex-col items-end gap-2 bg-[#0b1d33]/90 backdrop-blur-md px-4 py-3 rounded-xl border border-white/10 shadow-2xl">
+        <div className="absolute top-4 right-4 z-20 flex flex-col items-end gap-2 bg-[#F7F3EA]/95 backdrop-blur-md px-4 py-3 rounded-xl border border-[#D4C4A8] shadow-md">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-            <span className="font-mono text-[11px] uppercase tracking-widest text-cyan-300 font-semibold">
+            <span className="w-2 h-2 rounded-full bg-[#C87954] animate-pulse" />
+            <span className="font-mono text-[11px] uppercase tracking-widest text-[#454640] font-bold">
               SUBSEA DIGITAL TWIN
             </span>
           </div>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-1 font-mono text-[10px] text-white/70 text-right">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1 font-mono text-[10px] text-[#A69B89] text-right">
             <span>BATHYMETRY DEPTH:</span>
-            <span className="text-white font-bold">4,820 m</span>
+            <span className="text-[#454640] font-bold">4,820 m</span>
             <span>HYDROSTATIC PRESS:</span>
-            <span className="text-white font-bold">48.2 MPa</span>
+            <span className="text-[#454640] font-bold">48.2 MPa</span>
             <span>WATER TEMP:</span>
-            <span className="text-white font-bold">1.8 °C</span>
+            <span className="text-[#454640] font-bold">1.8 °C</span>
             <span>ENVIRONMENT:</span>
-            <span className={assetsLoaded ? "text-emerald-400 font-bold" : "text-amber-400 font-bold"}>
+            <span className={assetsLoaded ? "text-[#687B59] font-bold" : "text-[#C87954] font-bold"}>
               {assetsLoaded ? "OCEAN FLOOR LINKED" : "LOADING TERRAIN"}
             </span>
           </div>
         </div>
 
         {/* Bottom-Left Real-Time Operational Sequence Monitor */}
-        <div className="absolute bottom-4 left-4 z-20 bg-[#0b1d33]/90 backdrop-blur-md px-4 py-3 rounded-xl border border-white/10 shadow-2xl max-w-sm">
-          <div className="text-[10px] font-mono uppercase tracking-wider text-white/50 mb-1">
+        <div className="absolute bottom-4 left-4 z-20 bg-[#F7F3EA]/95 backdrop-blur-md px-4 py-3 rounded-xl border border-[#D4C4A8] shadow-md max-w-sm">
+          <div className="text-[10px] font-mono uppercase tracking-wider text-[#A69B89] mb-1 font-semibold">
             PHYSICAL REPAIR TIMELINE
           </div>
-          <div className="text-sm font-bold text-white flex items-center gap-2">
-            <span className="px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-400 font-mono text-xs border border-cyan-800">
+          <div className="text-sm font-bold text-[#454640] flex items-center gap-2">
+            <span className="px-2 py-0.5 rounded bg-[#83B9A9] text-[#454640] font-mono text-xs font-bold border border-[#687B59]/30">
               STAGE {stageState} / 11
             </span>
-            <span>
+            <span className="text-xs">
               {stageState <= 1 && 'Surface Dispatch & ROV Descent'}
               {stageState === 2 && 'Benthic Survey & Multibeam Sonar Scan'}
               {stageState === 3 && 'Manipulator Alignment & Clamping'}

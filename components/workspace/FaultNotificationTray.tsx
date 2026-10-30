@@ -26,11 +26,11 @@ export function FaultNotificationTray({ onClose }: FaultNotificationTrayProps) {
   });
 
   return (
-    <div className="bg-white rounded-2xl border border-[#CBDDEB] shadow-2xl flex flex-col overflow-hidden text-[#152D46]">
+    <div className="bg-white rounded-2xl border border-[#D4C4A8] shadow-2xl flex flex-col overflow-hidden text-[#454640]">
       {/* Popover Header */}
-      <div className="p-3.5 px-4 bg-[#F7F8F5] border-b border-[#E9F0F5] flex items-center justify-between">
+      <div className="p-3.5 px-4 bg-[#F7F3EA] border-b border-[#D4C4A8] flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-[#DDF8FA] border border-[#13BFD3]/30 flex items-center justify-center text-[#0E8B99]">
+          <div className="w-7 h-7 rounded-lg bg-[#FCEFE7] border border-[#C87954]/30 flex items-center justify-center text-[#C87954]">
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
               <path d="M13.73 21a2 2 0 0 1-3.46 0" />
@@ -38,7 +38,7 @@ export function FaultNotificationTray({ onClose }: FaultNotificationTrayProps) {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-grotesk text-sm font-bold text-[#152D46]">
+              <h3 className="font-grotesk text-sm font-bold text-[#454640]">
                 Fault Verification
               </h3>
               {pendingNotificationsCount > 0 ? (
@@ -51,7 +51,7 @@ export function FaultNotificationTray({ onClose }: FaultNotificationTrayProps) {
                 </span>
               )}
             </div>
-            <p className="font-mono text-[10px] text-[#60758A]">
+            <p className="font-mono text-[10px] text-[#A69B89]">
               Review detected anomalies for operational triage
             </p>
           </div>
@@ -60,7 +60,7 @@ export function FaultNotificationTray({ onClose }: FaultNotificationTrayProps) {
         {onClose && (
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-[#60758A] hover:bg-[#EDF3F7] hover:text-[#152D46] transition-colors"
+            className="p-1 rounded-lg text-[#A69B89] hover:bg-[#EDF3F7] hover:text-[#454640] transition-colors"
             title="Close"
             aria-label="Close notification box"
           >
@@ -73,7 +73,7 @@ export function FaultNotificationTray({ onClose }: FaultNotificationTrayProps) {
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-1 px-4 py-2 bg-white border-b border-[#E9F0F5]">
+      <div className="flex items-center gap-1 px-4 py-2 bg-white border-b border-[#D4C4A8]">
         {(['Pending', 'Approved', 'Declined', 'All'] as const).map((tab) => {
           const count = tab === 'All' 
             ? notifications.length 
@@ -85,12 +85,12 @@ export function FaultNotificationTray({ onClose }: FaultNotificationTrayProps) {
               onClick={() => setFilter(tab)}
               className={`px-2.5 py-1 rounded-lg text-[10px] font-mono transition-all flex items-center gap-1.5 ${
                 filter === tab
-                  ? 'bg-[#153A5B] text-white font-bold shadow-2xs'
-                  : 'bg-[#EDF3F7] text-[#60758A] hover:bg-[#E2EBF2] hover:text-[#152D46]'
+                  ? 'bg-[#83B9A9] text-[#454640] font-bold shadow-2xs'
+                  : 'bg-[#EDF3F7] text-[#A69B89] hover:bg-[#E2EBF2] hover:text-[#454640]'
               }`}
             >
               <span>{tab}</span>
-              <span className={`text-[9px] px-1 py-0.2 rounded ${filter === tab ? 'bg-white/20 text-white' : 'bg-white text-[#60758A]'}`}>
+              <span className={`text-[9px] px-1 py-0.2 rounded ${filter === tab ? 'bg-white/20 text-white' : 'bg-white text-[#A69B89]'}`}>
                 {count}
               </span>
             </button>
@@ -163,12 +163,12 @@ export function FaultNotificationTray({ onClose }: FaultNotificationTrayProps) {
       {/* Scrollable Notification List */}
       <div className="p-3 space-y-2.5 overflow-y-auto max-h-[380px]">
         {filteredNotifications.length === 0 ? (
-          <div className="py-8 px-4 text-center text-xs text-[#60758A] font-mono bg-[#F7F8F5] rounded-xl border border-[#E9F0F5]">
+          <div className="py-8 px-4 text-center text-xs text-[#A69B89] font-mono bg-[#F7F3EA] rounded-xl border border-[#D4C4A8]">
             <svg className="w-6 h-6 text-emerald-600 mx-auto mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
               <polyline points="9 12 11 14 15 10" />
             </svg>
-            <p className="font-semibold text-[#152D46]">All Systems Nominal</p>
+            <p className="font-semibold text-[#454640]">All Systems Nominal</p>
             <p className="text-[10px] mt-0.5">No unverified faults in {filter.toLowerCase()} queue.</p>
           </div>
         ) : (
@@ -185,14 +185,14 @@ export function FaultNotificationTray({ onClose }: FaultNotificationTrayProps) {
                     ? 'bg-emerald-50/60 border-emerald-300'
                     : isDeclined
                     ? 'bg-[#FAFBF9] border-[#E2DBD0] opacity-75'
-                    : 'bg-white border-[#CBDDEB] shadow-2xs'
+                    : 'bg-white border-[#D4C4A8] shadow-2xs'
                 }`}
               >
                 {/* Header & Badges */}
                 <div className="flex items-start justify-between gap-2 mb-1.5">
                   <div>
                     <div className="flex items-center gap-1.5">
-                      <span className="font-mono text-[10px] font-bold text-[#152D46]">
+                      <span className="font-mono text-[10px] font-bold text-[#454640]">
                         {notif.cableName}
                       </span>
                       <span
@@ -207,7 +207,7 @@ export function FaultNotificationTray({ onClose }: FaultNotificationTrayProps) {
                         {notif.severity}
                       </span>
                     </div>
-                    <span className="font-mono text-[9px] text-[#60758A]">
+                    <span className="font-mono text-[9px] text-[#A69B89]">
                       {notif.nearestLandingStation} · {notif.lat.toFixed(2)}°N, {notif.lon.toFixed(2)}°E (-{notif.depthMeters}m)
                     </span>
                   </div>
@@ -218,12 +218,12 @@ export function FaultNotificationTray({ onClose }: FaultNotificationTrayProps) {
                 </div>
 
                 {/* Description */}
-                <p className="text-[11px] text-[#60758A] font-body leading-relaxed mb-2">
+                <p className="text-[11px] text-[#A69B89] font-body leading-relaxed mb-2">
                   {notif.description}
                 </p>
 
                 {/* Metrics Pill Strip */}
-                <div className="flex items-center gap-3 py-1.5 px-2 bg-[#F7F8F5] rounded-lg border border-[#E9F0F5] font-mono text-[9px] mb-2">
+                <div className="flex items-center gap-3 py-1.5 px-2 bg-[#F7F3EA] rounded-lg border border-[#D4C4A8] font-mono text-[9px] mb-2">
                   <span>Loss: <strong className="text-rose-700">{notif.opticalLossDb} dB</strong></span>
                   <span>·</span>
                   <span>Impact: <strong className="text-amber-700">{notif.affectedTrafficTbps} Tbps</strong></span>
@@ -233,8 +233,8 @@ export function FaultNotificationTray({ onClose }: FaultNotificationTrayProps) {
 
                 {/* Asking for Approval Buttons */}
                 {isPending && (
-                  <div className="pt-2 border-t border-[#E9F0F5] flex items-center justify-between gap-2">
-                    <span className="font-mono text-[9px] text-[#60758A]">
+                  <div className="pt-2 border-t border-[#D4C4A8] flex items-center justify-between gap-2">
+                    <span className="font-mono text-[9px] text-[#A69B89]">
                       Action required:
                     </span>
                     <div className="flex items-center gap-1.5">
@@ -282,7 +282,7 @@ export function FaultNotificationTray({ onClose }: FaultNotificationTrayProps) {
 
                 {/* Declined State */}
                 {isDeclined && (
-                  <div className="pt-2 border-t border-[#E9F0F5] flex items-center justify-between text-xs">
+                  <div className="pt-2 border-t border-[#D4C4A8] flex items-center justify-between text-xs">
                     <span className="font-mono text-[10px] text-[#91A1AF] flex items-center gap-1">
                       <svg className="w-3 h-3 text-[#91A1AF]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <line x1="18" y1="6" x2="6" y2="18" />
@@ -305,7 +305,7 @@ export function FaultNotificationTray({ onClose }: FaultNotificationTrayProps) {
       </div>
 
       {/* Footer Info */}
-      <div className="px-4 py-2 bg-[#F7F8F5] border-t border-[#E9F0F5] flex items-center justify-between font-mono text-[9px] text-[#91A1AF]">
+      <div className="px-4 py-2 bg-[#F7F3EA] border-t border-[#D4C4A8] flex items-center justify-between font-mono text-[9px] text-[#91A1AF]">
         <span>Sensors: Ingesting OTDR & Benthic telemetry</span>
         <span>VARUNASETU Enclave</span>
       </div>

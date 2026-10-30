@@ -24,7 +24,7 @@ export function Sidebar() {
       path: '/workspace',
       badge: '426',
       icon: (active) => (
-        <svg className={`w-5 h-5 transition-colors ${active ? 'text-[#13BFD3]' : 'text-[#91A1AF]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <svg className={`w-5 h-5 transition-colors ${active ? 'text-[#C87954]' : 'text-[#6D6E66]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
           <circle cx="12" cy="12" r="9" />
           <path d="M3.6 9h16.8" />
           <path d="M3.6 15h16.8" />
@@ -39,7 +39,7 @@ export function Sidebar() {
       path: '/workspace/digital-twin',
       badge: '3D',
       icon: (active) => (
-        <svg className={`w-5 h-5 transition-colors ${active ? 'text-[#13BFD3]' : 'text-[#91A1AF]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <svg className={`w-5 h-5 transition-colors ${active ? 'text-[#C87954]' : 'text-[#6D6E66]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
           <path d="M2 17c3-3 6-3 9 0s6 3 9 0" />
           <path d="M2 12c3-3 6-3 9 0s6 3 9 0" />
           <path d="M12 3v6" />
@@ -53,7 +53,7 @@ export function Sidebar() {
       path: '/workspace/operations',
       badge: 'Sim',
       icon: (active) => (
-        <svg className={`w-5 h-5 transition-colors ${active ? 'text-[#13BFD3]' : 'text-[#91A1AF]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <svg className={`w-5 h-5 transition-colors ${active ? 'text-[#C87954]' : 'text-[#6D6E66]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
           <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
         </svg>
       )
@@ -64,7 +64,7 @@ export function Sidebar() {
       path: '/workspace/war-room',
       badge: 'Logistics',
       icon: (active) => (
-        <svg className={`w-5 h-5 transition-colors ${active ? 'text-[#13BFD3]' : 'text-[#91A1AF]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <svg className={`w-5 h-5 transition-colors ${active ? 'text-[#C87954]' : 'text-[#6D6E66]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           <polyline points="9 12 11 14 15 10" />
         </svg>
@@ -76,7 +76,7 @@ export function Sidebar() {
       path: '/workspace/mission-control',
       badge: '5 Agents',
       icon: (active) => (
-        <svg className={`w-5 h-5 transition-colors ${active ? 'text-[#13BFD3]' : 'text-[#91A1AF]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <svg className={`w-5 h-5 transition-colors ${active ? 'text-[#C87954]' : 'text-[#6D6E66]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
           <line x1="8" y1="9" x2="16" y2="9" />
           <line x1="8" y1="13" x2="13" y2="13" />
@@ -89,7 +89,7 @@ export function Sidebar() {
       path: '/workspace/analytics',
       badge: 'Audit',
       icon: (active) => (
-        <svg className={`w-5 h-5 transition-colors ${active ? 'text-[#13BFD3]' : 'text-[#91A1AF]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <svg className={`w-5 h-5 transition-colors ${active ? 'text-[#C87954]' : 'text-[#6D6E66]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
           <line x1="18" y1="20" x2="18" y2="10" />
           <line x1="12" y1="20" x2="12" y2="4" />
           <line x1="6" y1="20" x2="6" y2="14" />
@@ -102,7 +102,7 @@ export function Sidebar() {
       path: '/workspace/data',
       badge: 'GIS Hub',
       icon: (active) => (
-        <svg className={`w-5 h-5 transition-colors ${active ? 'text-[#13BFD3]' : 'text-[#91A1AF]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <svg className={`w-5 h-5 transition-colors ${active ? 'text-[#C87954]' : 'text-[#6D6E66]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
           <ellipse cx="12" cy="5" rx="9" ry="3" />
           <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
           <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
@@ -113,31 +113,31 @@ export function Sidebar() {
 
   return (
     <aside
-      className={`relative z-20 flex flex-col flex-shrink-0 bg-[#0B1D33] border-r border-[#102A46] text-[#F5FAFF] transition-all duration-300 ease-in-out ${
+      className={`relative z-20 flex flex-col flex-shrink-0 bg-[#E8D9BF] border-r border-[#D4C4A8] text-[#454640] transition-all duration-300 ease-in-out ${
         collapsed ? 'w-[70px]' : 'w-64'
       }`}
     >
       {/* Brand & Workspace Identity (Midnight Navy Header) */}
-      <div className="h-14 flex items-center justify-between px-3.5 border-b border-[#102A46] bg-[#091728]">
+      <div className="h-14 flex items-center justify-between px-3.5 border-b border-[#102A46] bg-[#D4C4A8]">
         {!collapsed ? (
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-xl bg-[#102A46] border border-[#153A5B] flex items-center justify-center text-[#13BFD3] shadow-xs transition-transform group-hover:scale-105">
+            <div className="w-8 h-8 rounded-xl bg-[#F7F3EA] border border-[#D4C4A8] flex items-center justify-center text-[#C87954] shadow-xs transition-transform group-hover:scale-105">
               <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-                <path d="M2 10 Q5 5, 10 7.5 Q15 10, 18 5" stroke="#13BFD3" strokeWidth="2" strokeLinecap="round" fill="none" />
-                <path d="M2 13 Q5 8, 10 10.5 Q15 13, 18 8" stroke="#13BFD3" strokeWidth="1.2" strokeLinecap="round" fill="none" opacity="0.6" />
+                <path d="M2 10 Q5 5, 10 7.5 Q15 10, 18 5" stroke="#C87954" strokeWidth="2" strokeLinecap="round" fill="none" />
+                <path d="M2 13 Q5 8, 10 10.5 Q15 13, 18 8" stroke="#C87954" strokeWidth="1.2" strokeLinecap="round" fill="none" opacity="0.6" />
                 <circle cx="10" cy="8.75" r="1.8" fill="#FFFFFF" />
               </svg>
             </div>
             <div>
-              <span className="font-grotesk font-bold text-xs tracking-wider text-white">VARUNASETU</span>
-              <p className="font-mono text-[9px] text-[#13BFD3] tracking-widest uppercase font-semibold">Subsea Twin</p>
+              <span className="font-grotesk font-bold text-xs tracking-wider text-[#454640]">VARUNASETU</span>
+              <p className="font-mono text-[9px] text-[#C87954] tracking-widest uppercase font-semibold">Subsea Twin</p>
             </div>
           </Link>
         ) : (
           <Link href="/" className="mx-auto" title="VARUNASETU Home">
-            <div className="w-8 h-8 rounded-xl bg-[#102A46] border border-[#153A5B] flex items-center justify-center text-[#13BFD3] shadow-xs">
+            <div className="w-8 h-8 rounded-xl bg-[#F7F3EA] border border-[#D4C4A8] flex items-center justify-center text-[#C87954] shadow-xs">
               <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-                <path d="M2 10 Q5 5, 10 7.5 Q15 10, 18 5" stroke="#13BFD3" strokeWidth="2" strokeLinecap="round" fill="none" />
+                <path d="M2 10 Q5 5, 10 7.5 Q15 10, 18 5" stroke="#C87954" strokeWidth="2" strokeLinecap="round" fill="none" />
                 <circle cx="10" cy="8.75" r="1.8" fill="#FFFFFF" />
               </svg>
             </div>
@@ -146,7 +146,7 @@ export function Sidebar() {
 
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className={`p-1.5 rounded-lg text-[#91A1AF] hover:bg-[#102A46] hover:text-[#13BFD3] transition-colors ${
+          className={`p-1.5 rounded-lg text-[#6D6E66] hover:bg-[#102A46] hover:text-[#C87954] transition-colors ${
             collapsed ? 'hidden' : 'block'
           }`}
           title="Collapse navigation"
@@ -161,7 +161,7 @@ export function Sidebar() {
       {/* Navigation Links */}
       <nav className="flex-1 py-4 px-2 space-y-1.5 overflow-y-auto">
         {!collapsed && (
-          <p className="px-3 pb-1 font-mono text-[10px] tracking-[0.2em] text-[#60758A] uppercase">
+          <p className="px-3 pb-1 font-mono text-[10px] tracking-[0.2em] text-[#A69B89] uppercase">
             Platform Sections
           </p>
         )}
@@ -174,14 +174,14 @@ export function Sidebar() {
               href={item.path}
               className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all group ${
                 isActive
-                  ? 'bg-[#153A5B] text-white shadow-xs'
-                  : 'text-[#91A1AF] hover:bg-[#102A46] hover:text-white'
+                  ? 'bg-[#153A5B] text-[#454640] shadow-xs'
+                  : 'text-[#6D6E66] hover:bg-[#102A46] hover:text-[#454640]'
               } ${collapsed ? 'justify-center px-2' : ''}`}
               title={collapsed ? item.name : undefined}
             >
               {/* Cyan Active Indicator on Midnight Navy */}
               {isActive && (
-                <span className="absolute left-0 top-2 bottom-2 w-1 bg-[#13BFD3] rounded-r-full shadow-[0_0_8px_#13BFD3]" />
+                <span className="absolute left-0 top-2 bottom-2 w-1 bg-[#C87954] rounded-r-full" />
               )}
 
               <div className="flex-shrink-0">{item.icon(isActive)}</div>
@@ -193,8 +193,8 @@ export function Sidebar() {
                     <span
                       className={`ml-2 px-1.5 py-0.5 rounded text-[9px] font-mono tracking-wider ${
                         isActive
-                          ? 'bg-[#102A46] text-[#13BFD3] border border-[#13BFD3]/30 font-bold'
-                          : 'bg-[#091728] text-[#91A1AF]'
+                          ? 'bg-[#102A46] text-[#C87954] border border-[#13BFD3]/30 font-bold'
+                          : 'bg-[#D4C4A8] text-[#6D6E66]'
                       }`}
                     >
                       {item.badge}
@@ -208,12 +208,12 @@ export function Sidebar() {
       </nav>
 
       {/* Footer Controls / Expand Toggle */}
-      <div className="p-2.5 border-t border-[#102A46] bg-[#091728] space-y-1.5">
+      <div className="p-2.5 border-t border-[#102A46] bg-[#D4C4A8] space-y-1.5">
         {/* Expand / Collapse Button when Collapsed */}
         {collapsed ? (
           <button
             onClick={() => setCollapsed(false)}
-            className="w-full flex items-center justify-center p-2 rounded-xl text-[#91A1AF] hover:text-[#13BFD3] hover:bg-[#102A46] transition-colors"
+            className="w-full flex items-center justify-center p-2 rounded-xl text-[#6D6E66] hover:text-[#C87954] hover:bg-[#102A46] transition-colors"
             title="Expand Navigation (Detailed)"
             aria-label="Expand sidebar"
           >
@@ -224,7 +224,7 @@ export function Sidebar() {
         ) : (
           <button
             onClick={() => setCollapsed(true)}
-            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-[#91A1AF] hover:text-white hover:bg-[#102A46] text-xs font-mono transition-colors"
+            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-[#6D6E66] hover:text-[#454640] hover:bg-[#102A46] text-xs font-mono transition-colors"
             title="Compact Navigation"
           >
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -237,7 +237,7 @@ export function Sidebar() {
         {/* Exit Link */}
         <Link
           href="/"
-          className={`flex items-center rounded-xl text-[#91A1AF] hover:text-white hover:bg-[#102A46] text-xs font-body transition-colors ${
+          className={`flex items-center rounded-xl text-[#6D6E66] hover:text-[#454640] hover:bg-[#102A46] text-xs font-body transition-colors ${
             collapsed ? 'justify-center p-2' : 'gap-2 px-3 py-2'
           }`}
           title="Exit to Landing"

@@ -35,16 +35,16 @@ export function Header() {
         2. Current Date & Time
         3. User Name & Profile / Avatar
       */}
-      <header className="h-14 flex-shrink-0 bg-white border-b border-[#E9F0F5] px-6 flex items-center justify-between gap-4 relative z-10 shadow-2xs">
+      <header className="h-14 flex-shrink-0 bg-[#F7F3EA] border-b border-[#D4C4A8] px-6 flex items-center justify-between gap-4 relative z-10 shadow-2xs">
         {/* Left: Brand / System Status Indicator */}
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#13BFD3] animate-pulse" />
-            <span className="font-grotesk text-xs font-bold tracking-wider text-[#152D46]">
+            <span className="w-2 h-2 rounded-full bg-[#C87954] animate-pulse" />
+            <span className="font-grotesk text-xs font-bold tracking-wider text-[#454640]">
               VARUNASETU
             </span>
             <span className="text-[#CBDDEB] text-xs">/</span>
-            <span className="font-mono text-[11px] text-[#60758A] tracking-wide">
+            <span className="font-mono text-[11px] text-[#A69B89] tracking-wide">
               Submarine Cable Resilience Twin
             </span>
           </div>
@@ -58,8 +58,8 @@ export function Header() {
               onClick={() => setIsNotificationTrayOpen(!isNotificationTrayOpen)}
               className={`relative p-2 rounded-xl transition-all flex items-center justify-center border ${
                 pendingNotificationsCount > 0
-                  ? 'bg-[#DDF8FA] border-[#13BFD3]/40 text-[#0E8B99] hover:bg-[#c9f3f6]'
-                  : 'bg-[#EDF3F7] border-[#CBDDEB] text-[#60758A] hover:text-[#152D46] hover:bg-[#E2EBF2]'
+                  ? 'bg-[#FCEFE7] border-[#C87954]/40 text-[#C87954] hover:bg-[#c9f3f6]'
+                  : 'bg-[#EDF3F7] border-[#CBDDEB] text-[#A69B89] hover:text-[#454640] hover:bg-[#E2EBF2]'
               }`}
               title="Fault Notifications & Alert Center"
               aria-label="Notifications"
@@ -69,7 +69,7 @@ export function Header() {
                 <path d="M13.73 21a2 2 0 0 1-3.46 0" />
               </svg>
               {pendingNotificationsCount > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-[#DC2626] text-white font-mono text-[9px] font-bold flex items-center justify-center shadow-xs">
+                <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-[#C87954] text-white font-mono text-[9px] font-bold flex items-center justify-center shadow-xs">
                   {pendingNotificationsCount}
                 </span>
               )}
@@ -93,24 +93,24 @@ export function Header() {
           </div>
 
           {/* 2. Current Date and Time */}
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#F7F8F5] border border-[#E9F0F5]">
-            <svg className="w-3.5 h-3.5 text-[#60758A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#E8D9BF] border border-[#D4C4A8]">
+            <svg className="w-3.5 h-3.5 text-[#A69B89]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="12" cy="12" r="10" />
               <polyline points="12 6 12 12 16 14" />
             </svg>
-            <span className="font-mono text-xs font-medium text-[#152D46]">
+            <span className="font-mono text-xs font-medium text-[#454640]">
               {formattedDateTime || '30 Oct 2026 · UTC'}
             </span>
           </div>
 
           {/* 3. User Name & Profile Avatar */}
-          <div className="flex items-center gap-2.5 pl-2 border-l border-[#E9F0F5]">
-            <div className="w-8 h-8 rounded-xl bg-[#0B1D33] border border-[#153A5B] flex items-center justify-center text-xs font-bold font-mono text-[#13BFD3] shadow-xs">
+          <div className="flex items-center gap-2.5 pl-2 border-l border-[#D4C4A8]">
+            <div className="w-8 h-8 rounded-xl bg-[#E8D9BF] border border-[#D4C4A8] flex items-center justify-center text-xs font-bold font-mono text-[#454640] shadow-xs">
               VS
             </div>
             <div className="hidden md:block text-left">
-              <p className="text-xs font-bold text-[#152D46] leading-tight font-body">NOC Commander</p>
-              <p className="font-mono text-[10px] text-[#60758A]">Operations Lead</p>
+              <p className="text-xs font-bold text-[#454640] leading-tight font-body">NOC Commander</p>
+              <p className="font-mono text-[10px] text-[#A69B89]">Operations Lead</p>
             </div>
           </div>
         </div>

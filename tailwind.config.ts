@@ -7,52 +7,93 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Navigation (Midnight Navy System)
-        navy: {
-          midnight: "#0B1D33",
-          deep: "#102A46",
-          surface: "#153A5B",
-          light: "#1C4A73",
+        // Approved PARJANYAH Light Theme Palette
+        ivory: {
+          DEFAULT: '#F7F3EA',
+          warm: '#F7F3EA',
+          soft: '#E8D9BF',
         },
-        // Primary Interaction (Ocean Blue & Cyan)
+        sand: {
+          DEFAULT: '#E8D9BF',
+          light: '#F4ECE0',
+          dark: '#D4C4A8',
+        },
+        limestone: '#D4C4A8',
+        terracotta: {
+          DEFAULT: '#C87954',
+          hover: '#B86A45',
+          dark: '#9E5635',
+          light: '#F8ECE7',
+        },
+        coral: {
+          DEFAULT: '#E99A65',
+          light: '#FCEFE7',
+        },
+        sage: {
+          DEFAULT: '#A8B99A',
+          dark: '#687B59',
+          light: '#EEF3EC',
+        },
+        seaglass: {
+          DEFAULT: '#83B9A9',
+          dark: '#659D8E',
+          light: '#E6F3EF',
+        },
+        olive: '#687B59',
+        charcoal: {
+          DEFAULT: '#454640',
+          muted: '#6D6E66',
+          light: '#8F9087',
+        },
+        taupe: {
+          DEFAULT: '#A69B89',
+          light: '#C4BCAD',
+          border: '#D4C4A8',
+        },
+        mist: '#E6E5DF',
+        paleAqua: '#DCEBE4',
+
+        // Semantic light-theme mappings
+        surface: {
+          DEFAULT: '#F7F3EA',
+          white: '#FFFFFF',
+          card: '#FFFFFF',
+          secondary: '#E8D9BF',
+          panel: '#F7F3EA',
+          border: '#D4C4A8',
+          divider: '#E6E5DF',
+          subtle: '#FAF7F0',
+        },
+        text: {
+          primary: '#454640',
+          secondary: '#A69B89',
+          muted: '#A69B89',
+          heading: '#454640',
+        },
+        status: {
+          active: '#83B9A9',
+          warning: '#E99A65',
+          critical: '#C87954',
+          success: '#A8B99A',
+          info: '#83B9A9',
+          inactive: '#E6E5DF',
+        },
+        // Fallback backward compatibility tokens
+        navy: {
+          midnight: '#454640',
+          deep: '#454640',
+          surface: '#F7F3EA',
+          light: '#E8D9BF',
+        },
         ocean: {
-          DEFAULT: "#1677B8",
-          deep: "#075B91",
-          light: "#E8F3FA",
+          DEFAULT: '#C87954',
+          deep: '#B86A45',
+          light: '#F8ECE7',
         },
         cyan: {
-          DEFAULT: "#13BFD3",
-          light: "#DDF8FA",
-          dark: "#0E8B99",
-        },
-        // Workspace Surfaces & Backgrounds
-        ivory: {
-          warm: "#F7F8F5",
-          soft: "#F1F4F2",
-          DEFAULT: "#F7F8F5",
-        },
-        surface: {
-          white: "#FFFFFF",
-          pale: "#EDF3F7",
-          card: "#FFFFFF",
-          subtle: "#FAFBF9",
-          border: "#E2DBD0",
-          "border-light": "#E9F0F5",
-        },
-        // Text
-        text: {
-          primary: "#152D46",
-          secondary: "#60758A",
-          muted: "#91A1AF",
-          onNavy: "#F5FAFF",
-        },
-        // Semantic Status
-        status: {
-          active: "#0D9488",
-          warning: "#D97706",
-          critical: "#DC2626",
-          unknown: "#6B7280",
-          info: "#1677B8",
+          DEFAULT: '#83B9A9',
+          light: '#E6F3EF',
+          dark: '#659D8E',
         },
       },
       fontFamily: {
