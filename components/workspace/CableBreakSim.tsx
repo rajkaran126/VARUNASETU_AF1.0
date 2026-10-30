@@ -87,10 +87,10 @@ export default function CableBreakSim() {
       renderer.toneMappingExposure = 0.95;
       mountRef.current!.appendChild(renderer.domElement);
 
-      /* ─── SCENE (PURE BLACK — NO DARK BLUE) ─── */
+      /* ─── SCENE (BRIGHT DAYLIGHT ENVIRONMENT) ─── */
       const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x000000);
-      scene.fog = new THREE.FogExp2(0x000000, 0.022);
+      scene.background = new THREE.Color(0xd8eaf7);
+      scene.fog = new THREE.FogExp2(0xd8eaf7, 0.008);
 
       /* ─── CAMERA ─── */
       const W = mountRef.current!.clientWidth;
@@ -108,12 +108,12 @@ export default function CableBreakSim() {
       controls.maxPolarAngle = Math.PI * 0.88;
       controls.update();
 
-      /* ─── LIGHTS (NEUTRAL WARM & CLEAN WHITE — NO BLUE) ─── */
-      scene.add(new THREE.AmbientLight(0x222222, 2.2));
-      scene.add(new THREE.HemisphereLight(0x3a3a3a, 0x0a0a0a, 1.8));
+      /* ─── LIGHTS (FULL DAYLIGHT SUN & SKY AMBIENCE) ─── */
+      scene.add(new THREE.AmbientLight(0xffffff, 1.5));
+      scene.add(new THREE.HemisphereLight(0xedf6fc, 0x6e8a7c, 1.8));
 
-      const sun = new THREE.DirectionalLight(0xfffbeb, 1.8);
-      sun.position.set(6, 30, 10);
+      const sun = new THREE.DirectionalLight(0xfffaed, 3.2);
+      sun.position.set(22, 48, 26);
       sun.castShadow = true;
       scene.add(sun);
 
@@ -143,58 +143,63 @@ export default function CableBreakSim() {
         );
       }
       sbGeo.computeVertexNormals();
-      const seabed = new THREE.Mesh(sbGeo, new THREE.MeshLambertMaterial({ color: 0x111111 }));
+      const seabed = new THREE.Mesh(sbGeo, new THREE.MeshLambertMaterial({ color: 0x3d4842 }));
       seabed.receiveShadow = true;
       scene.add(seabed);
 
+      // Helper to compute exact seabed elevation at any (x, z)
+      function getSeabedY(x: number, z: number): number {
+        return (
+          -12
+          + Math.sin(x * 0.28) * Math.cos(z * 0.35) * 1.6
+          + Math.sin(x * 0.14 + 1.2) * Math.cos(z * 0.22 + 2.1) * 2.4
+        );
+      }
+
       // Benthic Seaweed Flora (GLB Asset: /models/sea_weed.glb from ns2)
-      // Replacing spherical rock balls with compact seaweed clusters lying along the cables
+      // Confined strictly to deep seabed floor along the cables (zero seaweed on surface of water)
       const weedClumps: THREE.Group[] = [];
       gltfLoader.load(
         '/models/sea_weed.glb',
         (gltf) => {
           const baseWeed = gltf.scene;
-          // Coordinates positioned close to the submarine cables with minimized scale (0.35 - 0.45)
-          const weedPositions = [
-            // Along west cable descent and furrow
-            [-18, -8.2,   1.4, 0.38, 0.5],
-            [-17, -8.8,  -0.7, 0.42, 1.8],
-            [-15, -9.6,   0.8, 0.35, 2.7],
-            [-14, -10.1, -1.9, 0.45, 0.9],
-            [-12, -10.4, -0.3, 0.40, 3.1],
-            [-10, -10.9,  1.2, 0.38, 1.4],
-            [-9,  -11.1,  2.6, 0.44, 2.2],
-            [-7,  -11.1,  0.9, 0.36, 0.3],
-            [-5,  -10.8,  1.8, 0.42, 1.7],
-            [-4,  -10.7, -0.4, 0.38, 2.8],
-            [-2,  -11.2,  1.1, 0.40, 0.8],
-            [-1,  -11.6, -1.4, 0.45, 2.4],
-            // Around break / repair zone
-            [1,   -11.2,  0.7, 0.42, 1.1],
-            [2,   -10.8, -1.1, 0.35, 2.9],
-            [4,   -10.4,  1.2, 0.44, 0.4],
-            [5,   -10.6, -0.8, 0.38, 1.9],
-            // Along east trench and ascent
-            [7,   -10.7, -2.1, 0.40, 2.6],
-            [8.5, -10.3, -0.2, 0.42, 0.7],
-            [10,  -10.1,  1.8, 0.36, 3.0],
-            [11.5,-9.7,   0.3, 0.45, 1.5],
-            [13,  -9.4,   2.1, 0.38, 0.2],
-            [14.5,-9.0,   0.6, 0.42, 2.3],
-            [16,  -8.4,  -1.3, 0.35, 1.0],
-            [18,  -7.6,   0.5, 0.40, 2.5],
-            // Along alternative optical bypass route
-            [-11, -11.0, -7.2, 0.42, 1.3],
-            [-4,  -11.4, -9.0, 0.38, 2.1],
-            [2,   -11.5, -9.8, 0.44, 0.6],
-            [8,   -11.2, -8.5, 0.40, 2.8],
+          // Coordinates positioned strictly in the deep seabed basin (-13 to +13), flanking the cable
+          const weedCoords: [number, number, number, number][] = [
+            [-13, -0.6, 0.35, 1.2],
+            [-12,  0.8, 0.40, 2.5],
+            [-10, -0.8, 0.38, 0.4],
+            [-9,   1.2, 0.42, 1.9],
+            [-7,  -0.5, 0.35, 3.1],
+            [-6,   1.5, 0.40, 0.8],
+            [-4,  -0.7, 0.38, 2.2],
+            [-3,   1.0, 0.42, 1.4],
+            [-1,  -1.1, 0.36, 0.6],
+            [ 0,   0.9, 0.40, 2.8],
+            [ 1,  -0.8, 0.38, 1.1],
+            [ 2,   1.2, 0.35, 2.0],
+            [ 4,  -0.9, 0.42, 0.3],
+            [ 5,   1.0, 0.36, 1.7],
+            [ 7,  -1.3, 0.40, 2.6],
+            [ 8,   0.7, 0.38, 0.9],
+            [10,  -0.5, 0.42, 1.5],
+            [11,   1.1, 0.35, 2.4],
+            [12,  -0.8, 0.38, 0.2],
+            [13,   0.6, 0.40, 1.8],
+            // Along alternative optical bypass furrow
+            [-10, -8.2, 0.38, 1.0],
+            [-5,  -9.2, 0.40, 2.3],
+            [ 0,  -9.8, 0.42, 0.7],
+            [ 5,  -9.0, 0.38, 1.6],
+            [10,  -8.0, 0.35, 2.9],
           ];
 
-          weedPositions.forEach(([wx, wy, wz, ws, wr]) => {
+          weedCoords.forEach(([wx, wz, ws, wr]) => {
             const clump = baseWeed.clone(true);
             clump.scale.setScalar(ws);
             clump.rotation.y = wr;
-            clump.position.set(wx, wy, wz);
+            // Rooted directly on the deep ocean floor (y ≈ -10.5 to -11.5, never near surface)
+            const seabedY = getSeabedY(wx, wz);
+            clump.position.set(wx, seabedY, wz);
             clump.traverse((child) => {
               if ((child as THREE.Mesh).isMesh) {
                 child.castShadow = true;
@@ -231,8 +236,9 @@ export default function CableBreakSim() {
       const oceanOrigY = new Float32Array(oceanGeo.attributes.position.count);
       for (let i = 0; i < oceanOrigY.length; i++) oceanOrigY[i] = 0;
       const oceanMat = new THREE.MeshPhongMaterial({
-        color: 0x141414, emissive: 0x050505,
-        transparent: true, opacity: 0.75, shininess: 140,
+        color: 0x1d8a8a, emissive: 0x062828,
+        specular: 0xffffff,
+        transparent: true, opacity: 0.62, shininess: 180,
         side: THREE.DoubleSide,
       });
       const ocean = new THREE.Mesh(oceanGeo, oceanMat);
@@ -308,8 +314,8 @@ export default function CableBreakSim() {
 
       // Landmass
       function addLand(x: number) {
-        const lMat = new THREE.MeshLambertMaterial({ color: 0x222222 });
-        const sMat = new THREE.MeshLambertMaterial({ color: 0x3a3a3a });
+        const lMat = new THREE.MeshLambertMaterial({ color: 0x6e685f });
+        const sMat = new THREE.MeshLambertMaterial({ color: 0x8a7f72 });
         const land = new THREE.Mesh(new THREE.BoxGeometry(14, 3.5, 22), lMat);
         land.position.set(x, -1, 0); scene.add(land);
         const shore = new THREE.Mesh(new THREE.BoxGeometry(5, 0.3, 22), sMat);
