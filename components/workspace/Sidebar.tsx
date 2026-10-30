@@ -108,6 +108,32 @@ export function Sidebar() {
           <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
         </svg>
       )
+    },
+    {
+      id: 'srlg',
+      name: 'SRLG Analysis',
+      path: '/workspace/srlg',
+      badge: 'SRLG',
+      icon: (active) => (
+        <svg className={`w-5 h-5 transition-colors ${active ? 'text-[#C87954]' : 'text-[#6D6E66]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" />
+          <path d="M4.93 4.93l14.14 14.14" />
+          <path d="M12 8v4l3 3" />
+        </svg>
+      )
+    },
+    {
+      id: 'false-redundancy',
+      name: 'False Redundancy Lab',
+      path: '/workspace/false-redundancy',
+      badge: 'NEW',
+      icon: (active) => (
+        <svg className={`w-5 h-5 transition-colors ${active ? 'text-[#C87954]' : 'text-[#6D6E66]'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+          <line x1="12" y1="9" x2="12" y2="13" />
+          <line x1="12" y1="17" x2="12.01" y2="17" />
+        </svg>
+      )
     }
   ];
 

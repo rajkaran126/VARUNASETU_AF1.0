@@ -1,4 +1,4 @@
-export type ProvenanceType = 'Observed' | 'Derived' | 'Synthetic' | 'Assumed' | 'Unverified';
+export type ProvenanceType = 'Observed' | 'Derived' | 'Synthetic' | 'Assumed' | 'Assumption' | 'Unverified';
 
 export interface LandingStation {
   id: string;
@@ -215,7 +215,7 @@ export interface AgentMessage {
 export interface DatasetRecord {
   id: string;
   name: string;
-  fileType: 'CSV' | 'JSON' | 'GeoJSON' | 'GPKG';
+  fileType: 'CSV' | 'JSON' | 'GeoJSON' | 'GPKG' | 'XLSX';
   rowCount: number;
   fileSizeKb: number;
   uploadedAt: string;
