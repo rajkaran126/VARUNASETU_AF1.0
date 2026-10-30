@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
@@ -24,7 +24,7 @@ export function CableGlobe3D({
   const [modelLoaded, setModelLoaded] = useState(false);
   const [autoRotate, setAutoRotate] = useState(true);
 
-  // Interaction tracking
+  // Interaction tracking (Full Unconstrained 3D Trackball Rotation)
   const isDragging = useRef(false);
   const prevMousePos = useRef({ x: 0, y: 0 });
   const rotVelocity = useRef({ x: 0, y: 0.002 });
@@ -37,15 +37,15 @@ export function CableGlobe3D({
 
     // 1. Scene, Camera, Renderer
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x040d1a);
+    scene.background = new THREE.Color(0x13171d);
 
     const camera = new THREE.PerspectiveCamera(
       45,
       container.clientWidth / container.clientHeight,
       0.1,
-      25000
+      35000
     );
-    camera.position.set(0, 800, 7500);
+    camera.position.set(0, 0, 7500);
 
     const renderer = new THREE.WebGLRenderer({
       canvas,
@@ -58,98 +58,58 @@ export function CableGlobe3D({
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.35;
 
-    // 2. Cosmic Background Environment (Starfield in 3D)
-    const starCount = 1200;
-    const starGeo = new THREE.BufferGeometry();
-    const starPos = new Float32Array(starCount * 3);
-    const starCols = new Float32Array(starCount * 3);
-    for (let i = 0; i < starCount; i++) {
-      const r = 10000 + Math.random() * 8000;
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-      starPos[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-      starPos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-      starPos[i * 3 + 2] = r * Math.cos(phi);
-
-      const isBlue = Math.random() > 0.6;
-      starCols[i * 3] = isBlue ? 0.7 : 1.0;
-      starCols[i * 3 + 1] = isBlue ? 0.85 : 0.95;
-      starCols[i * 3 + 2] = 1.0;
-    }
-    starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-    starGeo.setAttribute('color', new THREE.BufferAttribute(starCols, 3));
-    const starMat = new THREE.PointsMaterial({
-      size: 18,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.85,
-    });
-    const starField = new THREE.Points(starGeo, starMat);
-    scene.add(starField);
-
-    // 3. Lighting Setup
-    const ambientLight = new THREE.AmbientLight(0x0f2b48, 2.8);
+    // 2. Comprehensive Multi-Directional Lighting (ensures every angle is brilliantly illuminated)
+    const ambientLight = new THREE.AmbientLight(0xfff7ed, 1.8);
     scene.add(ambientLight);
 
-    const sunLight = new THREE.DirectionalLight(0xdbeafe, 3.2);
-    sunLight.position.set(4000, 3000, 5000);
-    scene.add(sunLight);
+    // Front-top key light
+    const keyLight = new THREE.DirectionalLight(0xfffbeb, 2.8);
+    keyLight.position.set(4000, 3500, 5000);
+    scene.add(keyLight);
 
-    const rimLight = new THREE.DirectionalLight(0x13bfd3, 2.0);
-    rimLight.position.set(-4000, -2000, -4000);
+    // Opposite fill light
+    const fillLight = new THREE.DirectionalLight(0xfef3c7, 2.0);
+    fillLight.position.set(-4000, -2500, -4000);
+    scene.add(fillLight);
+
+    // Lateral rim light
+    const rimLight = new THREE.DirectionalLight(0xe8d9bf, 1.5);
+    rimLight.position.set(-3000, 3000, 3000);
     scene.add(rimLight);
 
-    // 4. Central Globe Group
+    // 3. Central Globe Group
     const globeGroup = new THREE.Group();
     scene.add(globeGroup);
     globeGroupRef.current = globeGroup;
-
-    // Solid inner Earth sphere core (radius ~2930 to sit beneath cable ribbons at radius 2950-3000)
-    const earthGeo = new THREE.SphereGeometry(2920, 64, 48);
-    const earthMat = new THREE.MeshStandardMaterial({
-      color: 0x081d33,
-      roughness: 0.75,
-      metalness: 0.25,
-    });
-    const earthMesh = new THREE.Mesh(earthGeo, earthMat);
-    globeGroup.add(earthMesh);
-
-    // Atmospheric Glow Halo Sphere
-    const atmoGeo = new THREE.SphereGeometry(3080, 48, 36);
-    const atmoMat = new THREE.MeshBasicMaterial({
-      color: 0x13bfd3,
-      transparent: true,
-      opacity: 0.12,
-      side: THREE.BackSide,
-      blending: THREE.AdditiveBlending,
-    });
-    const atmoMesh = new THREE.Mesh(atmoGeo, atmoMat);
-    globeGroup.add(atmoMesh);
 
     // Active Fault 3D Beacon Marker on Globe
     let faultMarker: THREE.Group | null = null;
     if (activeFault) {
       faultMarker = new THREE.Group();
-      // Convert lat/lon (12.3, 43.5) to spherical 3D coordinates
       const phi = (90 - activeFault.lat) * (Math.PI / 180);
       const theta = (activeFault.lon + 180) * (Math.PI / 180);
-      const r = 2980;
+      const r = 3010;
       const fx = -r * Math.sin(phi) * Math.cos(theta);
       const fz = r * Math.sin(phi) * Math.sin(theta);
       const fy = r * Math.cos(phi);
       faultMarker.position.set(fx, fy, fz);
 
-      // Red core dot
+      // Core fault dot
       const dot = new THREE.Mesh(
-        new THREE.SphereGeometry(35, 16, 16),
-        new THREE.MeshBasicMaterial({ color: 0xdc2626 })
+        new THREE.SphereGeometry(38, 16, 16),
+        new THREE.MeshBasicMaterial({ color: 0xc87954 })
       );
       faultMarker.add(dot);
 
       // Radar pulse ring
       const ring = new THREE.Mesh(
-        new THREE.RingGeometry(35, 75, 32),
-        new THREE.MeshBasicMaterial({ color: 0xef4444, side: THREE.DoubleSide, transparent: true, opacity: 0.7 })
+        new THREE.RingGeometry(38, 85, 32),
+        new THREE.MeshBasicMaterial({
+          color: 0xe99a65,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.8,
+        })
       );
       ring.lookAt(new THREE.Vector3(0, 0, 0));
       faultMarker.add(ring);
@@ -157,25 +117,46 @@ export function CableGlobe3D({
       globeGroup.add(faultMarker);
     }
 
-    // 5. Load the Subsea Cable Network 3D Model from assets/model1 (public/models/model1/globe_ribbons.gltf)
+    // 4. Load the Subsea Cable Network 3D Model (Model 1) from public/models/model1/globe_ribbons.gltf
     const gltfLoader = new GLTFLoader();
     gltfLoader.load(
       '/models/model1/globe_ribbons.gltf',
       (gltf) => {
         const cableModel = gltf.scene;
 
-        // Enhance materials of the cable ribbons for high-tech digital twin visual quality
+        // UNMASK MODEL 1:
+        // Do NOT wrap in artificial occlusion spheres or dark blue emissive masks.
+        // Mesh 0 is the textured Earth globe with high-res 5400x2700 map.
+        // Mesh 1 is the 3D submarine cable ribbons with COLOR_0 vertex colors.
         cableModel.traverse((child) => {
           if ((child as THREE.Mesh).isMesh) {
             const mesh = child as THREE.Mesh;
             mesh.castShadow = true;
             mesh.receiveShadow = true;
-            if (mesh.material) {
-              const mat = mesh.material as THREE.MeshStandardMaterial;
-              mat.roughness = 0.35;
-              mat.metalness = 0.65;
-              mat.emissive = new THREE.Color(0x0e4b75);
-              mat.emissiveIntensity = 0.6;
+
+            const hasVertexColors = mesh.geometry.attributes.color !== undefined;
+
+            if (hasVertexColors) {
+              // Mesh 1: 3D Cable Ribbons
+              // Unmask the authentic vertex colors and make ribbons double-sided so they are visible from all angles
+              mesh.material = new THREE.MeshStandardMaterial({
+                vertexColors: true,
+                roughness: 0.25,
+                metalness: 0.45,
+                side: THREE.DoubleSide,
+                depthWrite: true,
+                transparent: false,
+              });
+            } else {
+              // Mesh 0: Base Textured Earth Globe
+              // Unmask the authentic Earth surface map without any tint or dark cover
+              if (mesh.material) {
+                const mat = mesh.material as THREE.MeshStandardMaterial;
+                mat.roughness = 0.82;
+                mat.metalness = 0.08;
+                mat.emissive.set(0x000000);
+                mat.side = THREE.FrontSide;
+              }
             }
           }
         });
@@ -187,7 +168,7 @@ export function CableGlobe3D({
       undefined,
       (err) => {
         console.warn('Could not load globe_ribbons.gltf, falling back to procedural cable network:', err);
-        // Fallback: procedural 3D cable arcs linking landing stations
+        // Fallback procedural cables
         cables.forEach((c) => {
           if (c.landingStations.length < 2) return;
           const curvePoints: THREE.Vector3[] = [];
@@ -202,7 +183,7 @@ export function CableGlobe3D({
           });
           const curve = new THREE.CatmullRomCurve3(curvePoints);
           const tubeGeo = new THREE.TubeGeometry(curve, 32, 12, 8, false);
-          const tubeMat = new THREE.MeshBasicMaterial({ color: 0x13bfd3 });
+          const tubeMat = new THREE.MeshStandardMaterial({ color: 0xc87954, roughness: 0.3 });
           const tubeMesh = new THREE.Mesh(tubeGeo, tubeMat);
           globeGroup.add(tubeMesh);
         });
@@ -211,10 +192,11 @@ export function CableGlobe3D({
       }
     );
 
-    // Mouse & Touch Controls
+    // 5. Full Unconstrained 3D Trackball / Free-Rotation Controls (Rotates in ANY direction)
     const handlePointerDown = (e: PointerEvent) => {
       isDragging.current = true;
       prevMousePos.current = { x: e.clientX, y: e.clientY };
+      rotVelocity.current = { x: 0, y: 0 };
     };
 
     const handlePointerMove = (e: PointerEvent) => {
@@ -223,14 +205,20 @@ export function CableGlobe3D({
       const dy = e.clientY - prevMousePos.current.y;
       prevMousePos.current = { x: e.clientX, y: e.clientY };
 
+      const factor = 0.0045;
       rotVelocity.current = {
-        x: dy * 0.003,
-        y: dx * 0.003,
+        x: dy * factor,
+        y: dx * factor,
       };
 
-      globeGroupRef.current.rotation.y += dx * 0.004;
-      globeGroupRef.current.rotation.x += dy * 0.004;
-      globeGroupRef.current.rotation.x = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, globeGroupRef.current.rotation.x));
+      // Full 3D unconstrained trackball rotation using quaternions:
+      // Horizontal drag rotates around view-space Y axis
+      // Vertical drag rotates around view-space X axis
+      const qY = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), dx * factor);
+      const qX = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), dy * factor);
+
+      globeGroupRef.current.quaternion.premultiply(qY);
+      globeGroupRef.current.quaternion.premultiply(qX);
     };
 
     const handlePointerUp = () => {
@@ -239,7 +227,7 @@ export function CableGlobe3D({
 
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
-      camera.position.z = Math.max(4500, Math.min(12000, camera.position.z + e.deltaY * 3.5));
+      camera.position.z = Math.max(3800, Math.min(14000, camera.position.z + e.deltaY * 3.5));
     };
 
     canvas.addEventListener('pointerdown', handlePointerDown);
@@ -256,7 +244,7 @@ export function CableGlobe3D({
     };
     window.addEventListener('resize', handleResize);
 
-    // Animation Loop
+    // 6. Smooth Animation & Momentum Loop
     let animId: number;
     const clock = new THREE.Clock();
 
@@ -267,19 +255,26 @@ export function CableGlobe3D({
       if (globeGroupRef.current) {
         if (!isDragging.current) {
           if (autoRotate) {
-            globeGroupRef.current.rotation.y += 0.0018;
+            // Gentle continuous planetary rotation
+            const qAuto = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0.0016);
+            globeGroupRef.current.quaternion.premultiply(qAuto);
           } else {
-            globeGroupRef.current.rotation.y += rotVelocity.current.y;
-            globeGroupRef.current.rotation.x += rotVelocity.current.x;
-            rotVelocity.current.x *= 0.94;
-            rotVelocity.current.y *= 0.94;
+            // Smooth inertia damping after user drag in any direction
+            if (Math.abs(rotVelocity.current.x) > 0.00005 || Math.abs(rotVelocity.current.y) > 0.00005) {
+              const qY = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), rotVelocity.current.y);
+              const qX = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), rotVelocity.current.x);
+              globeGroupRef.current.quaternion.premultiply(qY);
+              globeGroupRef.current.quaternion.premultiply(qX);
+              rotVelocity.current.x *= 0.94;
+              rotVelocity.current.y *= 0.94;
+            }
           }
         }
       }
 
       // Animate active fault marker pulse
       if (faultMarker) {
-        const pulse = Math.sin(timeMs * 0.005) * 0.25 + 1.0;
+        const pulse = Math.sin(timeMs * 0.005) * 0.2 + 1.0;
         faultMarker.scale.setScalar(pulse);
       }
 
@@ -300,14 +295,14 @@ export function CableGlobe3D({
   }, [cables, activeFault, autoRotate]);
 
   return (
-    <div ref={containerRef} className="relative w-full h-[520px] rounded-2xl bg-[#F7F3EA] border border-[#D4C4A8] overflow-hidden shadow-xl select-none">
+    <div ref={containerRef} className="relative w-full h-[540px] rounded-2xl bg-[#13171d] border border-[#D4C4A8] overflow-hidden shadow-xl select-none font-sans">
       <canvas ref={canvasRef} className="w-full h-full block cursor-grab active:cursor-grabbing" />
 
       {/* Top Left 3D Asset Header Overlay (PARJANYAḤ Light Theme) */}
       <div className="absolute top-4 left-4 z-20 flex items-center gap-2.5 bg-[#F7F3EA]/95 backdrop-blur-md px-3.5 py-2 rounded-xl border border-[#D4C4A8] shadow-md">
         <span className="w-2 h-2 rounded-full bg-[#C87954] animate-pulse" />
         <span className="font-sans text-xs font-bold text-[#454640] tracking-wide">
-          3D Subsea Cable Network · Model 1
+          Subsea Cable Network · Model 1 (Unmasked)
         </span>
         <span className="px-2 py-0.5 rounded text-[10px] font-sans font-bold bg-[#E8D9BF] text-[#454640] border border-[#D4C4A8]">
           Global Topology
@@ -328,7 +323,7 @@ export function CableGlobe3D({
         </button>
         <span className="text-[#A69B89] text-xs">|</span>
         <span className="text-[11px] font-sans text-[#A69B89]">
-          Drag to orbit / Scroll to zoom
+          Drag to orbit 360° in any direction · Scroll to zoom
         </span>
       </div>
 
@@ -354,11 +349,11 @@ export function CableGlobe3D({
         <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-[#F7F3EA]/90 backdrop-blur-sm">
           <div className="w-8 h-8 rounded-full border-2 border-[#C87954] border-t-transparent animate-spin mb-3" />
           <span className="font-sans text-xs text-[#454640] font-bold tracking-wide">
-            Initializing 3D Cable Network Model...
+            Loading Subsea Cable Model 1...
           </span>
         </div>
       )}
     </div>
   );
 }
-
+export default CableGlobe3D;
