@@ -166,6 +166,33 @@ export interface RecoveryStrategy {
   actionSteps: string[];
 }
 
+export interface RerouteWaypoint {
+  id: string;
+  name: string;
+  lat: number;
+  lon: number;
+  type: 'Origin' | 'Optical Grooming Node' | 'Overland Diversion' | 'Transshipment' | 'Terminus';
+  status: 'Active' | 'Standby';
+}
+
+export interface ReroutePlan {
+  id: string;
+  strategyId: string;
+  title: string;
+  targetCableId: string;
+  targetFaultId: string;
+  status: 'Determined & Active' | 'Standby' | 'Executing';
+  determinedAt: string;
+  bypassCorridorName: string;
+  restoredCapacityTbps: number;
+  restoredCapacityPct: number;
+  latencyPenaltyMs: number;
+  operationalWindow: string; // e.g. "Active until physical benthic splice is completed"
+  waypoints: RerouteWaypoint[];
+  pathCoordinates: [number, number][]; // [lon, lat] coordinate pairs along bypass
+  notes: string;
+}
+
 export type AgentRole = 
   | 'Chief Orchestrator'
   | 'Network Analyst'

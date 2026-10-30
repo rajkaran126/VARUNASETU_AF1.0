@@ -1,4 +1,4 @@
-import { CableRoute, LandingStation, FaultIncident, FaultNotification, RepairVessel, RecoveryStrategy, DatasetRecord } from './types';
+import { CableRoute, LandingStation, FaultIncident, FaultNotification, RepairVessel, RecoveryStrategy, DatasetRecord, ReroutePlan, RerouteWaypoint } from './types';
 
 export const VERIFIED_LANDING_STATIONS: LandingStation[] = [
   { id: 'cls-mumbai', name: 'Mumbai CLS (Versova/Prabhadevi)', city: 'Mumbai', country: 'India', region: 'South Asia', lat: 19.0760, lon: 72.8777, cablesConnected: ['smw4', 'smw5', 'aae1', 'bbg', 'fal'] },
@@ -615,6 +615,80 @@ export const INITIAL_DATASETS: DatasetRecord[] = [
     validationStatus: 'Valid',
     validationErrors: [],
     description: 'High-frequency optical power attenuation (dB), chromatic dispersion (ps/nm), and BGP flap logs derived from DWDM transponder monitors.'
+  }
+];
+
+export const DETERMINED_REROUTE_PLANS: ReroutePlan[] = [
+  {
+    id: 'reroute-alpha-aae1-2africa',
+    strategyId: 'strat-a-optical-reroute',
+    title: 'Strategy Alpha: Dynamic Multi-Carriage Optical Reroute',
+    targetCableId: 'smw4',
+    targetFaultId: 'flt-smw4-red-sea-01',
+    status: 'Determined & Active',
+    determinedAt: '2026-10-30T09:12:00Z',
+    bypassCorridorName: 'AAE-1 Overland & 2Africa Subsea Trunk Bypass',
+    restoredCapacityTbps: 14.2,
+    restoredCapacityPct: 84.5,
+    latencyPenaltyMs: 38.4,
+    operationalWindow: 'Active until CS Ile de Sein completes benthic splice',
+    waypoints: [
+      { id: 'wp-bom', name: 'Mumbai CLS (Origin)', lat: 19.0760, lon: 72.8777, type: 'Origin', status: 'Active' },
+      { id: 'wp-fuj', name: 'Fujairah Marine Hub (Spectral Grooming)', lat: 25.1288, lon: 56.3265, type: 'Optical Grooming Node', status: 'Active' },
+      { id: 'wp-arab', name: 'Arabian Peninsula Overland Conduit', lat: 26.5000, lon: 44.0000, type: 'Overland Diversion', status: 'Active' },
+      { id: 'wp-suez', name: 'Suez Canal Terminal (Zafarana Transit)', lat: 29.9668, lon: 32.5498, type: 'Transshipment', status: 'Active' },
+      { id: 'wp-mrs', name: 'Marseille Marine Terminal (Terminus)', lat: 43.2965, lon: 5.3698, type: 'Terminus', status: 'Active' },
+    ],
+    pathCoordinates: [
+      [72.8777, 19.0760], // Mumbai
+      [64.5, 21.2],       // Arabian Sea
+      [56.3265, 25.1288], // Fujairah
+      [47.0, 26.2],       // Overland corridor across Arabian Peninsula
+      [38.5, 28.0],       // Sinai / Northern Red Sea
+      [32.5498, 29.9668], // Suez
+      [24.5, 34.2],       // Eastern Mediterranean
+      [14.0, 37.8],       // Ionian / Sicilian Strait
+      [5.3698, 43.2965]   // Marseille
+    ],
+    notes: 'Bypasses the compromised Bab el-Mandeb benthic slope by allocating 14.2 Tbps burst lambdas north through Fujairah and Egypt overland DWDM trunks.'
+  },
+  {
+    id: 'reroute-bravo-transpacific',
+    strategyId: 'strat-b-transpacific-bypass',
+    title: 'Strategy Bravo: Transpacific Geodiversity Spillover',
+    targetCableId: 'smw4',
+    targetFaultId: 'flt-smw4-red-sea-01',
+    status: 'Standby',
+    determinedAt: '2026-10-30T09:14:00Z',
+    bypassCorridorName: 'FASTER Transpacific + MAREA Transatlantic Global Ring',
+    restoredCapacityTbps: 18.0,
+    restoredCapacityPct: 94.0,
+    latencyPenaltyMs: 112.6,
+    operationalWindow: 'Secondary failover standby',
+    waypoints: [
+      { id: 'wp-bom-b', name: 'Mumbai CLS', lat: 19.0760, lon: 72.8777, type: 'Origin', status: 'Active' },
+      { id: 'wp-sin', name: 'Singapore Tuas CLS', lat: 1.3521, lon: 103.8198, type: 'Optical Grooming Node', status: 'Active' },
+      { id: 'wp-tyo', name: 'Chikura Hub, Japan', lat: 34.9622, lon: 139.9577, type: 'Transshipment', status: 'Active' },
+      { id: 'wp-ore', name: 'Pacific City, Oregon', lat: 45.2040, lon: -123.9626, type: 'Transshipment', status: 'Active' },
+      { id: 'wp-vab', name: 'Virginia Beach CLS', lat: 36.8529, lon: -75.9780, type: 'Transshipment', status: 'Active' },
+      { id: 'wp-mrs-b', name: 'Marseille Terminal', lat: 43.2965, lon: 5.3698, type: 'Terminus', status: 'Active' }
+    ],
+    pathCoordinates: [
+      [72.8777, 19.0760],
+      [80.0, 6.0],
+      [98.0, 4.0],
+      [103.8198, 1.3521],
+      [118.0, 18.0],
+      [139.9577, 34.9622],
+      [-170.0, 42.0],
+      [-123.9626, 45.2040],
+      [-100.0, 40.0],
+      [-75.9780, 36.8529],
+      [-40.0, 41.0],
+      [-2.9818, 43.3792],
+      [5.3698, 43.2965]
+    ],
+    notes: 'Transfers bulk cloud replication and asynchronous payload across the global Pacific/Atlantic ring, bypassing Eurasia entirely.'
   }
 ];
 

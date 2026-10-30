@@ -11,7 +11,8 @@ import {
   RecoveryStrategy, 
   DatasetRecord, 
   SimulationSnapshot,
-  AgentMessage 
+  AgentMessage,
+  ReroutePlan
 } from './types';
 import { 
   VERIFIED_CABLE_ROUTES, 
@@ -19,7 +20,8 @@ import {
   INITIAL_FAULT_NOTIFICATIONS,
   REPAIR_FLEET, 
   INITIAL_RECOVERY_STRATEGIES, 
-  INITIAL_DATASETS 
+  INITIAL_DATASETS,
+  DETERMINED_REROUTE_PLANS
 } from './cable-data';
 import { runNetworkSimulation } from './simulation-engine';
 
@@ -52,6 +54,14 @@ interface WorkspaceContextType {
   selectedStrategy: RecoveryStrategy;
   setSelectedStrategy: (strategy: RecoveryStrategy) => void;
   repairFleet: RepairVessel[];
+
+  // Dynamic Rerouting & Post-Breakdown Bypass State
+  reroutePlans: ReroutePlan[];
+  activeReroutePlan: ReroutePlan | null;
+  setActiveReroutePlan: (plan: ReroutePlan | null) => void;
+  isRerouteActive: boolean;
+  setIsRerouteActive: (active: boolean) => void;
+  toggleRerouteStatus: () => void;
 
   // Multi-Agent Mission Control State
   agentMessages: AgentMessage[];
@@ -131,6 +141,15 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const [strategies, setStrategies] = useState<RecoveryStrategy[]>(INITIAL_RECOVERY_STRATEGIES);
   const [selectedStrategy, setSelectedStrategy] = useState<RecoveryStrategy>(INITIAL_RECOVERY_STRATEGIES[0]);
   const [repairFleet] = useState<RepairVessel[]>(REPAIR_FLEET);
+
+  // Dynamic Rerouting & Post-Breakdown Bypass State
+  const [reroutePlans, setReroutePlans] = useState<ReroutePlan[]>(DETERMINED_REROUTE_PLANS);
+  const [activeReroutePlan, setActiveReroutePlan] = useState<ReroutePlan | null>(DETERMINED_REROUTE_PLANS[0]);
+  const [isRerouteActive, setIsRerouteActive] = useState<boolean>(true);
+
+  const toggleRerouteStatus = () => {
+    setIsRerouteActive(prev => !prev);
+  };
 
   const [agentMessages, setAgentMessages] = useState<AgentMessage[]>(initialAgentConversation);
   const [isAgentThinking, setIsAgentThinking] = useState<boolean>(false);
@@ -412,6 +431,12 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
         selectedStrategy,
         setSelectedStrategy,
         repairFleet,
+        reroutePlans,
+        activeReroutePlan,
+        setActiveReroutePlan,
+        isRerouteActive,
+        setIsRerouteActive,
+        toggleRerouteStatus,
         agentMessages,
         sendAgentQuery,
         resetAgentChat,

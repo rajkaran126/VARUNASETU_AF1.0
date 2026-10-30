@@ -3,20 +3,26 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { CableRoute, FaultIncident } from '@/lib/types';
+import { CableRoute, FaultIncident, ReroutePlan } from '@/lib/types';
 
 interface CableGlobe3DProps {
   cables: CableRoute[];
   selectedCable?: CableRoute;
   activeFault?: FaultIncident;
+  activeReroute?: ReroutePlan | null;
+  showReroute?: boolean;
   onSelectCable?: (cable: CableRoute) => void;
+  onToggleReroute?: () => void;
 }
 
 export function CableGlobe3D({
   cables,
   selectedCable,
   activeFault,
+  activeReroute,
+  showReroute = true,
   onSelectCable,
+  onToggleReroute,
 }: CableGlobe3DProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -29,6 +35,8 @@ export function CableGlobe3D({
   const prevMousePos = useRef({ x: 0, y: 0 });
   const rotVelocity = useRef({ x: 0, y: 0.002 });
   const globeGroupRef = useRef<THREE.Group | null>(null);
+  const rerouteCurveRef = useRef<THREE.CatmullRomCurve3 | null>(null);
+  const pulseMeshesRef = useRef<THREE.Mesh[]>([]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -170,6 +178,85 @@ export function CableGlobe3D({
 
           cableModel.add(markerGroup);
           faultMarker = markerGroup;
+        }
+
+        // 3D DETERMINED REROUTE BYPASS FLOW (POST-BREAKDOWN MITIGATION UNTIL PHYSICAL SPLICE)
+        if (activeReroute && showReroute && activeReroute.pathCoordinates.length > 1) {
+          const rerouteGroup = new THREE.Group();
+          const curvePoints: THREE.Vector3[] = [];
+          activeReroute.pathCoordinates.forEach(([lon, lat]) => {
+            const latRad = lat * (Math.PI / 180);
+            const lonRad = lon * (Math.PI / 180);
+            const r = 2975; // Elevated slightly above base sphere for crisp visibility
+            const px = r * Math.cos(latRad) * Math.cos(lonRad);
+            const py = r * Math.cos(latRad) * Math.sin(lonRad);
+            const pz = r * Math.sin(latRad);
+            curvePoints.push(new THREE.Vector3(px, py, pz));
+          });
+
+          const rerouteCurve = new THREE.CatmullRomCurve3(curvePoints);
+          const tubeGeo = new THREE.TubeGeometry(rerouteCurve, 80, 14, 8, false);
+          const tubeMat = new THREE.MeshStandardMaterial({
+            color: 0x83B9A9, // Sea Glass
+            emissive: 0x2A6255,
+            emissiveIntensity: 0.9,
+            roughness: 0.25,
+            metalness: 0.4,
+            transparent: true,
+            opacity: 0.92,
+          });
+          const tubeMesh = new THREE.Mesh(tubeGeo, tubeMat);
+          rerouteGroup.add(tubeMesh);
+
+          // Animated Data Photons / Traffic Pulses moving along the reroute
+          const pulseCount = 8;
+          const pulseMeshes: THREE.Mesh[] = [];
+          const pulseGeo = new THREE.SphereGeometry(22, 12, 12);
+          const pulseMat = new THREE.MeshBasicMaterial({ color: 0xF7F3EA }); // Pure glowing ivory
+          for (let i = 0; i < pulseCount; i++) {
+            const pMesh = new THREE.Mesh(pulseGeo, pulseMat);
+            rerouteGroup.add(pMesh);
+            pulseMeshes.push(pMesh);
+          }
+          rerouteCurveRef.current = rerouteCurve;
+          pulseMeshesRef.current = pulseMeshes;
+
+          // Waypoint node beacons at key landing hubs (Fujairah, Suez, Marseille)
+          activeReroute.waypoints.forEach((wp) => {
+            const wLat = wp.lat * (Math.PI / 180);
+            const wLon = wp.lon * (Math.PI / 180);
+            const wr = 2978;
+            const wx = wr * Math.cos(wLat) * Math.cos(wLon);
+            const wy = wr * Math.cos(wLat) * Math.sin(wLon);
+            const wz = wr * Math.sin(wLat);
+
+            const wpGroup = new THREE.Group();
+            wpGroup.position.set(wx, wy, wz);
+            const normal = new THREE.Vector3(wx, wy, wz).normalize();
+            wpGroup.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
+
+            const wpDot = new THREE.Mesh(
+              new THREE.SphereGeometry(20, 12, 12),
+              new THREE.MeshBasicMaterial({ color: 0x83B9A9 })
+            );
+            wpGroup.add(wpDot);
+
+            const wpRing = new THREE.Mesh(
+              new THREE.RingGeometry(26, 50, 24),
+              new THREE.MeshBasicMaterial({
+                color: 0xA8B99A,
+                side: THREE.DoubleSide,
+                transparent: true,
+                opacity: 0.8,
+              })
+            );
+            wpRing.position.z = 2;
+            wpGroup.add(wpRing);
+
+            rerouteGroup.add(wpGroup);
+          });
+
+          cableModel.add(rerouteGroup);
         }
 
         // UNMASK MODEL 1:
@@ -331,6 +418,17 @@ export function CableGlobe3D({
         faultMarker.scale.setScalar(pulse);
       }
 
+      // Animate active reroute pulse photons
+      if (rerouteCurveRef.current && pulseMeshesRef.current.length > 0) {
+        const speed = timeMs * 0.0002;
+        const total = pulseMeshesRef.current.length;
+        pulseMeshesRef.current.forEach((mesh, idx) => {
+          const t = (speed + idx / total) % 1;
+          const pt = rerouteCurveRef.current!.getPointAt(t);
+          mesh.position.copy(pt);
+        });
+      }
+
       renderer.render(scene, camera);
     };
 
@@ -345,7 +443,7 @@ export function CableGlobe3D({
       window.removeEventListener('resize', handleResize);
       renderer.dispose();
     };
-  }, [cables, activeFault, autoRotate]);
+  }, [cables, activeFault, activeReroute, showReroute, autoRotate]);
 
   return (
     <div ref={containerRef} className="relative w-full h-[540px] rounded-2xl bg-[#13171d] border border-[#D4C4A8] overflow-hidden shadow-xl select-none font-sans">
@@ -364,6 +462,23 @@ export function CableGlobe3D({
 
       {/* Top Right Auto-Rotate and Controls */}
       <div className="absolute top-4 right-4 z-20 flex items-center gap-2 bg-[#F7F3EA]/95 backdrop-blur-md px-3 py-1.5 rounded-xl border border-[#D4C4A8] shadow-md">
+        {onToggleReroute && activeReroute && (
+          <>
+            <button
+              onClick={onToggleReroute}
+              className={`px-2.5 py-1 rounded-lg text-xs font-sans font-bold transition-all flex items-center gap-1.5 ${
+                showReroute
+                  ? 'bg-[#83B9A9] text-[#454640] shadow-xs'
+                  : 'bg-[#E8D9BF] text-[#A69B89] hover:bg-[#D4C4A8]'
+              }`}
+              title="Toggle determined optical rerouting bypass overlay"
+            >
+              <span className={`w-1.5 h-1.5 rounded-full ${showReroute ? 'bg-[#454640] animate-pulse' : 'bg-[#A69B89]'}`} />
+              <span>{showReroute ? 'Bypass Flow Active' : 'Show Reroute'}</span>
+            </button>
+            <span className="text-[#A69B89] text-xs">|</span>
+          </>
+        )}
         <button
           onClick={() => setAutoRotate(!autoRotate)}
           className={`px-2.5 py-1 rounded-lg text-xs font-sans font-bold transition-all ${
@@ -376,9 +491,37 @@ export function CableGlobe3D({
         </button>
         <span className="text-[#A69B89] text-xs">|</span>
         <span className="text-[11px] font-sans text-[#A69B89]">
-          Drag to orbit 360° in any direction · Scroll to zoom
+          Drag to orbit 360° · Scroll to zoom
         </span>
       </div>
+
+      {/* Bottom Right Post-Breakdown Determined Rerouting Card */}
+      {activeReroute && showReroute && (
+        <div className="absolute bottom-4 right-4 z-20 bg-[#F7F3EA]/95 backdrop-blur-md px-4 py-3 rounded-2xl border border-[#83B9A9] shadow-lg max-w-sm transition-all font-sans">
+          <div className="flex items-center justify-between gap-2 mb-1">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#83B9A9] animate-pulse" />
+              <span className="text-[10px] font-sans uppercase tracking-wider text-[#687B59] font-bold">
+                Post-Breakdown Reroute Active
+              </span>
+            </div>
+            <span className="px-2 py-0.5 rounded text-[10px] font-sans font-bold bg-[#83B9A9]/20 text-[#454640] border border-[#83B9A9]/40">
+              {activeReroute.restoredCapacityPct}% Restored
+            </span>
+          </div>
+          <div className="text-sm font-bold text-[#454640] tracking-tight">
+            {activeReroute.bypassCorridorName}
+          </div>
+          <p className="text-[11px] text-[#687B59] mt-0.5 leading-snug">
+            Switches compromised traffic across diverse terrestrial & subsea channels until benthic repair is finished.
+          </p>
+          <div className="flex items-center justify-between text-[10px] font-sans text-[#A69B89] mt-2 pt-1.5 border-t border-[#D4C4A8]">
+            <span>Throughput: <strong className="text-[#454640]">{activeReroute.restoredCapacityTbps} Tbps</strong></span>
+            <span>Latency Delta: <strong className="text-[#C87954]">+{activeReroute.latencyPenaltyMs} ms</strong></span>
+            <span className="text-emerald-700 font-semibold">● Protection Live</span>
+          </div>
+        </div>
+      )}
 
       {/* Bottom Left Active Selected Cable Summary */}
       {selectedCable && (

@@ -12,7 +12,12 @@ export default function NetworkOverviewPage() {
     cables, 
     selectedCable, 
     setSelectedCable, 
-    activeFault 
+    activeFault,
+    reroutePlans,
+    activeReroutePlan,
+    setActiveReroutePlan,
+    isRerouteActive,
+    toggleRerouteStatus
   } = useWorkspace();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('All');
@@ -90,20 +95,105 @@ export default function NetworkOverviewPage() {
         </div>
       </div>
 
+      {/* Post-Breakdown Determined Rerouting Intelligence Banner */}
+      {activeReroutePlan && (
+        <div className="bg-[#F7F3EA] rounded-2xl border border-[#D4C4A8] p-4 lg:p-5 shadow-sm space-y-3 font-sans">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-[#D4C4A8]">
+            <div className="flex items-center gap-2.5">
+              <span className={`w-3 h-3 rounded-full ${isRerouteActive ? 'bg-[#83B9A9] animate-pulse' : 'bg-[#C87954]'}`} />
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-[#687B59]">
+                    Emergency Optical Rerouting Plan · Deterministic Protection
+                  </span>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#83B9A9]/20 text-[#454640] border border-[#83B9A9]/40">
+                    {isRerouteActive ? 'BYPASS ACTIVE ON MAP' : 'BYPASS MUTED'}
+                  </span>
+                </div>
+                <h3 className="font-bold text-base text-[#454640] tracking-tight mt-0.5">
+                  {activeReroutePlan.title}
+                </h3>
+              </div>
+            </div>
+
+            {/* Strategy Selector and Toggle */}
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center p-1 bg-white rounded-xl border border-[#D4C4A8] text-xs">
+                {reroutePlans.map((plan) => (
+                  <button
+                    key={plan.id}
+                    onClick={() => setActiveReroutePlan(plan)}
+                    className={`px-3 py-1 rounded-lg font-bold transition-all ${
+                      activeReroutePlan.id === plan.id
+                        ? 'bg-[#83B9A9] text-[#454640] shadow-2xs'
+                        : 'text-[#A69B89] hover:text-[#454640]'
+                    }`}
+                  >
+                    {plan.id.includes('alpha') ? 'Strategy Alpha (AAE-1)' : 'Strategy Bravo (Pacific)'}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={toggleRerouteStatus}
+                className={`px-3.5 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-2 border ${
+                  isRerouteActive
+                    ? 'bg-[#83B9A9] text-[#454640] border-[#83B9A9] shadow-2xs'
+                    : 'bg-white text-[#454640] border-[#D4C4A8] hover:bg-[#E8D9BF]'
+                }`}
+              >
+                <span className={`w-2 h-2 rounded-full ${isRerouteActive ? 'bg-[#454640]' : 'bg-[#C87954]'}`} />
+                <span>{isRerouteActive ? 'Bypass Flow: Active' : 'Enable Bypass Flow'}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Reroute Telemetry Strip */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div className="p-2.5 rounded-xl bg-white border border-[#D4C4A8]">
+              <span className="text-[10px] text-[#A69B89] font-medium block">Breakdown Target</span>
+              <strong className="text-[#C87954] font-bold block truncate">SEA-ME-WE 4 (Djibouti)</strong>
+              <span className="text-[10px] text-[#454640]/70">-4,120m Benthic Severance</span>
+            </div>
+            <div className="p-2.5 rounded-xl bg-white border border-[#D4C4A8]">
+              <span className="text-[10px] text-[#A69B89] font-medium block">Bypass Conduit</span>
+              <strong className="text-[#454640] font-bold block truncate">{activeReroutePlan.bypassCorridorName}</strong>
+              <span className="text-[10px] text-emerald-700 font-semibold">14.2 Tbps Burst Lambdas</span>
+            </div>
+            <div className="p-2.5 rounded-xl bg-white border border-[#D4C4A8]">
+              <span className="text-[10px] text-[#A69B89] font-medium block">Restored Capacity</span>
+              <strong className="text-[#687B59] font-bold text-sm block">{activeReroutePlan.restoredCapacityPct}%</strong>
+              <span className="text-[10px] text-[#454640]/70">{activeReroutePlan.restoredCapacityTbps} Tbps Carried</span>
+            </div>
+            <div className="p-2.5 rounded-xl bg-white border border-[#D4C4A8]">
+              <span className="text-[10px] text-[#A69B89] font-medium block">Bypass Operational Window</span>
+              <strong className="text-[#454640] font-bold block truncate">Until Benthic Splice</strong>
+              <span className="text-[10px] text-[#C87954]">+{activeReroutePlan.latencyPenaltyMs} ms Latency</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main Interactive Submarine Cable Visualization (3D Model 1 vs 2D Explorer Map) */}
       {viewMode === '3D' ? (
         <CableGlobe3D
           cables={filteredCables}
           selectedCable={selectedCable}
           activeFault={activeFault}
+          activeReroute={activeReroutePlan}
+          showReroute={isRerouteActive}
           onSelectCable={setSelectedCable}
+          onToggleReroute={toggleRerouteStatus}
         />
       ) : (
         <CableExplorerMap
           cables={filteredCables}
           landingStations={VERIFIED_LANDING_STATIONS}
           selectedCable={selectedCable}
+          activeReroute={activeReroutePlan}
+          showReroute={isRerouteActive}
           onSelectCable={setSelectedCable}
+          onToggleReroute={toggleRerouteStatus}
         />
       )}
 

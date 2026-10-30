@@ -4,18 +4,26 @@ import React, { useState } from 'react';
 import { CableRoute, LandingStation } from '@/lib/types';
 import { useWorkspace } from '@/lib/workspace-context';
 
+import { ReroutePlan } from '@/lib/types';
+
 interface CableExplorerMapProps {
   cables: CableRoute[];
   landingStations: LandingStation[];
   selectedCable: CableRoute;
+  activeReroute?: ReroutePlan | null;
+  showReroute?: boolean;
   onSelectCable: (cable: CableRoute) => void;
+  onToggleReroute?: () => void;
 }
 
 export function CableExplorerMap({
   cables,
   landingStations,
   selectedCable,
+  activeReroute,
+  showReroute = true,
   onSelectCable,
+  onToggleReroute,
 }: CableExplorerMapProps) {
   const { activeFault } = useWorkspace();
   const [hoveredCable, setHoveredCable] = useState<CableRoute | null>(null);
@@ -81,6 +89,22 @@ export function CableExplorerMap({
             </button>
           ))}
         </div>
+
+        {/* Reroute Toggle Button */}
+        {onToggleReroute && activeReroute && (
+          <button
+            onClick={onToggleReroute}
+            className={`pointer-events-auto px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-1.5 border ${
+              showReroute
+                ? 'bg-emerald-600/30 text-emerald-300 border-emerald-500/50 shadow-sm'
+                : 'bg-white/5 text-white/50 border-white/10 hover:text-white'
+            }`}
+            title="Toggle determined post-breakdown optical rerouting bypass"
+          >
+            <span className={`w-2 h-2 rounded-full ${showReroute ? 'bg-emerald-400 animate-pulse' : 'bg-white/40'}`} />
+            <span>{showReroute ? 'Reroute Bypass Active' : 'Show Reroute'}</span>
+          </button>
+        )}
 
         {/* Zoom Controls */}
         <div className="flex items-center gap-1 pointer-events-auto bg-[#071322]/85 backdrop-blur-md p-1 rounded-xl border border-white/10">
@@ -199,6 +223,53 @@ export function CableExplorerMap({
             })}
           </g>
 
+          {/* Post-Breakdown Determined Reroute Bypass Path */}
+          {activeReroute && showReroute && activeReroute.pathCoordinates.length > 1 && (
+            <g className="reroute-bypass-layer">
+              {/* Outer pulsing glow */}
+              <path
+                d={getPathData(activeReroute.pathCoordinates)}
+                fill="none"
+                stroke="#10B981"
+                strokeWidth="8"
+                strokeOpacity="0.35"
+                strokeLinecap="round"
+                className="animate-pulse"
+              />
+              {/* Core animated dynamic bypass flow line */}
+              <path
+                d={getPathData(activeReroute.pathCoordinates)}
+                fill="none"
+                stroke="#34D399"
+                strokeWidth="3.5"
+                strokeDasharray="10 6"
+                strokeLinecap="round"
+                className="animate-pulse"
+              />
+              {/* Waypoint nodes along the bypass */}
+              {activeReroute.waypoints.map((wp) => {
+                const [wx, wy] = project(wp.lon, wp.lat);
+                return (
+                  <g key={wp.id} transform={`translate(${wx}, ${wy})`}>
+                    <circle r="8" fill="#10B981" fillOpacity="0.4" className="animate-ping" />
+                    <circle r="4.5" fill="#34D399" stroke="#064E3B" strokeWidth="1.5" />
+                    <text
+                      y="-9"
+                      textAnchor="middle"
+                      fill="#A7F3D0"
+                      fontSize="9"
+                      fontFamily="monospace"
+                      fontWeight="bold"
+                      className="select-none pointer-events-none drop-shadow"
+                    >
+                      {wp.name.split(' (')[0]}
+                    </text>
+                  </g>
+                );
+              })}
+            </g>
+          )}
+
           {/* Active Fault Indicator Marker */}
           <g transform={`translate(${faultProjected[0]}, ${faultProjected[1]})`}>
             <circle r="12" fill="#EF4444" fillOpacity="0.25" className="animate-ping" />
@@ -273,6 +344,16 @@ export function CableExplorerMap({
             </span>
           </div>
         </div>
+
+        {/* Post-Breakdown Rerouting Status Pill */}
+        {activeReroute && showReroute && (
+          <div className="pointer-events-auto bg-emerald-950/90 backdrop-blur-md border border-emerald-500/40 px-3.5 py-1.5 rounded-xl flex items-center gap-2.5 text-emerald-200 text-xs shadow-md">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="font-mono text-[10px]">
+              DETERMINED BYPASS: <strong className="text-white">{activeReroute.bypassCorridorName}</strong> ({activeReroute.restoredCapacityPct}% Restored until Splice)
+            </span>
+          </div>
+        )}
 
         {/* Fault Notification Pill */}
         <div className="pointer-events-auto bg-rose-950/80 backdrop-blur-md border border-rose-500/30 px-3 py-1.5 rounded-xl flex items-center gap-2 text-rose-200 text-xs">
