@@ -156,6 +156,49 @@ export default function CableBreakSim() {
         scene.add(r);
       });
 
+      // Benthic Seaweed Flora (GLB Asset: /models/sea_weed.glb from ns2)
+      const weedClumps: THREE.Group[] = [];
+      gltfLoader.load(
+        '/models/sea_weed.glb',
+        (gltf) => {
+          const baseWeed = gltf.scene;
+          const weedPositions = [
+            [-20, -10.0, 4.0, 0.7, 0.3],
+            [-15, -10.6, -3.5, 0.85, 1.2],
+            [-10, -11.0, 3.2, 0.65, 2.1],
+            [-6,  -11.2, -4.0, 0.9, 0.7],
+            [-2,  -11.4, 2.5, 0.75, 3.1],
+            [1,   -11.3, -3.2, 0.8, 1.6],
+            [5,   -10.8, 3.6, 0.7, 0.2],
+            [9,   -10.2, -4.1, 0.85, 2.4],
+            [14,  -9.6,  2.2, 0.6, 1.0],
+            [18,  -9.1, -2.8, 0.75, 2.7],
+            [-12, -10.9, 5.0, 0.9, 0.9],
+            [6,   -10.5, 4.8, 0.8, 1.4],
+            [0,   -11.6, 4.2, 0.7, 2.0],
+            [-4,  -11.1, -5.0, 0.85, 0.5],
+            [11,  -9.8,  4.5, 0.65, 1.8],
+          ];
+
+          weedPositions.forEach(([wx, wy, wz, ws, wr]) => {
+            const clump = baseWeed.clone(true);
+            clump.scale.setScalar(ws);
+            clump.rotation.y = wr;
+            clump.position.set(wx, wy, wz);
+            clump.traverse((child) => {
+              if ((child as THREE.Mesh).isMesh) {
+                child.castShadow = true;
+                child.receiveShadow = true;
+              }
+            });
+            scene.add(clump);
+            weedClumps.push(clump);
+          });
+        },
+        undefined,
+        (err) => console.warn('Could not load sea_weed.glb', err)
+      );
+
       // Floating marine sediment dust (Warm Gold / Pale Sand)
       const bioGeo = new THREE.BufferGeometry();
       const bioN = 220;
@@ -193,43 +236,25 @@ export default function CableBreakSim() {
         oceanOrigZ[i] = oceanPos.getZ(i);
       }
 
-      /* ─── LANDING STATIONS (PURE BLACK / GRAPHITE SURFACES) ─── */
+      /* ─── LANDING STATIONS & COASTAL INDUSTRIAL PLANT (factory_plant.glb from ns2) ─── */
       function buildStation(x: number) {
         const g = new THREE.Group();
-        const bldMat = new THREE.MeshPhongMaterial({ color: 0x1e1e1e, emissive: 0x0a0a0a });
-        const winMat = new THREE.MeshPhongMaterial({ color: 0xffffff, emissive: 0xd4c4a8, emissiveIntensity: 0.9 });
         const metMat = new THREE.MeshPhongMaterial({ color: 0x333333 });
         const yelMat = new THREE.MeshPhongMaterial({ color: 0xc87954, emissive: 0x4a2414, emissiveIntensity: 0.4 });
 
-        const body = new THREE.Mesh(new THREE.BoxGeometry(3.5, 4, 3), bldMat);
-        body.position.y = 2; g.add(body);
-
-        const roof = new THREE.Mesh(new THREE.CylinderGeometry(2.2, 2.4, 0.3, 6), metMat);
-        roof.position.y = 4.3; g.add(roof);
-
-        // Antenna
-        const ant = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 4, 6), metMat);
-        ant.position.y = 6.5; g.add(ant);
-
-        // Dish
-        const dish = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.08, 0.25, 12), metMat);
-        dish.position.set(0.8, 5.5, 0); dish.rotation.z = -Math.PI/5; g.add(dish);
-
-        // Windows
-        for (let i = 0; i < 3; i++) {
-          const w = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.5, 0.05), winMat);
-          w.position.set(-0.6, 1.2 + i * 0.9, 1.53); g.add(w);
-        }
-
-        // Crane arm
-        const cb = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 3.5, 8), yelMat);
-        cb.position.set(1.5, 3.75, 0); g.add(cb);
-        const ca = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.14, 0.14), yelMat);
-        ca.position.set(2.2, 5.6, 0); g.add(ca);
-
-        // Cable conduit to seabed
+        // Cable conduit into seabed
         const cd = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, 9, 8), metMat);
-        cd.position.y = -3; g.add(cd);
+        cd.position.y = -3;
+        g.add(cd);
+
+        // Connection terminal riser & telemetry mast
+        const riser = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.8, 2.4), metMat);
+        riser.position.y = 1.0;
+        g.add(riser);
+
+        const beacon = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 2.2, 8), yelMat);
+        beacon.position.set(0, 2.2, 0);
+        g.add(beacon);
 
         g.position.set(x, 0, 0);
         scene.add(g);
@@ -237,6 +262,38 @@ export default function CableBreakSim() {
       }
       buildStation(-23);
       buildStation(23);
+
+      // Load Industrial Facility / Building Model (factory_plant.glb from ns2)
+      gltfLoader.load(
+        '/models/factory_plant.glb',
+        (gltf) => {
+          // West Shore Facility
+          const plantWest = gltf.scene;
+          plantWest.rotation.x = -Math.PI / 2;
+          plantWest.scale.setScalar(0.045);
+
+          plantWest.traverse((child) => {
+            if ((child as THREE.Mesh).isMesh) {
+              child.castShadow = true;
+              child.receiveShadow = true;
+            }
+          });
+
+          // Ground to land surface
+          const boxWest = new THREE.Box3().setFromObject(plantWest);
+          plantWest.position.set(-28, 0.8 - boxWest.min.y, 0);
+          scene.add(plantWest);
+
+          // East Shore Facility (mirrored orientation)
+          const plantEast = plantWest.clone(true);
+          plantEast.rotation.z = Math.PI;
+          const boxEast = new THREE.Box3().setFromObject(plantEast);
+          plantEast.position.set(28, 0.8 - boxEast.min.y, 0);
+          scene.add(plantEast);
+        },
+        undefined,
+        (err) => console.warn('Could not load factory_plant.glb', err)
+      );
 
       // Landmass
       function addLand(x: number) {
@@ -672,6 +729,13 @@ export default function CableBreakSim() {
           bioPos[i*3]   += Math.sin(t*0.4 + i)*0.003;
         }
         bioGeo.attributes.position.needsUpdate = true;
+
+        /* ── Seaweed Gentle Ocean Sway ── */
+        for (let i = 0; i < weedClumps.length; i++) {
+          const w = weedClumps[i];
+          w.rotation.z = Math.sin(t * 1.4 + i * 0.9) * 0.07;
+          w.rotation.x = Math.cos(t * 1.1 + i * 0.7) * 0.05;
+        }
 
         /* — Data particles — */
         const PSPD = 0.0045;
