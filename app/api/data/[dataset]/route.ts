@@ -23,7 +23,7 @@ import {
   getIncidentTimeline, getLatencyHistory, getBackupConnectivity,
   getUncertainty, getNOAACables, getCableLandingRelations,
   getSeedStatus,
-} from '@/lib/data-store';
+  broadcast, readSeed, writeSeed } from '@/lib/data-store';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -80,4 +80,60 @@ export async function GET(
       'X-VARUNASETU-Provenance': 'public-source-derived',
     },
   });
+}
+
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ dataset: string }> }
+) {
+  const { dataset } = await params;
+  try {
+    const body = await req.json();
+    const recordsToInject = Array.isArray(body)
+      ? body
+      : body.records
+      ? (Array.isArray(body.records) ? body.records : [body.records])
+      : [body];
+
+    const fileMap: Record<string, string> = {
+      cables: 'cables.json',
+      incidents: 'incidents.json',
+      'latency-events': 'latency_events.json',
+      vessels: 'repair_vessels.json',
+      traffic: 'traffic_demand.json',
+      telemetry: 'cable_telemetry.json',
+      weather: 'marine_weather.json',
+      risk: 'cable_risk.json',
+    };
+
+    const targetFile = fileMap[dataset];
+    let totalCount = 0;
+
+    if (targetFile) {
+      const existing = readSeed<Record<string, unknown>[]>(targetFile);
+      const merged = [...recordsToInject, ...existing];
+      writeSeed(targetFile, merged);
+      totalCount = merged.length;
+    }
+
+    // Broadcast SSE update event to all active clients
+    broadcast({
+      type: (dataset in fileMap ? dataset : 'all') as any,
+      timestamp: new Date().toISOString(),
+      recordCount: totalCount,
+      message: `Injected ${recordsToInject.length} records into ${dataset}. Real-time platform updated.`,
+    });
+
+    return NextResponse.json({
+      success: true,
+      injectedCount: recordsToInject.length,
+      totalCount,
+      dataset,
+      timestamp: new Date().toISOString(),
+      message: `Successfully injected ${recordsToInject.length} records into ${dataset}. Broadcasted across live SSE stream.`,
+    });
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : 'Failed to inject dataset records';
+    return NextResponse.json({ error: errorMsg }, { status: 400 });
+  }
 }

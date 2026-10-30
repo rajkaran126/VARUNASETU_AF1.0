@@ -55,6 +55,11 @@ interface WorkspaceContextType {
   setIsNotificationTrayOpen: (open: boolean) => void;
   activeConfirmedNotification: FaultNotification | null;
   dismissConfirmedNotification: () => void;
+  incomingWhatIfAlert: FaultNotification | null;
+  dismissIncomingWhatIfAlert: () => void;
+  generateWhatIfBreakage: (customParams?: Partial<FaultNotification>) => FaultNotification;
+  isWhatIfModalOpen: boolean;
+  setIsWhatIfModalOpen: (open: boolean) => void;
 
   // Scenario & Simulation Engine State
   activeScenario: ScenarioConfig;
@@ -151,6 +156,12 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const [notifications, setNotifications] = useState<FaultNotification[]>(INITIAL_FAULT_NOTIFICATIONS);
   const [isNotificationTrayOpen, setIsNotificationTrayOpen] = useState<boolean>(false);
   const [activeConfirmedNotification, setActiveConfirmedNotification] = useState<FaultNotification | null>(null);
+  const [incomingWhatIfAlert, setIncomingWhatIfAlert] = useState<FaultNotification | null>(null);
+  const [isWhatIfModalOpen, setIsWhatIfModalOpen] = useState<boolean>(false);
+
+  const dismissIncomingWhatIfAlert = () => {
+    setIncomingWhatIfAlert(null);
+  };
 
   const pendingNotificationsCount = notifications.filter(n => n.status === 'Pending').length;
 
@@ -261,13 +272,70 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     setSimulationResult(result);
   };
 
+  const generateWhatIfBreakage = (customParams?: Partial<FaultNotification>): FaultNotification => {
+    const targetCable = customParams?.cableId 
+      ? cables.find(c => c.id === customParams.cableId) || selectedCable
+      : selectedCable;
+
+    const firstStation = targetCable.landingStations && targetCable.landingStations.length > 0
+      ? targetCable.landingStations[0]
+      : null;
+
+    const newNotifId = 'notif-whatif-' + Date.now();
+    const newNotif: FaultNotification = {
+      id: newNotifId,
+      cableId: targetCable.id,
+      cableName: customParams?.cableName || targetCable.name,
+      title: customParams?.title || ('What-If: ' + (customParams?.cableName || targetCable.name) + ' Severance'),
+      description: customParams?.description || ('Simulated breakage on ' + (customParams?.cableName || targetCable.name) + '. High-power optical loss detected.'),
+      faultType: (customParams?.faultType as any) || 'Physical Anchor Drag',
+      severity: (customParams?.severity as any) || 'Critical',
+      lat: customParams?.lat ?? (firstStation?.lat ?? 12.3081),
+      lon: customParams?.lon ?? (firstStation?.lon ?? 43.4892),
+      depthMeters: customParams?.depthMeters ?? 4120,
+      nearestLandingStation: customParams?.nearestLandingStation || (firstStation?.name || 'Bab el-Mandeb (Segment 4)'),
+      opticalLossDb: customParams?.opticalLossDb ?? 48.6,
+      affectedTrafficTbps: customParams?.affectedTrafficTbps ?? 45.0,
+      detectedAt: new Date().toISOString(),
+      sourceSensor: customParams?.sourceSensor || 'Coherent DWDM OTDR / What-If Engine',
+      status: 'Pending'
+    };
+
+    setNotifications(prev => [newNotif, ...prev]);
+    setIncomingWhatIfAlert(newNotif);
+
+    // Asynchronously push to /api/data/incidents to persist in seed and broadcast SSE
+    fetch('/api/data/incidents', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        alert_number: 'WI-' + Date.now().toString().slice(-4),
+        cable_name: newNotif.cableName,
+        alert_type: newNotif.faultType,
+        severity: newNotif.severity,
+        status: 'Active',
+        detected_at: newNotif.detectedAt,
+        resolved_at: '',
+        rtt_baseline_ms: '42.0',
+        rtt_current_ms: '188.5',
+        affected_countries: 'Global Transit Corridor',
+        verdict: 'Confirmed What-If Benthic Breakage',
+        url: '',
+        data_origin: 'What-If Simulation Engine',
+        record_completeness: 'Complete'
+      })
+    }).catch(() => {});
+
+    return newNotif;
+  };
+
   const approveFaultNotification = (id: string) => {
-    const notif = notifications.find(n => n.id === id);
+    const notif = notifications.find(n => n.id === id) || incomingWhatIfAlert;
     if (!notif) return;
 
     // 1. Mark notification as Approved
     setNotifications(prev => prev.map(n => 
-      n.id === id 
+      n.id === notif.id 
         ? {
             ...n,
             status: 'Approved' as const,
@@ -279,9 +347,14 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
         : n
     ));
 
-    // 2. Formulate canonical FaultIncident
+    // 2. Dismiss incoming alert banner
+    if (incomingWhatIfAlert?.id === notif.id) {
+      setIncomingWhatIfAlert(null);
+    }
+
+    // 3. Formulate canonical FaultIncident
     const confirmedIncident: FaultIncident = {
-      id: `flt-${notif.cableId}-${Date.now()}`,
+      id: 'flt-' + notif.cableId + '-' + Date.now(),
       cableId: notif.cableId,
       cableName: notif.cableName,
       timestamp: new Date().toISOString(),
@@ -299,8 +372,8 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     };
     setActiveFault(confirmedIncident);
 
-    // 3. Mark target cable status
-    const matchedCable = cables.find(c => c.id === notif.cableId);
+    // 4. Mark target cable status as Severed
+    const matchedCable = cables.find(c => c.id === notif.cableId) || selectedCable;
     if (matchedCable) {
       const updatedCable: CableRoute = {
         ...matchedCable,
@@ -310,17 +383,23 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
       setCables(prev => prev.map(c => c.id === notif.cableId ? updatedCable : c));
     }
 
-    // 4. Update Scenario and run deterministic simulation
+    // 5. Activate Autonomous Optical Reroute Bypass
+    setIsRerouteActive(true);
+    if (reroutePlans.length > 0) {
+      setActiveReroutePlan(reroutePlans[0]);
+    }
+
+    // 6. Update Scenario and run deterministic simulation
     const updatedScenario: ScenarioConfig = {
-      id: `scen-${notif.cableId}-${Date.now()}`,
-      name: `${notif.cableName} Confirmed Fault Scenario`,
+      id: 'scen-' + notif.cableId + '-' + Date.now(),
+      name: notif.cableName + ' Remediation & Reroute Scenario',
       selectedCableIds: [notif.cableId],
       faultType: notif.faultType,
       faultLocation: {
         lat: notif.lat,
         lon: notif.lon,
         depthM: notif.depthMeters,
-        description: `${notif.nearestLandingStation} (${notif.depthMeters}m depth)`
+        description: notif.nearestLandingStation + ' (' + notif.depthMeters + 'm depth)'
       },
       trafficDemandAssumptionTbps: Math.max(35.0, notif.affectedTrafficTbps * 1.5),
       failureDurationHours: 336,
@@ -329,7 +408,35 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     setActiveScenario(updatedScenario);
     executeSimulation(updatedScenario);
 
-    // 5. Set active confirmed notification for user navigation banner
+    // 7. Inject high-priority audit message into Multi-Agent Mission Control
+    const approvalAuditMsg: AgentMessage = {
+      id: 'agt-approval-' + Date.now(),
+      sender: 'orchestrator',
+      agentName: 'Chief Orchestrator',
+      agentRole: 'Chief Orchestrator',
+      content: '🚨 OPERATOR APPROVED FIX: Confirmed breakage on **' + notif.cableName + '** at ' + notif.nearestLandingStation + ' (Depth: ' + notif.depthMeters + 'm, Optical Loss: ' + notif.opticalLossDb + ' dB).\n\nAutonomous remediation executed:\n- **Optical Bypass Active**: Diverting +' + notif.affectedTrafficTbps + ' Tbps via ' + (reroutePlans[0]?.title || 'Trans-Mediterranean Trunk') + '.\n- **Marine Fleet Mobilization**: DP2 Repair Vessel ' + (repairFleet[4]?.name || 'CS Sovereign') + ' dispatched from ' + (repairFleet[4]?.currentPort || 'Port Said') + ' (ETA 38.4h).\n- **Benthic ROV**: Hector 6000 deployed to seabed for optical fiber splice.\n- **Digital Twin & Telemetry**: 3D underwater simulation and telemetry monitors synchronized.',
+      timestamp: new Date().toISOString(),
+      reasoningChain: [
+        'Operator verified high-priority alert ' + notif.id + ' on ' + notif.cableName + '.',
+        'De-asserted primary optical transponder wavelengths.',
+        'Committed BGP community reroute tag across peering boundaries.',
+        'Issued electronic repair mobilization order to consortium fleet.'
+      ],
+      metrics: [
+        { label: 'Remediation', value: 'Active' },
+        { label: 'Bypass Traffic', value: notif.affectedTrafficTbps + ' Tbps' },
+        { label: 'ROV Status', value: 'Deployed' },
+        { label: 'Latency Recovery', value: '92.4%' }
+      ],
+      suggestedActions: [
+        { label: 'View Real-Time Monitoring', actionId: 'view-monitoring' },
+        { label: 'Inspect Digital Twin 3D Scene', actionId: 'view-digital-twin' },
+        { label: 'Review War Room Logistics', actionId: 'view-war-room' }
+      ]
+    };
+    setAgentMessages(prev => [approvalAuditMsg, ...prev]);
+
+    // 8. Set active confirmed notification for user navigation banner
     setActiveConfirmedNotification(notif);
   };
 
@@ -502,6 +609,11 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
         setIsNotificationTrayOpen,
         activeConfirmedNotification,
         dismissConfirmedNotification,
+        incomingWhatIfAlert,
+        dismissIncomingWhatIfAlert,
+        generateWhatIfBreakage,
+        isWhatIfModalOpen,
+        setIsWhatIfModalOpen,
         activeScenario,
         setActiveScenario,
         simulationResult,

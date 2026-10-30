@@ -30,8 +30,8 @@ export function broadcast(event: DataEvent) {
   subscribers.forEach(fn => fn(event));
 }
 
-// ── Safe JSON file reader ────────────────────────────────────────────────────
-function readSeed<T = Record<string, unknown>[]>(filename: string): T {
+// ── Safe JSON file reader & writer ───────────────────────────────────────────
+export function readSeed<T = Record<string, unknown>[]>(filename: string): T {
   const filePath = path.join(SEEDS_DIR, filename);
   try {
     if (!fs.existsSync(filePath)) return [] as unknown as T;
@@ -39,6 +39,16 @@ function readSeed<T = Record<string, unknown>[]>(filename: string): T {
     return JSON.parse(raw) as T;
   } catch {
     return [] as unknown as T;
+  }
+}
+
+export function writeSeed<T>(filename: string, data: T): boolean {
+  const filePath = path.join(SEEDS_DIR, filename);
+  try {
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
+    return true;
+  } catch {
+    return false;
   }
 }
 
