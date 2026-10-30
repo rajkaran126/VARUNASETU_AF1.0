@@ -224,49 +224,6 @@ export function CableGlobe3D({
           redLight.position.z = 80;
           markerGroup.add(redLight);
 
-          // 6. High-Visibility 3D Floating HUD Billboard Sprite
-          const canvas = document.createElement('canvas');
-          canvas.width = 512;
-          canvas.height = 256;
-          const ctx = canvas.getContext('2d');
-          if (ctx) {
-            ctx.fillStyle = 'rgba(14, 42, 71, 0.94)';
-            ctx.strokeStyle = '#FF1744';
-            ctx.lineWidth = 8;
-            ctx.beginPath();
-            ctx.roundRect(10, 10, 492, 236, 24);
-            ctx.fill();
-            ctx.stroke();
-
-            // Header Banner
-            ctx.fillStyle = '#FF1744';
-            ctx.fillRect(10, 10, 492, 52);
-
-            ctx.fillStyle = '#FFFFFF';
-            ctx.font = 'bold 24px monospace';
-            ctx.fillText('CRITICAL SEVERANCE DETECTED', 30, 46);
-
-            ctx.fillStyle = '#FFFFFF';
-            ctx.font = 'bold 28px sans-serif';
-            ctx.fillText(activeFault.cableName.slice(0, 30), 30, 110);
-
-            ctx.fillStyle = '#CBD5E1';
-            ctx.font = '20px monospace';
-            ctx.fillText('Loc: ' + activeFault.nearestLandingStation, 30, 150);
-            ctx.fillText('Lat: ' + activeFault.lat.toFixed(2) + 'N | Lon: ' + activeFault.lon.toFixed(2) + 'E', 30, 185);
-
-            ctx.fillStyle = '#F87171';
-            ctx.font = 'bold 20px monospace';
-            ctx.fillText('Loss: ' + activeFault.opticalLossDb + ' dB | Depth: -' + activeFault.depthMeters + 'm', 30, 222);
-
-            const texture = new THREE.CanvasTexture(canvas);
-            const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
-            const sprite = new THREE.Sprite(spriteMat);
-            sprite.scale.set(700, 350, 1);
-            sprite.position.set(0, 0, 620);
-            markerGroup.add(sprite);
-          }
-
           cableModel.add(markerGroup);
           faultMarker = markerGroup;
         }

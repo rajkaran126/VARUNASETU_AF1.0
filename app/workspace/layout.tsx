@@ -3,7 +3,6 @@ import { WorkspaceProvider } from '@/lib/workspace-context';
 import { Sidebar } from '@/components/workspace/Sidebar';
 import { Header } from '@/components/workspace/Header';
 import { GhostCopilot } from '@/components/workspace/GhostCopilot';
-import { IncidentResponsePipeline } from '@/components/workspace/IncidentResponsePipeline';
 
 export const metadata: Metadata = {
   title: 'Workspace — VARUNASETU Submarine Cable Digital Twin',
@@ -36,7 +35,6 @@ export default function WorkspaceLayout({
           {/* Section Main Viewport Area */}
           <main className="flex-1 overflow-y-auto px-6 py-6 lg:px-8 bg-[#F7F3EA]">
             <div className="max-w-[1600px] mx-auto pb-12">
-              <IncidentResponsePipeline />
               {children}
             </div>
           </main>
