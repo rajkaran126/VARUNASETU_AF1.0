@@ -45,51 +45,26 @@ export default function NetworkOverviewPage() {
           </p>
         </div>
 
-        {/* Global Topology Summary Pill */}
-        <div className="flex items-center gap-3">
-          <div className="px-3.5 py-2 rounded-xl bg-white border border-[#E0D7C9] text-right shadow-2xs">
-            <span className="font-mono text-[10px] text-[#5A738A] uppercase">Global Telemetry Flow</span>
-            <p className="font-mono text-sm font-bold text-[#0E2A47]">97.4% Nominal</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Network Intelligence KPI Metric Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 rounded-xl bg-white border border-[#E2DBD0] shadow-xs">
-          <div className="flex items-center justify-between text-[#59738A] mb-1">
-            <span className="font-mono text-[11px] uppercase tracking-wider">Cable Systems</span>
+        {/* Global Topology Summary Telemetry Strip */}
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="px-3 py-1.5 rounded-xl bg-white border border-[#E0D7C9] font-mono text-xs shadow-2xs flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#185382]" />
+            <span className="text-[#5A738A]">Systems:</span>
+            <strong className="text-[#0E2A47]">{cables.length} Active</strong>
           </div>
-          <p className="font-mono text-2xl font-bold text-[#0E2A47]">{cables.length}</p>
-          <p className="font-mono text-[10px] text-[#69829A] mt-1">421 In-Service Globally</p>
-        </div>
-
-        <div className="p-4 rounded-xl bg-white border border-[#E2DBD0] shadow-xs">
-          <div className="flex items-center justify-between text-[#59738A] mb-1">
-            <span className="font-mono text-[11px] uppercase tracking-wider">Landing Stations</span>
+          <div className="px-3 py-1.5 rounded-xl bg-white border border-[#E0D7C9] font-mono text-xs shadow-2xs flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span className="text-[#5A738A]">Landing Stations:</span>
+            <strong className="text-[#0E2A47]">{VERIFIED_LANDING_STATIONS.length} Grid</strong>
           </div>
-          <p className="font-mono text-2xl font-bold text-[#0E2A47]">{VERIFIED_LANDING_STATIONS.length}</p>
-          <p className="font-mono text-[10px] text-[#69829A] mt-1">1,248 Coastal Terminal Grid</p>
-        </div>
-
-        <div className="p-4 rounded-xl bg-white border border-[#E2DBD0] shadow-xs">
-          <div className="flex items-center justify-between text-[#59738A] mb-1">
-            <span className="font-mono text-[11px] uppercase tracking-wider">Subsea Fibre Reach</span>
-            <span className="w-2 h-2 rounded-full bg-sky-500" />
-          </div>
-          <p className="font-mono text-2xl font-bold text-[#0E2A47]">{(totalLength / 1000).toFixed(1)}k km</p>
-          <p className="font-mono text-[10px] text-[#69829A] mt-1">1.38M km International Reach</p>
-        </div>
-
-        <div className="p-4 rounded-xl bg-white border border-[#E2DBD0] shadow-xs">
-          <div className="flex items-center justify-between text-[#59738A] mb-1">
-            <span className="font-mono text-[11px] uppercase tracking-wider">Active Anomalies</span>
+          <div className="px-3 py-1.5 rounded-xl bg-white border border-[#E0D7C9] font-mono text-xs shadow-2xs flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
+            <span className="text-rose-700 font-semibold">2 Anomalies</span>
           </div>
-          <p className="font-mono text-2xl font-bold text-rose-700">02</p>
-          <p className="font-mono text-[10px] text-rose-600 mt-1">1 Severed · 1 Degraded</p>
+          <div className="px-3 py-1.5 rounded-xl bg-white border border-[#E0D7C9] font-mono text-xs shadow-2xs flex items-center gap-2">
+            <span className="text-[#5A738A]">Flow:</span>
+            <strong className="text-[#0E2A47]">97.4%</strong>
+          </div>
         </div>
       </div>
 
