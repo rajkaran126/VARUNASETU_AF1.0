@@ -116,8 +116,12 @@ export class AgentOrchestrator {
       return {
         agentRole: role,
         agentName: name,
-        summary: `${name} analysis completed using deterministic telemetry fallback.`,
-        findings: [`Grounded data analyzed across ${ragContext.evidence.length} evidence records.`],
+        summary: ragContext.evidence.length > 0
+          ? `${name} evaluated ${ragContext.evidence.length} verified records: ${ragContext.evidence.slice(0, 2).map(e => e.title).join('; ')}.`
+          : `${name} analysis completed using deterministic telemetry fallback.`,
+        findings: ragContext.evidence.length > 0
+          ? ragContext.evidence.slice(0, 4).map(e => `${e.title}: ${e.content} [${e.id}]`)
+          : [`Grounded data analyzed across ${ragContext.evidence.length} evidence records.`],
         evidenceCitations: ragContext.evidence.map(e => e.id),
         metrics: [{ label: 'Status', value: 'Fallback' }],
         assumptions: ['LLM inference bypassed due to rate limit/cooldown.'],
@@ -330,8 +334,12 @@ Output valid JSON only matching this schema:
       2
     )}`;
 
+    const fallbackSummary = specialistFindings.length > 0 && specialistFindings[0].summary
+      ? specialistFindings.map(s => s.summary).join(' ')
+      : `VARUNASETU multi-agent consensus converged across ${specialistFindings.length} specialist agents. Grounded evidence retrieved across ${ragContext.evidence.length} topology records.`;
+
     let consensusAssessment = {
-      summary: `VARUNASETU multi-agent consensus converged across ${specialistFindings.length} specialist agents. Grounded evidence retrieved across ${ragContext.evidence.length} topology records.`,
+      summary: fallbackSummary,
       keyFindings: specialistFindings.flatMap(s => s.findings),
       disagreements: [],
       actionPlan: [
