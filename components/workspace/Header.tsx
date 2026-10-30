@@ -52,27 +52,45 @@ export function Header() {
 
         {/* Right: Notification Bell, Current Date/Time, User Profile */}
         <div className="flex items-center gap-4">
-          {/* 1. Notification Icon Button */}
-          <button
-            onClick={() => setIsNotificationTrayOpen(!isNotificationTrayOpen)}
-            className={`relative p-2 rounded-xl transition-all flex items-center justify-center border ${
-              pendingNotificationsCount > 0
-                ? 'bg-[#DDF8FA] border-[#13BFD3]/40 text-[#0E8B99] hover:bg-[#c9f3f6]'
-                : 'bg-[#EDF3F7] border-[#CBDDEB] text-[#60758A] hover:text-[#152D46] hover:bg-[#E2EBF2]'
-            }`}
-            title="Fault Notifications & Alert Center"
-            aria-label="Notifications"
-          >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-            </svg>
-            {pendingNotificationsCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-[#DC2626] text-white font-mono text-[9px] font-bold flex items-center justify-center shadow-xs">
-                {pendingNotificationsCount}
-              </span>
+          {/* 1. Notification Icon Button & Anchored Pop-up Box */}
+          <div className="relative">
+            <button
+              onClick={() => setIsNotificationTrayOpen(!isNotificationTrayOpen)}
+              className={`relative p-2 rounded-xl transition-all flex items-center justify-center border ${
+                pendingNotificationsCount > 0
+                  ? 'bg-[#DDF8FA] border-[#13BFD3]/40 text-[#0E8B99] hover:bg-[#c9f3f6]'
+                  : 'bg-[#EDF3F7] border-[#CBDDEB] text-[#60758A] hover:text-[#152D46] hover:bg-[#E2EBF2]'
+              }`}
+              title="Fault Notifications & Alert Center"
+              aria-label="Notifications"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+              </svg>
+              {pendingNotificationsCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-[#DC2626] text-white font-mono text-[9px] font-bold flex items-center justify-center shadow-xs">
+                  {pendingNotificationsCount}
+                </span>
+              )}
+            </button>
+
+            {/* Small - Medium Notification Pop-up Box */}
+            {isNotificationTrayOpen && (
+              <>
+                {/* Subtle backdrop to close pop-up when clicking outside */}
+                <div
+                  onClick={() => setIsNotificationTrayOpen(false)}
+                  className="fixed inset-0 z-40 bg-black/15 backdrop-blur-[1px]"
+                />
+                
+                {/* Small - Medium Pop-up Box */}
+                <div className="absolute right-0 top-full mt-2.5 z-50 w-[380px] sm:w-[420px] max-w-[calc(100vw-2rem)]">
+                  <FaultNotificationTray onClose={() => setIsNotificationTrayOpen(false)} />
+                </div>
+              </>
             )}
-          </button>
+          </div>
 
           {/* 2. Current Date and Time */}
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#F7F8F5] border border-[#E9F0F5]">
@@ -97,22 +115,6 @@ export function Header() {
           </div>
         </div>
       </header>
-
-      {/* Slide-over Fault Notification Drawer */}
-      {isNotificationTrayOpen && (
-        <div className="fixed inset-0 z-50 flex justify-end">
-          <div
-            onClick={() => setIsNotificationTrayOpen(false)}
-            className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
-          />
-          <div className="relative z-10 w-full max-w-xl h-full">
-            <FaultNotificationTray
-              isSlideOver={true}
-              onClose={() => setIsNotificationTrayOpen(false)}
-            />
-          </div>
-        </div>
-      )}
     </>
   );
 }
