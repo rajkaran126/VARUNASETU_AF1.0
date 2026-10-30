@@ -23,7 +23,20 @@ import {
   INITIAL_DATASETS,
   DETERMINED_REROUTE_PLANS
 } from './cable-data';
+import {
+  REAL_CABLE_ROUTES,
+  REAL_FAULT_INCIDENTS,
+} from './cable-data-real';
 import { runNetworkSimulation } from './simulation-engine';
+
+// Merge: real registry (692) + curated simulation cables (10).
+// Dedup by id — VERIFIED_CABLE_ROUTES take precedence for simulation fidelity.
+const REAL_ID_SET = new Set(REAL_CABLE_ROUTES.map(c => c.id));
+const CURATED_ONLY = VERIFIED_CABLE_ROUTES.filter(c => !REAL_ID_SET.has(c.id));
+export const ALL_CABLE_ROUTES: CableRoute[] = [...REAL_CABLE_ROUTES, ...CURATED_ONLY];
+
+// Real incidents + simulation incidents merged (real first)
+export const ALL_FAULT_INCIDENTS: FaultIncident[] = [...REAL_FAULT_INCIDENTS, ...ACTIVE_FAULT_INCIDENTS];
 
 interface WorkspaceContextType {
   // Canonical Cable & Fault State
@@ -129,7 +142,8 @@ const initialAgentConversation: AgentMessage[] = [
 const WorkspaceContext = createContext<WorkspaceContextType | undefined>(undefined);
 
 export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
-  const [cables, setCables] = useState<CableRoute[]>(VERIFIED_CABLE_ROUTES);
+  // Full registry: 692 real + curated cables
+  const [cables, setCables] = useState<CableRoute[]>(ALL_CABLE_ROUTES);
   const [selectedCable, setSelectedCable] = useState<CableRoute>(VERIFIED_CABLE_ROUTES[0]);
   const [activeFault, setActiveFault] = useState<FaultIncident>(ACTIVE_FAULT_INCIDENTS[0]);
   
