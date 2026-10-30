@@ -143,11 +143,104 @@ export class AgentOrchestrator {
     // 1. NLP & NLU Analysis
     const nlp = await nlpEngine.analyzeQuery(query);
 
-    // 2. Hybrid RAG Evidence Retrieval
+    // 2. Fast-Path: Casual Conversation & Multilingual Greetings
+    if (nlp.primaryIntent === 'CASUAL_CONVERSATION') {
+      const casualPrompt = `You are the Chief Orchestrator and Ghost Copilot of VARUNASETU, an intelligent digital twin for global submarine telecommunications cable networks.
+The operator is engaging in casual conversation, greeting, or asking general introductory questions.
+User Query: "${query}"
+Language Detected: ${nlp.language.detectedLanguage} (script: ${nlp.language.detectedScript}, transliterated: ${nlp.language.isTransliterated}).
+
+MANDATORY INSTRUCTIONS:
+1. Respond conversationally, warmly, and authoritatively in the EXACT language and script style matching the user (English, native Kannada script, Romanized Kannada, native Hindi script, or Romanized Hindi).
+2. Introduce yourself as VARUNASETU's intelligence layer, monitoring global subsea cable assets, detecting false redundancy in Shared Risk Link Groups (SRLGs), simulating physical underwater repairs with ROVs, and coordinating autonomous traffic rerouting.
+3. Suggest specific technical questions the user can ask (e.g. asking about SMW4 and SMW5 false redundancy in Egypt, inspecting repair ships, or simulating a cable break).
+4. Output valid JSON matching this schema:
+{
+  "summary": "Warm, authentic conversational reply in the user's language/script",
+  "keyFindings": ["Subsea Cable Digital Twin Monitoring", "Shared Risk Link Group (SRLG) False Redundancy Detection", "Physical Underwater 3D Repair & ROV Simulation"],
+  "disagreements": [],
+  "actionPlan": [
+    {"step": 1, "action": "Inspect active subsea cables on 3D Digital Twin", "owner": "Operator"},
+    {"step": 2, "action": "Query false redundancy or run a What-If failure simulation", "owner": "Chief Orchestrator"}
+  ],
+  "overallConfidence": 1.0,
+  "recommendedNextStep": "Ask about cable redundancy (e.g., 'Are SMW4 and SMW5 redundant?') or click What-If Simulator."
+}`;
+
+      try {
+        const casualRes = await groqKeyManager.chatCompletion(
+          [
+            { role: 'system', content: casualPrompt },
+            { role: 'user', content: query },
+          ],
+          {
+            response_format: { type: 'json_object' },
+            temperature: 0.3,
+            max_tokens: 1000,
+          }
+        );
+        const parsed = JSON.parse(casualRes.content);
+        return {
+          taskId,
+          userQuery: query,
+          nlpAnalysis: nlp,
+          specialistFindings: [],
+          consensusAssessment: {
+            summary: parsed.summary || 'Namaskara / Hello! I am VARUNASETU, your submarine cable digital twin intelligence assistant.',
+            keyFindings: Array.isArray(parsed.keyFindings) ? parsed.keyFindings : ['Subsea Digital Twin Ready'],
+            disagreements: [],
+            actionPlan: Array.isArray(parsed.actionPlan) ? parsed.actionPlan : [
+              { step: 1, action: 'Explore 3D Digital Twin Globe', owner: 'Operator' }
+            ],
+            overallConfidence: 1.0,
+            recommendedNextStep: parsed.recommendedNextStep || 'Try asking about SMW4/SMW5 redundancy or nearest repair ships.',
+          },
+          totalDurationMs: Date.now() - totalStart,
+          timestamp: new Date().toISOString(),
+        };
+      } catch (err) {
+        console.warn('[AgentOrchestrator] Casual greeting fallback:', err);
+        const fallbackGreeting = nlp.language.detectedLanguage === 'kannada'
+          ? (nlp.language.isTransliterated
+              ? 'Namaskara! Naanu VARUNASETU AI Copilot. Submarine cables, fault simulation mathu repair logistics bagge enu bekaadru kelabahudu.'
+              : 'ನಮಸ್ಕಾರ! ನಾನು ವರುಣಸೇತು (VARUNASETU) AI ಕಾಪಿಲಟ್. ಜಾಗತಿಕ ಸಬ್‌ಮರೀನ್ ಕೇಬಲ್‌ಗಳು, ಫಾಲ್ಟ್ ಸಿಮ್ಯುಲೇಶನ್ ಮತ್ತು ದುರಸ್ತಿ ಲಾಜಿಸ್ಟಿಕ್ಸ್ ಬಗ್ಗೆ ನೀವು ವಿಚಾರಿಸಬಹುದು.')
+          : nlp.language.detectedLanguage === 'hindi'
+          ? (nlp.language.isTransliterated
+              ? 'Namaste! Main VARUNASETU AI Copilot hoon. Submarine cables, failure simulation aur repair logistics ke bare me pooch sakte hain.'
+              : 'नमस्ते! मैं VARUNASETU AI कॉपायलट हूँ। आप सबमरीन केबल, फॉल्ट सिमुलेशन और रिपेयर लॉजिस्टिक्स के बारे में पूछ सकते हैं।')
+          : 'Hello! I am VARUNASETU Chief Orchestrator and Ghost Copilot. I monitor global submarine cable infrastructure, detect Shared Risk Link Groups (SRLGs), simulate physical underwater repairs, and optimize autonomous traffic rerouting. How can I assist your operations?';
+
+        return {
+          taskId,
+          userQuery: query,
+          nlpAnalysis: nlp,
+          specialistFindings: [],
+          consensusAssessment: {
+            summary: fallbackGreeting,
+            keyFindings: [
+              'Global Submarine Cable Topology Digital Twin',
+              'Shared Risk Link Group (SRLG) False Redundancy Detection',
+              'Physical Underwater 3D Repair & ROV Simulation',
+            ],
+            disagreements: [],
+            actionPlan: [
+              { step: 1, action: 'Inspect active subsea cables on 3D Digital Twin', owner: 'Operator' },
+              { step: 2, action: 'Trigger a What-If failure simulation', owner: 'Chief Orchestrator' },
+            ],
+            overallConfidence: 1.0,
+            recommendedNextStep: 'Ask "Are SMW4 and SMW5 genuinely redundant in Egypt?" to test SRLG intelligence.',
+          },
+          totalDurationMs: Date.now() - totalStart,
+          timestamp: new Date().toISOString(),
+        };
+      }
+    }
+
+    // 3. Hybrid RAG Evidence Retrieval
     const evidence = ragService.retrieveEvidence(query, nlp.entities, activeSimulation);
     const ragContext = ragService.assembleRAGContext(query, evidence);
 
-    // 3. Select & Execute Specialists in Parallel
+    // 4. Select & Execute Specialists in Parallel
     const specialistPromises: Promise<SpecialistAgentResult>[] = [];
 
     if (nlp.requiresSpecialists.includes('network')) {
@@ -201,10 +294,17 @@ export class AgentOrchestrator {
     // Await all parallel specialists
     const specialistFindings = await Promise.all(specialistPromises);
 
-    // 4. Chief Orchestrator Consensus Synthesis
+    // 5. Chief Orchestrator Consensus Synthesis (with Multilingual Grounding)
+    const languageInstruction = nlp.language.detectedLanguage !== 'english'
+      ? `\n### MANDATORY MULTILINGUAL SYNTHESIS:
+The operator query was in ${nlp.language.detectedLanguage.toUpperCase()} (script: ${nlp.language.detectedScript}, transliterated: ${nlp.language.isTransliterated}).
+You MUST write the "summary" and "recommendedNextStep" in the SAME language and style (if transliterated Latin script, respond in natural Romanized ${nlp.language.detectedLanguage}; if native script, respond in native script).
+CRITICAL RULE: Keep all technical telecom entities, cable names (e.g. SMW4, SMW5, AAE-1, 2Africa), acronyms (OTDR, SRLG, BGP, DWDM, DP2, ROV), geographic locations (e.g., Suez, Egypt, Bab el-Mandeb), and numerical units (Tbps, ms, km) strictly in English/Latin text so they remain technically unambiguous.`
+      : '';
+
     const consensusPrompt = `You are the Chief Orchestrator of VARUNASETU.
 Synthesize the findings of your specialist agents into an authoritative consensus assessment for the NOC operator.
-Highlight actionable insights, resolve any conflicting interpretations, and formulate a clear step-by-step action plan.
+Highlight actionable insights, resolve any conflicting interpretations, and formulate a clear step-by-step action plan.${languageInstruction}
 
 Output valid JSON only matching this schema:
 {

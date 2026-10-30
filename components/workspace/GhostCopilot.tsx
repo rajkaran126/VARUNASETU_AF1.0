@@ -20,12 +20,15 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
   } = useWorkspace();
 
   const [isOpen, setIsOpen] = useState(initialOpen);
+  const [promptLangTab, setPromptLangTab] = useState<'EN' | 'KN' | 'HI'>('EN');
+  const [activeLangBadge, setActiveLangBadge] = useState<string | null>(null);
   const [messages, setMessages] = useState<
     {
       id: string;
       role: 'user' | 'copilot';
       content: string;
       citations?: string[];
+      langTag?: string;
       action?: {
         label: string;
         actionType: 'approve_fix' | 'run_simulation' | 'toggle_reroute';
@@ -37,7 +40,7 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
     {
       id: 'copilot-init',
       role: 'copilot',
-      content: `👋 **Ghost Copilot Online.** I am synchronized with the active digital twin.\n\nCurrently monitoring **${selectedCable.name}** at fault location **${activeFault.nearestLandingStation}** (Depth: ${activeFault.depthMeters}m).\n\nAsk me about corridor vulnerability, false redundancy, reroute capacity, or repair vessel logistics.`,
+      content: `👋 **Ghost Copilot Online.** I am synchronized with the active digital twin.\n\nCurrently monitoring **${selectedCable.name}** at fault location **${activeFault.nearestLandingStation}** (Depth: ${activeFault.depthMeters}m).\n\nAsk me in English, ಕನ್ನಡ, or हिंदी about corridor vulnerability, false redundancy, reroute capacity, or repair vessel logistics.`,
       timestamp: new Date().toLocaleTimeString(),
     },
   ]);
@@ -83,6 +86,20 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
       let replyContent = data.report?.consensusAssessment?.summary || 'Analysis complete based on active digital twin context.';
       const citations = data.report?.consensusAssessment?.keyFindings || [];
 
+      // Extract detected language
+      const langMeta = data.report?.nlpAnalysis?.language;
+      let langTag: string | undefined = undefined;
+      if (langMeta) {
+        if (langMeta.detectedLanguage === 'kannada') {
+          langTag = langMeta.isTransliterated ? 'Kannada · Romanized' : 'ಕನ್ನಡ · Kannada';
+        } else if (langMeta.detectedLanguage === 'hindi') {
+          langTag = langMeta.isTransliterated ? 'Hindi · Romanized' : 'हिंदी · Hindi';
+        } else if (langMeta.detectedLanguage === 'english') {
+          langTag = 'English';
+        }
+        if (langTag) setActiveLangBadge(langTag);
+      }
+
       // Check for action intent
       let action: { label: string; actionType: 'approve_fix' | 'run_simulation' | 'toggle_reroute'; status?: 'pending' } | undefined = undefined;
       const lower = userText.toLowerCase();
@@ -108,6 +125,7 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
           role: 'copilot',
           content: replyContent,
           citations,
+          langTag,
           action,
           timestamp: new Date().toLocaleTimeString(),
         },
@@ -148,6 +166,24 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
     );
   };
 
+  const promptOptions: Record<'EN' | 'KN' | 'HI', { label: string; query: string }[]> = {
+    EN: [
+      { label: 'Are SMW4 & SMW5 redundant?', query: 'Are SMW4 and SMW5 genuinely redundant in Egypt?' },
+      { label: 'Nearest repair ship', query: 'Show nearest repair ship and estimated transit time' },
+      { label: 'Explain reroute bypass', query: 'Explain current reroute bypass capacity and unserved demand' },
+    ],
+    KN: [
+      { label: 'SMW4 mathu SMW5 redundant idhiya?', query: 'SMW4 mathu SMW5 Egypt nalli redundant idhiya?' },
+      { label: 'ಹತ್ತಿರದ ರಿಪೇರಿ ಹಡಗು', query: 'ಹತ್ತಿರದ ರಿಪೇರಿ ಹಡಗು ಯಾವುದು ಮತ್ತು ETA ಎಷ್ಟು?' },
+      { label: 'ಕೇಬಲ್ ಬ್ರೇಕ್ ಪರಿಣಾಮ', query: 'ಕೇಬಲ್ ಕಟ್ ಆದಾಗ ಟ್ರಾಫಿಕ್ ಹೇಗೆ ರೀರೌಟ್ ಆಗುತ್ತೆ?' },
+    ],
+    HI: [
+      { label: 'Kya SMW4 & SMW5 redundant hain?', query: 'Kya SMW4 aur SMW5 Egypt me sach me redundant hain?' },
+      { label: 'सबसे नजदीकी रिपेयर जहाज', query: 'सबसे नजदीकी रिपेयर जहाज और उसका ETA क्या है?' },
+      { label: 'ट्रैफिक रीरूट कैसे होगा?', query: 'केबल कटने पर ट्रैफिक कैसे रीरूट होगा?' },
+    ],
+  };
+
   return (
     <>
       {/* Floating Trigger Button when closed */}
@@ -180,6 +216,11 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
                   <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-emerald-100 text-emerald-800">
                     TWIN-AWARE
                   </span>
+                  {activeLangBadge && (
+                    <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-[#EAE2D5] text-[#36506A]">
+                      {activeLangBadge}
+                    </span>
+                  )}
                 </div>
                 <p className="font-mono text-[9px] text-[#A69B89] truncate max-w-[220px]">
                   {selectedCable.name} · {activeFault.nearestLandingStation}
@@ -215,6 +256,13 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
                       : 'bg-white border border-[#E8E1D5] text-[#36506A] rounded-bl-none'
                   }`}
                 >
+                  {msg.langTag && (
+                    <div className="mb-1.5">
+                      <span className="px-1.5 py-0.5 rounded text-[8.5px] font-mono font-bold bg-[#F4EFE6] text-[#786955] border border-[#E0D7C6]">
+                        🌐 {msg.langTag}
+                      </span>
+                    </div>
+                  )}
                   <p className="whitespace-pre-line">{msg.content}</p>
 
                   {/* Findings / Citations Accordion */}
@@ -264,23 +312,44 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
             <div ref={scrollRef} />
           </div>
 
-          {/* Quick Prompts */}
-          <div className="p-2 px-3 bg-[#F7F3EA] border-t border-[#E8E1D5] flex gap-1.5 overflow-x-auto">
-            {[
-              'Are SMW4 and SMW5 genuinely redundant?',
-              'Show nearest repair ship',
-              'Explain current reroute bypass',
-            ].map(prompt => (
-              <button
-                key={prompt}
-                onClick={() => {
-                  setInput(prompt);
-                }}
-                className="whitespace-nowrap px-2 py-1 rounded-lg bg-white border border-[#DDD3C3] hover:border-[#C87954] text-[10px] font-mono text-[#59738A] hover:text-[#0E2A47] transition-all"
-              >
-                {prompt}
-              </button>
-            ))}
+          {/* Multilingual Quick Prompts */}
+          <div className="p-2 px-3 bg-[#F7F3EA] border-t border-[#E8E1D5]">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="font-mono text-[9px] uppercase font-bold text-[#A69B89]">
+                Quick Prompts:
+              </span>
+              <div className="flex items-center gap-1">
+                {(['EN', 'KN', 'HI'] as const).map(tab => (
+                  <button
+                    key={tab}
+                    type="button"
+                    onClick={() => setPromptLangTab(tab)}
+                    className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold transition-all ${
+                      promptLangTab === tab
+                        ? 'bg-[#0E2A47] text-white shadow-xs'
+                        : 'bg-white border border-[#DDD3C3] text-[#59738A] hover:bg-[#F0EBE0]'
+                    }`}
+                  >
+                    {tab === 'EN' ? 'EN' : tab === 'KN' ? 'ಕನ್ನಡ' : 'हिंदी'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex gap-1.5 overflow-x-auto pb-0.5">
+              {promptOptions[promptLangTab].map(item => (
+                <button
+                  key={item.label}
+                  type="button"
+                  onClick={() => {
+                    setInput(item.query);
+                  }}
+                  className="whitespace-nowrap px-2 py-1 rounded-lg bg-white border border-[#DDD3C3] hover:border-[#C87954] text-[10px] font-mono text-[#59738A] hover:text-[#0E2A47] transition-all"
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Input Box */}
