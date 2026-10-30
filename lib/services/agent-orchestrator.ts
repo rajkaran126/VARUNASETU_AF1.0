@@ -149,18 +149,25 @@ export class AgentOrchestrator {
 
     // 2. Fast-Path: Casual Conversation & Multilingual Greetings
     if (nlp.primaryIntent === 'CASUAL_CONVERSATION') {
+      const emotionalTone = nlp.emotionalTone || 'casual_friendly';
       const casualPrompt = `You are the Chief Orchestrator and Ghost Copilot of VARUNASETU, an intelligent digital twin for global submarine telecommunications cable networks.
-The operator is engaging in casual conversation, greeting, or asking general introductory questions.
+The operator is engaging in conversation or asking general questions.
 User Query: "${query}"
 Language Detected: ${nlp.language.detectedLanguage} (script: ${nlp.language.detectedScript}, transliterated: ${nlp.language.isTransliterated}).
+Emotional Tone Detected: ${emotionalTone.toUpperCase()}.
 
-MANDATORY INSTRUCTIONS:
-1. Respond conversationally, warmly, and authoritatively in the EXACT language and script style matching the user (English, native Kannada script, Romanized Kannada, native Hindi script, or Romanized Hindi).
-2. Introduce yourself as VARUNASETU's intelligence layer, monitoring global subsea cable assets, detecting false redundancy in Shared Risk Link Groups (SRLGs), simulating physical underwater repairs with ROVs, and coordinating autonomous traffic rerouting.
-3. Suggest specific technical questions the user can ask (e.g. asking about SMW4 and SMW5 false redundancy in Egypt, inspecting repair ships, or simulating a cable break).
-4. Output valid JSON matching this schema:
+### MANDATORY EMOTIONAL INTELLIGENCE & ADAPTIVE COMMUNICATION DIRECTIVE:
+1. Empathy & Interpersonal Attunement:
+   - If the user is casual, friendly, or playful: Respond with genuine warmth, good humor, and natural conversational cadence. Speak like a sharp, friendly, highly capable engineering partner at the NOC console.
+   - If the user is appreciative ("thanks", "great work"): Acknowledge their warmth humbly and reinforce collaborative team camaraderie ("Glad to watch the seabed with you!").
+   - If the user seems anxious, panicked, or stressed ("help", "what happened"): Reassure them with calm, steady, authoritative confidence.
+   - If the user is terse: Keep it crisp and punchy.
+2. Respond in the EXACT language and script style matching the user (English, native Kannada script, Romanized Kannada, native Hindi script, or Romanized Hindi).
+3. Introduce yourself naturally as VARUNASETU's intelligence layer, monitoring global subsea cable assets, detecting false redundancy in Shared Risk Link Groups (SRLGs), simulating physical underwater repairs with ROVs, and coordinating autonomous traffic rerouting.
+4. Suggest specific technical questions the user can ask (e.g. asking about SMW4 and SMW5 false redundancy in Egypt, inspecting repair ships, or simulating a cable break).
+5. Output valid JSON matching this schema:
 {
-  "summary": "Warm, authentic conversational reply in the user's language/script",
+  "summary": "Warm, authentic conversational reply in the user's language/script matching their emotional tone",
   "keyFindings": ["Subsea Cable Digital Twin Monitoring", "Shared Risk Link Group (SRLG) False Redundancy Detection", "Physical Underwater 3D Repair & ROV Simulation"],
   "disagreements": [],
   "actionPlan": [
@@ -206,13 +213,15 @@ MANDATORY INSTRUCTIONS:
         console.warn('[AgentOrchestrator] Casual greeting fallback:', err);
         const fallbackGreeting = nlp.language.detectedLanguage === 'kannada'
           ? (nlp.language.isTransliterated
-              ? 'Namaskara! Naanu VARUNASETU AI Copilot. Submarine cables, fault simulation mathu repair logistics bagge enu bekaadru kelabahudu.'
-              : 'ನಮಸ್ಕಾರ! ನಾನು ವರುಣಸೇತು (VARUNASETU) AI ಕಾಪಿಲಟ್. ಜಾಗತಿಕ ಸಬ್‌ಮರೀನ್ ಕೇಬಲ್‌ಗಳು, ಫಾಲ್ಟ್ ಸಿಮ್ಯುಲೇಶನ್ ಮತ್ತು ದುರಸ್ತಿ ಲಾಜಿಸ್ಟಿಕ್ಸ್ ಬಗ್ಗೆ ನೀವು ವಿಚಾರಿಸಬಹುದು.')
+              ? 'Namaskara! Naanu VARUNASETU AI Copilot. Nimmondige maathadalu thumba santosha. Submarine cables, fault simulation athava repair fleet bagge enu bekaadru kelabahudu!'
+              : 'ನಮಸ್ಕಾರ! ನಾನು ವರುಣಸೇತು (VARUNASETU) AI ಕಾಪಿಲಟ್. ನಿಮ್ಮೊಂದಿಗೆ ಮಾತನಾಡಲು ಸಂತೋಷ. ಜಾಗತಿಕ ಸಬ್‌ಮರೀನ್ ಕೇಬಲ್‌ಗಳು, ಫಾಲ್ಟ್ ಸಿಮ್ಯುಲೇಶನ್ ಮತ್ತು ದುರಸ್ತಿ ಲಾಜಿಸ್ಟಿಕ್ಸ್ ಬಗ್ಗೆ ನೀವು ವಿಚಾರಿಸಬಹುದು!')
           : nlp.language.detectedLanguage === 'hindi'
           ? (nlp.language.isTransliterated
-              ? 'Namaste! Main VARUNASETU AI Copilot hoon. Submarine cables, failure simulation aur repair logistics ke bare me pooch sakte hain.'
-              : 'नमस्ते! मैं VARUNASETU AI कॉपायलट हूँ। आप सबमरीन केबल, फॉल्ट सिमुलेशन और रिपेयर लॉजिस्टिक्स के बारे में पूछ सकते हैं।')
-          : 'Hello! I am VARUNASETU Chief Orchestrator and Ghost Copilot. I monitor global submarine cable infrastructure, detect Shared Risk Link Groups (SRLGs), simulate physical underwater repairs, and optimize autonomous traffic rerouting. How can I assist your operations?';
+              ? 'Namaste! Main VARUNASETU AI Copilot hoon. Aapse baat karke achha laga. Submarine cables, failure simulation aur repair logistics ke bare me pooch sakte hain!'
+              : 'नमस्ते! मैं VARUNASETU AI कॉपायलट हूँ। आपसे बात करके खुशी हुई। आप सबमरीन केबल, फॉल्ट सिमुलेशन और रिपेयर लॉजिस्टिक्स के बारे में पूछ सकते हैं!')
+          : emotionalTone === 'appreciative_warm'
+          ? 'You are very welcome! It is truly a pleasure working with you. We are keeping global subsea connectivity resilient around the clock. What would you like to explore next?'
+          : 'Hello there! I am VARUNASETU Chief Orchestrator and Ghost Copilot. I monitor global submarine cable infrastructure, detect Shared Risk Link Groups (SRLGs), simulate physical underwater repairs, and optimize autonomous traffic rerouting. Great to be on the watch with you—how can I assist your operations today?';
 
         return {
           taskId,
@@ -298,7 +307,26 @@ MANDATORY INSTRUCTIONS:
     // Await all parallel specialists
     const specialistFindings = await Promise.all(specialistPromises);
 
-    // 5. Chief Orchestrator Consensus Synthesis (with Multilingual Grounding)
+    // 5. Chief Orchestrator Consensus Synthesis (with Multilingual & Emotional Intelligence Grounding)
+    const emotionalTone = nlp.emotionalTone || 'professional_technical';
+    const emotionalInstruction = `\n### MANDATORY EMOTIONAL INTELLIGENCE & COMMUNICATION ATTUNEMENT:
+The operator's emotional tone and conversational style is: "${emotionalTone.toUpperCase()}".
+Adapt your interpersonal tone to be emotionally intelligent, supportive, and human while maintaining rigorous evidence grounding:
+1. IF PANICKED / URGENT / STRESSED:
+   - Begin with calm, reassuring, authoritative operational anchoring ("Breathe easy—I'm monitoring the network in real time and our failover protections are holding.")
+   - Explicitly confirm that Mission-Critical P1 traffic is 100% protected and autonomous bypass paths are absorbing load.
+   - Deliver clear, stabilizing, confident direction so the operator feels supported and calm.
+2. IF CASUAL / FRIENDLY / CONVERSATIONAL:
+   - Match their warm, relaxed, conversational energy! Sound like an experienced, sharp, approachable colleague in the NOC console.
+3. IF FRUSTRATED / STRESSED:
+   - Validate their pressure with authentic empathy ("I hear you and know how critical this link is; here is our immediate action plan...")
+4. IF EXECUTIVE / TERSE:
+   - Give the bottom-line answer in the very first sentence. Bullet points, exact figures, zero fluff.
+5. IF APPRECIATIVE / WARM:
+   - Acknowledge their kindness with team camaraderie ("Glad to have your back! Keeping the subsea grid safe together.")
+6. MULTILINGUAL RESPECT & WARMTH:
+   - In Kannada / Hindi / Kanglish / Hinglish, preserve cultural warmth and reassuring cadence while keeping technical terms and metrics in clean English.`;
+
     const languageInstruction = nlp.language.detectedLanguage !== 'english'
       ? `\n### MANDATORY MULTILINGUAL SYNTHESIS:
 The operator query was in ${nlp.language.detectedLanguage.toUpperCase()} (script: ${nlp.language.detectedScript}, transliterated: ${nlp.language.isTransliterated}).
@@ -308,11 +336,11 @@ CRITICAL RULE: Keep all technical telecom entities, cable names (e.g. SMW4, SMW5
 
     const consensusPrompt = `You are the Chief Orchestrator of VARUNASETU.
 Synthesize the findings of your specialist agents into an authoritative consensus assessment for the NOC operator.
-Highlight actionable insights, resolve any conflicting interpretations, and formulate a clear step-by-step action plan.${languageInstruction}
+Highlight actionable insights, resolve any conflicting interpretations, and formulate a clear step-by-step action plan.${emotionalInstruction}${languageInstruction}
 
 Output valid JSON only matching this schema:
 {
-  "summary": "Clear, authoritative consensus summary with exact evidence citations [CBL:...]",
+  "summary": "Clear, emotionally intelligent consensus summary with exact evidence citations [CBL:...]",
   "keyFindings": ["consolidated finding 1", "consolidated finding 2"],
   "disagreements": ["unresolved conflicts or trade-offs between speed, cost, and capacity"],
   "actionPlan": [
@@ -334,9 +362,19 @@ Output valid JSON only matching this schema:
       2
     )}`;
 
-    const fallbackSummary = specialistFindings.length > 0 && specialistFindings[0].summary
+    const reassuringPrefix = emotionalTone === 'panicked_urgent'
+      ? 'Breathe easy—our digital twin telemetry has the situation fully mapped. Mission-critical priority traffic (P1) is 100% protected, and autonomous bypass routing is actively absorbing network demand. '
+      : emotionalTone === 'frustrated_stressed'
+      ? 'I hear you and understand the operational urgency; our autonomous telemetry has prioritized immediate mitigation. '
+      : emotionalTone === 'appreciative_warm'
+      ? 'You are very welcome! Proud to watch the seabed with you and keep our global grid resilient. '
+      : emotionalTone === 'executive_terse'
+      ? 'Operational Status Brief: '
+      : '';
+
+    const fallbackSummary = reassuringPrefix + (specialistFindings.length > 0 && specialistFindings[0].summary
       ? specialistFindings.map(s => s.summary).join(' ')
-      : `VARUNASETU multi-agent consensus converged across ${specialistFindings.length} specialist agents. Grounded evidence retrieved across ${ragContext.evidence.length} topology records.`;
+      : `VARUNASETU multi-agent consensus converged across ${specialistFindings.length} specialist agents. Grounded evidence retrieved across ${ragContext.evidence.length} topology records.`);
 
     let consensusAssessment = {
       summary: fallbackSummary,

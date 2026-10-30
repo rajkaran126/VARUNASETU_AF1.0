@@ -35,6 +35,15 @@ export type CanonicalIntent =
   | 'GENERAL_EXPLANATION'
   | 'CASUAL_CONVERSATION';
 
+export type EmotionalTone =
+  | 'panicked_urgent'
+  | 'frustrated_stressed'
+  | 'casual_friendly'
+  | 'appreciative_warm'
+  | 'executive_terse'
+  | 'curious_exploratory'
+  | 'professional_technical';
+
 export interface ResolvedEntity {
   type: 'cable' | 'landing_station' | 'region' | 'vessel' | 'srlg_chokepoint' | 'metric';
   rawMention: string;
@@ -57,6 +66,8 @@ export interface NLPAnalysisResult {
   confidence: number;
   entities: ResolvedEntity[];
   language: LanguageMetadata;
+  emotionalTone: EmotionalTone;
+  toneConfidence: number;
   requiresSpecialists: ('orchestrator' | 'network' | 'risk' | 'logistics' | 'policy')[];
   suggestedAction?: {
     actionType: 'SIMULATE' | 'REROUTE' | 'DISPATCH' | 'ANALYZE_SRLG' | 'GENERATE_REPORT' | 'NAVIGATE';
@@ -131,6 +142,70 @@ export class NLPEngine {
       isTransliterated: false,
       confidence: 0.95,
     };
+  }
+
+  /**
+   * Emotional Intelligence & Communication Tone Attunement
+   */
+  public detectEmotionalTone(text: string): { emotionalTone: EmotionalTone; toneConfidence: number } {
+    const lower = text.toLowerCase().trim();
+    const words = lower.split(/\s+/).filter(Boolean);
+
+    // 1. Appreciative / Warm (Check first so "thanks for the help!" isn't marked as panic)
+    const appreciationTriggers = [
+      'thanks', 'thank you', 'awesome', 'great work', 'nice job', 'appreciate',
+      'good job', 'dhanyavaada', 'shukriya', 'shabaash', 'superb', 'love it',
+      'brilliant', 'wonderful', 'kudos', 'well done', 'thank u', 'much obliged'
+    ];
+    if (appreciationTriggers.some(t => new RegExp(`\\b${t}\\b`, 'i').test(lower))) {
+      return { emotionalTone: 'appreciative_warm', toneConfidence: 0.96 };
+    }
+
+    // 2. Frustrated / Stressed
+    const frustrationTriggers = [
+      'annoying', 'why is this', 'stuck', 'failed again', 'terrible', 'ugh', 'hate',
+      'irritated', 'again', 'not working', 'useless', 'slow', 'headache', 'fed up', 'stress'
+    ];
+    if (frustrationTriggers.some(t => lower.includes(t))) {
+      return { emotionalTone: 'frustrated_stressed', toneConfidence: 0.92 };
+    }
+
+    // 3. Panicked / Urgent
+    const panicTriggers = [
+      'emergency', 'critical', 'broken', 'help me', 'please help', 'omg', 'panicking', 'shut down',
+      'collapse', 'asap', 'hurry', 'alert', 'crisis', 'disaster', 'failing',
+      'saving', 'terrified', 'kya hoga', 'chinthe', 'bhaya', 'what happened', 'cable break'
+    ];
+    const hasExclamations = (text.match(/!{2,}/g) || []).length > 0;
+    const hasAllCaps = text.length > 5 && text === text.toUpperCase() && /[A-Z]/.test(text);
+    const panicHits = panicTriggers.filter(t => new RegExp(`\\b${t}\\b`, 'i').test(lower)).length;
+
+    if (hasExclamations || hasAllCaps || panicHits >= 2 || (panicHits >= 1 && (lower.includes('!') || lower.includes('please') || lower.includes('now') || lower.includes('quick')))) {
+      return { emotionalTone: 'panicked_urgent', toneConfidence: 0.95 };
+    }
+
+    // 4. Casual / Friendly
+    const casualTriggers = [
+      'hey', 'hi', 'hello', 'sup', 'buddy', 'dude', 'bro', 'how are you', 'whats up',
+      'good morning', 'good afternoon', 'cool', 'haha', 'cheers', 'namaskara', 'namaste',
+      'hegiddira', 'kaise ho', 'yo'
+    ];
+    if (casualTriggers.some(t => new RegExp(`^${t}\\b|\\b${t}\\b`, 'i').test(lower))) {
+      return { emotionalTone: 'casual_friendly', toneConfidence: 0.9 };
+    }
+
+    // 5. Executive / Terse (rapid-fire, concise query under 5 words)
+    if (words.length <= 5 && (lower.endsWith('?') || lower.startsWith('status') || lower.startsWith('loss') || lower.startsWith('eta') || lower.startsWith('capacity'))) {
+      return { emotionalTone: 'executive_terse', toneConfidence: 0.88 };
+    }
+
+    // 6. Curious / Exploratory
+    const curiousTriggers = ['explain', 'why', 'how does', 'tell me about', 'what is the difference', 'can you show me', 'history', 'walk me through'];
+    if (curiousTriggers.some(t => lower.includes(t))) {
+      return { emotionalTone: 'curious_exploratory', toneConfidence: 0.89 };
+    }
+
+    return { emotionalTone: 'professional_technical', toneConfidence: 0.85 };
   }
 
   /**
@@ -225,6 +300,7 @@ export class NLPEngine {
     history: ConversationTurn[] = []
   ): Promise<NLPAnalysisResult> {
     const language = this.detectLanguageAndScript(query);
+    const { emotionalTone, toneConfidence } = this.detectEmotionalTone(query);
     const localEntities = this.resolveEntitiesLocally(query);
 
     // Multi-turn context resolution: if user says "it", "these two cables", use previous entities
@@ -251,6 +327,8 @@ export class NLPEngine {
         confidence: 0.99,
         entities: mergedEntities,
         language,
+        emotionalTone,
+        toneConfidence,
         requiresSpecialists: ['orchestrator'],
       };
     }
@@ -312,6 +390,8 @@ Directly resolved entities: ${JSON.stringify(localEntities.map(e => `${e.type}:$
         confidence: parsed.confidence || 0.9,
         entities: mergedEntities,
         language,
+        emotionalTone,
+        toneConfidence,
         requiresSpecialists: Array.isArray(parsed.requiresSpecialists)
           ? parsed.requiresSpecialists
           : ['orchestrator', 'network'],
@@ -320,15 +400,18 @@ Directly resolved entities: ${JSON.stringify(localEntities.map(e => `${e.type}:$
       };
     } catch (err) {
       console.warn('[NLPEngine] LLM classification fallback to rule-based parser:', err);
-      return this.ruleBasedFallback(query, mergedEntities, language);
+      return this.ruleBasedFallback(query, mergedEntities, language, emotionalTone, toneConfidence);
     }
   }
 
   private ruleBasedFallback(
     query: string,
     entities: ResolvedEntity[],
-    language: LanguageMetadata
+    language: LanguageMetadata,
+    emotionalTone?: EmotionalTone,
+    toneConfidence?: number
   ): NLPAnalysisResult {
+    const toneInfo = emotionalTone ? { emotionalTone, toneConfidence: toneConfidence ?? 0.85 } : this.detectEmotionalTone(query);
     const lower = query.toLowerCase();
     let intent: CanonicalIntent = 'GENERAL_EXPLANATION';
     const specialists: ('orchestrator' | 'network' | 'risk' | 'logistics' | 'policy')[] = ['orchestrator'];
@@ -356,6 +439,8 @@ Directly resolved entities: ${JSON.stringify(localEntities.map(e => `${e.type}:$
       confidence: 0.85,
       entities,
       language,
+      emotionalTone: toneInfo.emotionalTone,
+      toneConfidence: toneInfo.toneConfidence,
       requiresSpecialists: specialists,
     };
   }
