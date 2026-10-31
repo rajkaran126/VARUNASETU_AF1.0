@@ -88,7 +88,7 @@ export function GhostModeOverlay({
                   : 'text-[#454640] hover:bg-[#D4C4A8]'
               }`}
             >
-              {tab === 'theatre' ? 'Theatre' : tab === 'operations' ? 'Operations' : tab === 'analysis' ? 'Analysis' : 'Ghost Copilot'}
+              {tab === 'theatre' ? 'Theatre' : tab === 'operations' ? 'Operations' : tab === 'analysis' ? 'Analysis' : 'LLUVIA Copilot'}
             </button>
           ))}
         </div>
@@ -181,7 +181,7 @@ export function GhostModeOverlay({
               <div className="flex items-center justify-between pb-2 border-b border-[#D4C4A8]">
                 <div className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-[#83B9A9] animate-ping" />
-                  <span className="font-sans font-bold text-sm font-bold text-[#454640]">Ghost Copilot Intelligence</span>
+                  <span className="font-sans font-bold text-sm font-bold text-[#454640]">LLUVIA Copilot Intelligence</span>
                 </div>
                 <span className="text-[#83B9A9] text-[10px] font-bold">DETERMINISTIC BUS</span>
               </div>

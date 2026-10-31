@@ -250,7 +250,7 @@ export default function HeroSection() {
                     <div>
                       <h4 className="font-display text-xs font-bold text-white">5-Agent Collaborative AI</h4>
                       <p className="font-body text-[11px] text-white/60 leading-normal mt-0.5">
-                        Network Analyst, Risk & Scenario, Logistics Fleet, and Policy Agents governed by Chief Orchestrator & Ghost Copilot.
+                        Network Analyst, Risk & Scenario, Logistics Fleet, and Policy Agents governed by Chief Orchestrator & LLUVIA.
                       </p>
                     </div>
                   </div>

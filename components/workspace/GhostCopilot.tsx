@@ -41,7 +41,7 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
     {
       id: 'copilot-init',
       role: 'copilot',
-      content: `👋 **Ghost Copilot Online.** I am synchronized with the active digital twin.\n\nCurrently monitoring **${selectedCable.name}** at fault location **${activeFault.nearestLandingStation}** (Depth: ${activeFault.depthMeters}m).\n\nAsk me in English, ಕನ್ನಡ, or हिंदी about corridor vulnerability, false redundancy, reroute capacity, or repair vessel logistics.`,
+      content: `👋 **LLUVIA Online.** I am your AI copilot and friend, synchronized with the active digital twin.\n\nCurrently monitoring **${selectedCable.name}** at fault location **${activeFault.nearestLandingStation}** (Depth: ${activeFault.depthMeters}m).\n\nAsk me in English, ಕನ್ನಡ, or हिंदी about corridor vulnerability, false redundancy, reroute capacity, or chat freely with me!`,
       timestamp: new Date().toLocaleTimeString(),
     },
   ]);
@@ -200,13 +200,13 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
         <button
           onClick={() => setIsOpen(true)}
           className="fixed bottom-5 right-5 z-40 px-3.5 py-2.5 rounded-2xl bg-[#E06D3B] hover:bg-[#C85D2D] text-white shadow-xl flex items-center gap-2 font-grotesk text-xs font-bold transition-all active:scale-95 border border-orange-400/80 shadow-orange-500/20"
-          title="Open Ghost Copilot AI"
+          title="Open LLUVIA AI Copilot"
         >
           <div className="w-5 h-5 rounded-md bg-black/30 flex items-center justify-center p-0.5 overflow-hidden">
             <Image src="/icon.png" alt="VARUNASETU" width={18} height={18} className="object-contain" />
           </div>
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>Ghost Copilot</span>
+          <span>LLUVIA</span>
           <span className="font-mono text-[9px] bg-white/20 px-1.5 py-0.5 rounded text-white">AI</span>
         </button>
       )}
@@ -218,12 +218,12 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
           <div className="p-3 px-4 bg-[#F7F3EA] border-b-2 border-[#E06D3B]/30 flex items-center justify-between flex-shrink-0">
             <div className="flex items-center gap-2.5">
               <div className="w-7 h-7 rounded-lg bg-black/90 border border-orange-400/40 flex items-center justify-center p-0.5 shadow-xs overflow-hidden">
-                <Image src="/icon.png" alt="Ghost Copilot" width={22} height={22} className="object-contain" />
+                <Image src="/icon.png" alt="LLUVIA" width={22} height={22} className="object-contain" />
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
                   <h3 className="font-grotesk font-bold text-xs text-[#1C1917]">
-                    Ghost Copilot
+                    LLUVIA
                   </h3>
                   <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-emerald-100 text-emerald-800">
                     TWIN-AWARE
@@ -244,7 +244,7 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
               <button
                 onClick={() => setIsOpen(false)}
                 className="p-1 rounded-lg text-[#A69B89] hover:bg-[#EDF3F7] hover:text-[#454640] transition-colors"
-                title="Minimize Copilot"
+                title="Minimize LLUVIA"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <line x1="18" y1="6" x2="6" y2="18" />
@@ -271,9 +271,9 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
                   {msg.role === 'copilot' && (
                     <div className="flex items-center gap-1.5 mb-2 pb-1 border-b border-[#F0EBE0]">
                       <div className="w-4 h-4 rounded overflow-hidden bg-black/10 flex items-center justify-center p-0.5">
-                        <Image src="/icon.png" alt="Ghost Copilot" width={14} height={14} className="object-contain" />
+                        <Image src="/icon.png" alt="LLUVIA" width={14} height={14} className="object-contain" />
                       </div>
-                      <span className="font-grotesk text-[10px] font-bold text-[#E06D3B] tracking-wide">Ghost Copilot</span>
+                      <span className="font-grotesk text-[10px] font-bold text-[#E06D3B] tracking-wide">LLUVIA</span>
                     </div>
                   )}
                   {msg.langTag && (
@@ -326,7 +326,7 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
             {isLoading && (
               <div className="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-[#E8E1D5] text-xs text-[#59738A] w-fit">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#E06D3B] animate-ping" />
-                <span className="font-mono text-[10px]">Ghost Copilot synthesizing digital twin telemetry…</span>
+                <span className="font-mono text-[10px]">LLUVIA synthesizing digital twin telemetry…</span>
               </div>
             )}
             <div ref={scrollRef} />
@@ -378,7 +378,7 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
               type="text"
               value={input}
               onChange={e => setInput(e.target.value)}
-              placeholder="Ask Ghost Copilot about active digital twin..."
+              placeholder="Ask LLUVIA about active digital twin..."
               className="flex-1 px-3 py-1.5 rounded-xl bg-[#FAF7F2] border border-[#DDD3C3] text-xs text-[#1C1917] placeholder-[#A69B89] focus:outline-none focus:border-[#E06D3B]"
             />
             <button
