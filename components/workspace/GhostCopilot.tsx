@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import { useWorkspace } from '@/lib/workspace-context';
 
 export interface GhostCopilotProps {
@@ -75,7 +76,13 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          query: `[Context: Active cable ${selectedCable.name}, Fault at ${activeFault.nearestLandingStation} (-${activeFault.depthMeters}m), Reroute bypass ${isRerouteActive ? 'ACTIVE' : 'INACTIVE'}]: ${userText}`,
+          query: userText,
+          digitalTwinContext: {
+            cableName: selectedCable?.name,
+            faultLocation: activeFault?.nearestLandingStation,
+            depthMeters: activeFault?.depthMeters,
+            isRerouteActive,
+          },
           activeSimulation: simulationResult,
         }),
       });
@@ -83,8 +90,10 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
       if (!res.ok) throw new Error('Inference error');
       const data = await res.json();
 
-      let replyContent = data.report?.consensusAssessment?.summary || 'Analysis complete based on active digital twin context.';
-      const citations = data.report?.consensusAssessment?.keyFindings || [];
+      let replyContent = data.report?.consensusAssessment?.summary || 'Connected with active digital twin telemetry.';
+      const isCasual = data.report?.nlpAnalysis?.primaryIntent === 'CASUAL_CONVERSATION';
+      const rawCitations = data.report?.consensusAssessment?.keyFindings || [];
+      const citations = isCasual ? [] : rawCitations;
 
       // Extract detected language
       const langMeta = data.report?.nlpAnalysis?.language;
@@ -193,7 +202,10 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
           className="fixed bottom-5 right-5 z-40 px-3.5 py-2.5 rounded-2xl bg-[#E06D3B] hover:bg-[#C85D2D] text-white shadow-xl flex items-center gap-2 font-grotesk text-xs font-bold transition-all active:scale-95 border border-orange-400/80 shadow-orange-500/20"
           title="Open Ghost Copilot AI"
         >
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+          <div className="w-5 h-5 rounded-md bg-black/30 flex items-center justify-center p-0.5 overflow-hidden">
+            <Image src="/icon.png" alt="VARUNASETU" width={18} height={18} className="object-contain" />
+          </div>
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
           <span>Ghost Copilot</span>
           <span className="font-mono text-[9px] bg-white/20 px-1.5 py-0.5 rounded text-white">AI</span>
         </button>
@@ -205,8 +217,8 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
           {/* Header */}
           <div className="p-3 px-4 bg-[#F7F3EA] border-b-2 border-[#E06D3B]/30 flex items-center justify-between flex-shrink-0">
             <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-[#E06D3B] flex items-center justify-center text-white text-xs font-mono font-bold shadow-xs">
-                GC
+              <div className="w-7 h-7 rounded-lg bg-black/90 border border-orange-400/40 flex items-center justify-center p-0.5 shadow-xs overflow-hidden">
+                <Image src="/icon.png" alt="Ghost Copilot" width={22} height={22} className="object-contain" />
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
@@ -256,6 +268,14 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
                       : 'bg-white border border-[#E8E1D5] text-[#36506A] rounded-bl-none'
                   }`}
                 >
+                  {msg.role === 'copilot' && (
+                    <div className="flex items-center gap-1.5 mb-2 pb-1 border-b border-[#F0EBE0]">
+                      <div className="w-4 h-4 rounded overflow-hidden bg-black/10 flex items-center justify-center p-0.5">
+                        <Image src="/icon.png" alt="Ghost Copilot" width={14} height={14} className="object-contain" />
+                      </div>
+                      <span className="font-grotesk text-[10px] font-bold text-[#E06D3B] tracking-wide">Ghost Copilot</span>
+                    </div>
+                  )}
                   {msg.langTag && (
                     <div className="mb-1.5">
                       <span className="px-1.5 py-0.5 rounded text-[8.5px] font-mono font-bold bg-[#F4EFE6] text-[#786955] border border-[#E0D7C6]">

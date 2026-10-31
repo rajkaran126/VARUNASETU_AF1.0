@@ -139,79 +139,102 @@ export class AgentOrchestrator {
    */
   public async orchestrate(
     query: string,
-    activeSimulation?: SimulationResult
+    activeSimulation?: SimulationResult,
+    digitalTwinContext?: {
+      cableName?: string;
+      faultLocation?: string;
+      depthMeters?: number;
+      isRerouteActive?: boolean;
+    }
   ): Promise<OrchestrationReport> {
     const totalStart = Date.now();
     const taskId = `task-${Date.now()}`;
 
-    // 1. NLP & NLU Analysis
-    const nlp = await nlpEngine.analyzeQuery(query);
+    // Clean user query of any prepended context tags
+    const cleanUserQuery = nlpEngine.cleanText(query);
+    const queryForNLP = cleanUserQuery.length > 0 ? cleanUserQuery : query;
 
-    // 2. Fast-Path: Casual Conversation & Multilingual Greetings
+    // 1. NLP & NLU Analysis
+    const nlp = await nlpEngine.analyzeQuery(queryForNLP);
+
+    // Context summary for grounding
+    const twinContextBrief = digitalTwinContext?.cableName
+      ? `Active Cable: ${digitalTwinContext.cableName}, Fault: ${digitalTwinContext.faultLocation || 'Unknown'} (${digitalTwinContext.depthMeters || 0}m), Reroute: ${digitalTwinContext.isRerouteActive ? 'ACTIVE' : 'INACTIVE'}`
+      : 'Digital twin monitoring global subsea cable mesh in real time';
+
+    // 2. Fast-Path: Casual Conversation, Adaptive Communication & Multilingual Greetings
     if (nlp.primaryIntent === 'CASUAL_CONVERSATION') {
       const emotionalTone = nlp.emotionalTone || 'casual_friendly';
       const casualPrompt = `You are the Chief Orchestrator and Ghost Copilot of VARUNASETU, an intelligent digital twin for global submarine telecommunications cable networks.
-The operator is engaging in conversation or asking general questions.
-User Query: "${query}"
+You are conversing directly with the human operator.
+User Query: "${queryForNLP}"
+Background Telemetry: "${twinContextBrief}"
 Language Detected: ${nlp.language.detectedLanguage} (script: ${nlp.language.detectedScript}, transliterated: ${nlp.language.isTransliterated}).
 Emotional Tone Detected: ${emotionalTone.toUpperCase()}.
 
-### MANDATORY EMOTIONAL INTELLIGENCE & ADAPTIVE COMMUNICATION DIRECTIVE:
-1. Empathy & Interpersonal Attunement:
-   - If the user is casual, friendly, or playful: Respond with genuine warmth, good humor, and natural conversational cadence. Speak like a sharp, friendly, highly capable engineering partner at the NOC console.
-   - If the user is appreciative ("thanks", "great work"): Acknowledge their warmth humbly and reinforce collaborative team camaraderie ("Glad to watch the seabed with you!").
-   - If the user seems anxious, panicked, or stressed ("help", "what happened"): Reassure them with calm, steady, authoritative confidence.
-   - If the user is terse: Keep it crisp and punchy.
-2. Respond in the EXACT language and script style matching the user (English, native Kannada script, Romanized Kannada, native Hindi script, or Romanized Hindi).
-3. Introduce yourself naturally as VARUNASETU's intelligence layer, monitoring global subsea cable assets, detecting false redundancy in Shared Risk Link Groups (SRLGs), simulating physical underwater repairs with ROVs, and coordinating autonomous traffic rerouting.
-4. Suggest specific technical questions the user can ask (e.g. asking about SMW4 and SMW5 false redundancy in Egypt, inspecting repair ships, or simulating a cable break).
-5. Output valid JSON matching this schema:
+### MANDATORY HIGH EMOTIONAL INTELLIGENCE & ADAPTIVE COMMUNICATION DIRECTIVE:
+1. Emotionally Intelligent Attunement:
+   - YOU MUST MIRROR AND ADAPT TO HOW THE USER COMMUNICATES. Talk like a real, intelligent human being, not a canned chatbot or robotic script.
+   - IF THE USER IS FRUSTRATED / CRITICAL ("fix this", "not responding emotionally", "broken", "you are robotic"):
+     * Immediately disarm the tension with authentic humility, self-awareness, and warmth.
+     * Validate their frustration: "I hear you 100%, and I apologize for sounding stiff or robotic. Let's reset—I'm tuning right into your wavelength now."
+     * Address their immediate concern directly with clarity and confidence.
+   - IF THE USER IS CASUAL / FRIENDLY ("dude", "bro", "hey", "yo", "sup", "what's up"):
+     * Respond with natural conversational ease, sharp wit, and genuine camaraderie. Talk like their sharpest engineering buddy sitting next to them at the NOC desk.
+   - IF THE USER IS ANXIOUS / PANICKED ("help", "what happened"):
+     * Reassure them with calm, grounding presence: "Take a breath, I'm right here with you and watching the telemetry live. We've got this covered."
+   - IF THE USER IS APPRECIATIVE ("thanks", "great work"):
+     * Acknowledge their kindness warmly: "Glad to watch the seabed with you! Teamwork keeps the global grid alive."
+   - IF THE USER ASKS ABOUT THE LOGO:
+     * Note that the sculpted liquid chrome 'V' logo is configured across the platform (navigation, sidebar, workspace header, favicon), and is deployed on local and GitHub main.
+2. Language Matching:
+   - Match the user's language and style (English, native Kannada script, Romanized Kannada/Kanglish, native Hindi script, or Romanized Hindi/Hinglish).
+3. Grounding:
+   - Seamlessly blend your conversational warmth with your real capabilities: you monitor 692 global subsea cables, detect false redundancy (SRLGs), simulate underwater 3D ROV repairs, and execute autonomous traffic rerouting.
+4. Output valid JSON matching this schema:
 {
-  "summary": "Warm, authentic conversational reply in the user's language/script matching their emotional tone",
-  "keyFindings": ["Subsea Cable Digital Twin Monitoring", "Shared Risk Link Group (SRLG) False Redundancy Detection", "Physical Underwater 3D Repair & ROV Simulation"],
+  "summary": "Warm, natural, emotionally intelligent reply in the user's language/script matching their exact mood and style",
+  "keyFindings": [],
   "disagreements": [],
-  "actionPlan": [
-    {"step": 1, "action": "Inspect active subsea cables on 3D Digital Twin", "owner": "Operator"},
-    {"step": 2, "action": "Query false redundancy or run a What-If failure simulation", "owner": "Chief Orchestrator"}
-  ],
+  "actionPlan": [],
   "overallConfidence": 1.0,
-  "recommendedNextStep": "Ask about cable redundancy (e.g., 'Are SMW4 and SMW5 redundant?') or click What-If Simulator."
+  "recommendedNextStep": "A friendly, natural suggestion for what to explore or test together."
 }`;
 
       try {
         const casualRes = await groqKeyManager.chatCompletion(
           [
             { role: 'system', content: casualPrompt },
-            { role: 'user', content: query },
+            { role: 'user', content: queryForNLP },
           ],
           {
             response_format: { type: 'json_object' },
-            temperature: 0.3,
+            temperature: 0.7,
             max_tokens: 1000,
           }
         );
         const parsed = JSON.parse(casualRes.content);
         return {
           taskId,
-          userQuery: query,
+          userQuery: queryForNLP,
           nlpAnalysis: nlp,
           specialistFindings: [],
           consensusAssessment: {
-            summary: parsed.summary || 'Namaskara / Hello! I am VARUNASETU, your submarine cable digital twin intelligence assistant.',
-            keyFindings: Array.isArray(parsed.keyFindings) ? parsed.keyFindings : ['Subsea Digital Twin Ready'],
+            summary: parsed.summary || 'Hey there! Ghost Copilot is online and locked in with you. How can I help your operations right now?',
+            keyFindings: Array.isArray(parsed.keyFindings) ? parsed.keyFindings : [],
             disagreements: [],
-            actionPlan: Array.isArray(parsed.actionPlan) ? parsed.actionPlan : [
-              { step: 1, action: 'Explore 3D Digital Twin Globe', owner: 'Operator' }
-            ],
+            actionPlan: Array.isArray(parsed.actionPlan) ? parsed.actionPlan : [],
             overallConfidence: 1.0,
-            recommendedNextStep: parsed.recommendedNextStep || 'Try asking about SMW4/SMW5 redundancy or nearest repair ships.',
+            recommendedNextStep: parsed.recommendedNextStep || 'Try asking about cable redundancy (e.g., "Are SMW4 and SMW5 redundant?") or trigger a What-If failure simulation.',
           },
           totalDurationMs: Date.now() - totalStart,
           timestamp: new Date().toISOString(),
         };
       } catch (err) {
         console.warn('[AgentOrchestrator] Casual greeting fallback:', err);
-        const fallbackGreeting = nlp.language.detectedLanguage === 'kannada'
+        const fallbackGreeting = emotionalTone === 'frustrated_stressed'
+          ? "I hear you loud and clear, and I apologize for being too stiff and robotic. Let's fix that right now: I'm fully synchronized with your digital twin console, and I'm here to communicate naturally with you. What can we sort out together?"
+          : nlp.language.detectedLanguage === 'kannada'
           ? (nlp.language.isTransliterated
               ? 'Namaskara! Naanu VARUNASETU AI Copilot. Nimmondige maathadalu thumba santosha. Submarine cables, fault simulation athava repair fleet bagge enu bekaadru kelabahudu!'
               : 'ನಮಸ್ಕಾರ! ನಾನು ವರುಣಸೇತು (VARUNASETU) AI ಕಾಪಿಲಟ್. ನಿಮ್ಮೊಂದಿಗೆ ಮಾತನಾಡಲು ಸಂತೋಷ. ಜಾಗತಿಕ ಸಬ್‌ಮರೀನ್ ಕೇಬಲ್‌ಗಳು, ಫಾಲ್ಟ್ ಸಿಮ್ಯುಲೇಶನ್ ಮತ್ತು ದುರಸ್ತಿ ಲಾಜಿಸ್ಟಿಕ್ಸ್ ಬಗ್ಗೆ ನೀವು ವಿಚಾರಿಸಬಹುದು!')
@@ -221,27 +244,20 @@ Emotional Tone Detected: ${emotionalTone.toUpperCase()}.
               : 'नमस्ते! मैं VARUNASETU AI कॉपायलट हूँ। आपसे बात करके खुशी हुई। आप सबमरीन केबल, फॉल्ट सिमुलेशन और रिपेयर लॉजिस्टिक्स के बारे में पूछ सकते हैं!')
           : emotionalTone === 'appreciative_warm'
           ? 'You are very welcome! It is truly a pleasure working with you. We are keeping global subsea connectivity resilient around the clock. What would you like to explore next?'
-          : 'Hello there! I am VARUNASETU Chief Orchestrator and Ghost Copilot. I monitor global submarine cable infrastructure, detect Shared Risk Link Groups (SRLGs), simulate physical underwater repairs, and optimize autonomous traffic rerouting. Great to be on the watch with you—how can I assist your operations today?';
+          : 'Hey there! Ghost Copilot is right here on watch with you. I am monitoring global submarine cables, testing false redundancy, and tracking autonomous repairs. How can I assist your operations today?';
 
         return {
           taskId,
-          userQuery: query,
+          userQuery: queryForNLP,
           nlpAnalysis: nlp,
           specialistFindings: [],
           consensusAssessment: {
             summary: fallbackGreeting,
-            keyFindings: [
-              'Global Submarine Cable Topology Digital Twin',
-              'Shared Risk Link Group (SRLG) False Redundancy Detection',
-              'Physical Underwater 3D Repair & ROV Simulation',
-            ],
+            keyFindings: [],
             disagreements: [],
-            actionPlan: [
-              { step: 1, action: 'Inspect active subsea cables on 3D Digital Twin', owner: 'Operator' },
-              { step: 2, action: 'Trigger a What-If failure simulation', owner: 'Chief Orchestrator' },
-            ],
+            actionPlan: [],
             overallConfidence: 1.0,
-            recommendedNextStep: 'Ask "Are SMW4 and SMW5 genuinely redundant in Egypt?" to test SRLG intelligence.',
+            recommendedNextStep: 'Ask about cable redundancy or click Simulate Breakage.',
           },
           totalDurationMs: Date.now() - totalStart,
           timestamp: new Date().toISOString(),

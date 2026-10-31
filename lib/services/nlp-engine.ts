@@ -145,9 +145,17 @@ export class NLPEngine {
   }
 
   /**
+   * Helper to strip technical context prefixes e.g. "[Context: Active cable ...]: user message"
+   */
+  public cleanText(text: string): string {
+    return text.replace(/^\[Context:[^\]]*\]:\s*/i, '').trim();
+  }
+
+  /**
    * Emotional Intelligence & Communication Tone Attunement
    */
-  public detectEmotionalTone(text: string): { emotionalTone: EmotionalTone; toneConfidence: number } {
+  public detectEmotionalTone(rawText: string): { emotionalTone: EmotionalTone; toneConfidence: number } {
+    const text = this.cleanText(rawText);
     const lower = text.toLowerCase().trim();
     const words = lower.split(/\s+/).filter(Boolean);
 
@@ -155,24 +163,28 @@ export class NLPEngine {
     const appreciationTriggers = [
       'thanks', 'thank you', 'awesome', 'great work', 'nice job', 'appreciate',
       'good job', 'dhanyavaada', 'shukriya', 'shabaash', 'superb', 'love it',
-      'brilliant', 'wonderful', 'kudos', 'well done', 'thank u', 'much obliged'
+      'brilliant', 'wonderful', 'kudos', 'well done', 'thank u', 'much obliged',
+      'legend', 'goat', 'sweet', 'clutch', 'impressive', 'good bot', 'best ai'
     ];
     if (appreciationTriggers.some(t => new RegExp(`\\b${t}\\b`, 'i').test(lower))) {
       return { emotionalTone: 'appreciative_warm', toneConfidence: 0.96 };
     }
 
-    // 2. Frustrated / Stressed
+    // 2. Frustrated / Stressed / Demanding Improvement
     const frustrationTriggers = [
-      'annoying', 'why is this', 'stuck', 'failed again', 'terrible', 'ugh', 'hate',
-      'irritated', 'again', 'not working', 'useless', 'slow', 'headache', 'fed up', 'stress'
+      'not responding', 'fix this', 'broken', 'wrong', 'annoying', 'why is this', 'stuck',
+      'failed again', 'terrible', 'ugh', 'hate', 'irritated', 'again', 'not working',
+      'useless', 'slow', 'headache', 'fed up', 'stress', 'emotional', 'emotionally',
+      'be human', 'reply like', 'robot', 'robotic', 'stiff', 'dry', 'answer properly',
+      'listen to me', 'cmon', 'come on', 'why wont you', 'doesnt work', "doesn't work"
     ];
     if (frustrationTriggers.some(t => lower.includes(t))) {
-      return { emotionalTone: 'frustrated_stressed', toneConfidence: 0.92 };
+      return { emotionalTone: 'frustrated_stressed', toneConfidence: 0.95 };
     }
 
     // 3. Panicked / Urgent
     const panicTriggers = [
-      'emergency', 'critical', 'broken', 'help me', 'please help', 'omg', 'panicking', 'shut down',
+      'emergency', 'critical', 'broken cable', 'help me', 'please help', 'omg', 'panicking', 'shut down',
       'collapse', 'asap', 'hurry', 'alert', 'crisis', 'disaster', 'failing',
       'saving', 'terrified', 'kya hoga', 'chinthe', 'bhaya', 'what happened', 'cable break'
     ];
@@ -186,12 +198,13 @@ export class NLPEngine {
 
     // 4. Casual / Friendly
     const casualTriggers = [
-      'hey', 'hi', 'hello', 'sup', 'buddy', 'dude', 'bro', 'how are you', 'whats up',
-      'good morning', 'good afternoon', 'cool', 'haha', 'cheers', 'namaskara', 'namaste',
-      'hegiddira', 'kaise ho', 'yo'
+      'hey', 'hi', 'hello', 'sup', 'buddy', 'dude', 'bro', 'man', 'pal', 'mate', 'yo',
+      'how are you', 'whats up', 'whatsup', 'wassup', 'how is it going', 'how are things',
+      'good morning', 'good afternoon', 'cool', 'haha', 'lol', 'cheers', 'namaskara', 'namaste',
+      'hegiddira', 'kaise ho', 'bol bhai', 'kya haal', 'sun yaar', 'talk to me', 'who are you', 'tell me'
     ];
-    if (casualTriggers.some(t => new RegExp(`^${t}\\b|\\b${t}\\b`, 'i').test(lower))) {
-      return { emotionalTone: 'casual_friendly', toneConfidence: 0.9 };
+    if (casualTriggers.some(t => new RegExp(`(^|\\b)${t}(\\b|$)`, 'i').test(lower))) {
+      return { emotionalTone: 'casual_friendly', toneConfidence: 0.92 };
     }
 
     // 5. Executive / Terse (rapid-fire, concise query under 5 words)
@@ -299,9 +312,11 @@ export class NLPEngine {
     query: string,
     history: ConversationTurn[] = []
   ): Promise<NLPAnalysisResult> {
-    const language = this.detectLanguageAndScript(query);
-    const { emotionalTone, toneConfidence } = this.detectEmotionalTone(query);
-    const localEntities = this.resolveEntitiesLocally(query);
+    const cleanUserQuery = this.cleanText(query);
+    const textToAnalyze = cleanUserQuery.length > 0 ? cleanUserQuery : query;
+    const language = this.detectLanguageAndScript(textToAnalyze);
+    const { emotionalTone, toneConfidence } = this.detectEmotionalTone(textToAnalyze);
+    const localEntities = this.resolveEntitiesLocally(textToAnalyze);
 
     // Multi-turn context resolution: if user says "it", "these two cables", use previous entities
     const contextEntities: ResolvedEntity[] = [];
@@ -316,11 +331,22 @@ export class NLPEngine {
 
     const mergedEntities = [...localEntities, ...contextEntities];
 
-    // Check for casual greetings first
-    const lower = query.toLowerCase().trim();
-    const casualGreetings = ['hi', 'hello', 'hey', 'namaste', 'namaskara', 'namaskaram', 'greetings', 'who are you', 'how are you', 'devaru olleyadu maduthare', 'bhagwan achha karenge'];
-    const isGreeting = casualGreetings.some(g => lower === g || new RegExp(`^${g}[,!?\\s]`, 'i').test(lower) || lower.includes('who are you') || lower.includes('what is varunasetu'));
-    if (isGreeting) {
+    // Check for conversational / emotional attunement queries
+    const lower = textToAnalyze.toLowerCase().trim();
+    const words = lower.split(/\s+/).filter(Boolean);
+
+    const conversationalPatterns = [
+      /^(hi|hello|hey|yo|sup|namaste|namaskara|namaskaram|greetings|hola)\b/i,
+      /^(how are you|how r u|how is it going|how are things|whats up|what's up|wassup|how do you do)/i,
+      /^(who are you|what is varunasetu|what can you do|introduce yourself|tell me about yourself)/i,
+      /^(dude|bro|man|buddy|mate)\b/i,
+      /(respond emotionally|be emotional|talk like a human|be human|talk to me|fix this|not working|not responding|be friendly|reply like)/i,
+      /(devaru olleyadu|bhagwan achha|kaise ho|hegiddira|kya haal)/i,
+    ];
+    const isConversational = conversationalPatterns.some(p => p.test(lower)) ||
+      (words.length <= 4 && (lower === 'hi' || lower === 'hello' || lower === 'hey' || lower === 'yo' || lower === 'dude' || lower === 'bro' || lower === 'help'));
+
+    if (isConversational) {
       return {
         query,
         primaryIntent: 'CASUAL_CONVERSATION',

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useWorkspace } from '@/lib/workspace-context';
 import { FaultNotificationTray } from './FaultNotificationTray';
@@ -58,16 +59,19 @@ export function Header() {
       <header className="h-14 flex-shrink-0 bg-[#F7F3EA] border-b border-[#D4C4A8] px-4 sm:px-6 flex items-center justify-between gap-4 relative z-20 shadow-2xs">
         {/* Left: Brand / System Status Indicator */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#C87954] animate-pulse" />
+          <Link href="/" className="flex items-center gap-2 group" title="Return to Home">
+            <div className="w-7 h-7 rounded-lg bg-[#EAE2D5] border border-[#D4C4A8] flex items-center justify-center p-0.5 shadow-2xs group-hover:scale-105 transition-transform overflow-hidden">
+              <Image src="/icon.png" alt="VARUNASETU" width={22} height={22} className="object-contain" />
+            </div>
             <span className="font-grotesk text-xs font-bold tracking-wider text-[#454640]">
               VARUNASETU
             </span>
-            <span className="text-[#CBDDEB] text-xs hidden sm:inline">/</span>
-            <span className="font-mono text-[11px] text-[#A69B89] tracking-wide hidden sm:inline">
-              Submarine Cable Resilience Twin
-            </span>
-          </div>
+          </Link>
+          <span className="w-2 h-2 rounded-full bg-[#C87954] animate-pulse" />
+          <span className="text-[#CBDDEB] text-xs hidden sm:inline">/</span>
+          <span className="font-mono text-[11px] text-[#A69B89] tracking-wide hidden sm:inline">
+            Submarine Cable Resilience Twin
+          </span>
         </div>
 
         {/* Right: What-If Trigger, Notification Bell, Current Date/Time, User Profile */}

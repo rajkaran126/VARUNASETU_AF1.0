@@ -15,13 +15,13 @@ export const runtime = 'nodejs';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { query, activeSimulation } = body;
+    const { query, activeSimulation, digitalTwinContext } = body;
 
     if (!query || typeof query !== 'string' || !query.trim()) {
       return NextResponse.json({ error: 'Query text is required.' }, { status: 400 });
     }
 
-    const report = await agentOrchestrator.orchestrate(query, activeSimulation);
+    const report = await agentOrchestrator.orchestrate(query, activeSimulation, digitalTwinContext);
     const messages = agentOrchestrator.toAgentMessages(report);
 
     return NextResponse.json({
