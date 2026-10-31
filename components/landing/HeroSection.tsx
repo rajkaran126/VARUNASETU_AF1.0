@@ -1,12 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import FloatingIntelPanel from "./FloatingIntelPanel";
 
 export default function HeroSection() {
   const [visible, setVisible] = useState(false);
   const [demoModalOpen, setDemoModalOpen] = useState(false);
+  const [videoSpeed, setVideoSpeed] = useState<number>(1);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const handleSpeedChange = (spd: number) => {
+    setVideoSpeed(spd);
+    if (videoRef.current) {
+      videoRef.current.playbackRate = spd;
+    }
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => setVisible(true), 100);
@@ -188,19 +197,53 @@ export default function HeroSection() {
             </button>
 
             {/* Left Side: Video Player */}
-            <div className="lg:w-[58%] bg-black flex flex-col justify-center items-center relative overflow-hidden min-h-[260px] sm:min-h-[360px] lg:min-h-[460px]">
-              <video
-                src="/video/demo.mp4"
-                controls
-                autoPlay
-                playsInline
-                className="w-full h-full object-contain max-h-[500px]"
-              />
-              <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/70 border border-white/20 backdrop-blur-md flex items-center gap-1.5 pointer-events-none">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="font-mono text-[10px] text-white/90 uppercase tracking-widest font-semibold">
-                  VARUNASETU System Walkthrough
-                </span>
+            <div className="lg:w-[58%] bg-black flex flex-col justify-between items-center relative overflow-hidden min-h-[260px] sm:min-h-[360px] lg:min-h-[460px]">
+              <div className="relative w-full flex-1 flex items-center justify-center bg-black min-h-[220px]">
+                <video
+                  ref={videoRef}
+                  src="/video/demo.mp4"
+                  controls
+                  autoPlay
+                  playsInline
+                  onPlay={() => {
+                    if (videoRef.current) {
+                      videoRef.current.playbackRate = videoSpeed;
+                    }
+                  }}
+                  className="w-full h-full object-contain max-h-[450px]"
+                />
+                <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/70 border border-white/20 backdrop-blur-md flex items-center gap-1.5 pointer-events-none">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="font-mono text-[10px] text-white/90 uppercase tracking-widest font-semibold">
+                    VARUNASETU System Walkthrough
+                  </span>
+                </div>
+              </div>
+
+              {/* Video Playback Speed Selector (0.5x, 1x, 1.5x, 2x) */}
+              <div className="w-full bg-black/90 px-4 py-2 border-t border-white/10 flex items-center justify-between z-10">
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#E06D3B]" />
+                  <span className="font-mono text-[10px] sm:text-[11px] text-white/70 uppercase tracking-wider font-semibold">
+                    Playback Rate
+                  </span>
+                </div>
+                <div className="flex items-center gap-1 sm:gap-1.5">
+                  {[0.5, 1, 1.5, 2].map((spd) => (
+                    <button
+                      key={spd}
+                      type="button"
+                      onClick={() => handleSpeedChange(spd)}
+                      className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg font-mono text-[10px] sm:text-[11px] font-bold transition-all ${
+                        videoSpeed === spd
+                          ? 'bg-[#E06D3B] text-white shadow-md ring-1 ring-[#E06D3B]/70 scale-105'
+                          : 'text-white/70 hover:text-white bg-white/[0.06] hover:bg-white/15'
+                      }`}
+                    >
+                      {spd}x
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 

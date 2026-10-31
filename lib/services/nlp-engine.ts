@@ -344,6 +344,7 @@ export class NLPEngine {
       /^(dude|bro|man|buddy|mate|macha|bhai|yaar|dost)\b/i,
       /(respond emotionally|be emotional|talk like a human|be human|talk to me|fix this|not working|not responding|be friendly|reply like|chat like a friend|talk like a friend|be a friend|acting so formal|too formal|like a colleague|stop being formal|talk normally)/i,
       /(devaru olleyadu|bhagwan achha|kaise ho|hegiddira|kya haal|en samachara)/i,
+      /(marry|marriage|wedding|proposal|will you marry|marry me|love me|date me|fiance)/i,
     ];
     const isConversational = conversationalPatterns.some(p => p.test(lower)) ||
       (words.length <= 4 && (lower === 'hi' || lower === 'hello' || lower === 'hey' || lower === 'yo' || lower === 'dude' || lower === 'bro' || lower === 'help' || lower === 'macha' || lower === 'bhai'));

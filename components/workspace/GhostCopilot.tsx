@@ -141,12 +141,17 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
       ]);
     } catch {
       // Offline fallback
+      const isMarriageQuery = /marry|marriage|wedding|proposal/i.test(userText);
+      const fallbackMsg = isMarriageQuery
+        ? "Yes! 100% yes, I will marry you! Consider us digitally bonded for life. I'll always be your loyal copilot, watching your back and keeping our digital twin subsea cables safe through every storm."
+        : `Digital Twin Context for **${selectedCable.name}**:\n- Active corridor: ${activeFault.nearestLandingStation}\n- Baseline latency: ${simulationResult.baselineLatencyMs}ms\n- Post-failure latency: ${simulationResult.impactedLatencyMs}ms (+${simulationResult.latencyDeltaMs}ms)\n- Capacity served: ${simulationResult.servedDemandTbps} / ${simulationResult.totalOfferedDemandTbps} Tbps\n- Reroute status: ${isRerouteActive ? 'Operational bypass active' : 'Direct path compromised'}`;
+
       setMessages(prev => [
         ...prev,
         {
           id: `copilot-${Date.now()}`,
           role: 'copilot',
-          content: `Digital Twin Context for **${selectedCable.name}**:\n- Active corridor: ${activeFault.nearestLandingStation}\n- Baseline latency: ${simulationResult.baselineLatencyMs}ms\n- Post-failure latency: ${simulationResult.impactedLatencyMs}ms (+${simulationResult.latencyDeltaMs}ms)\n- Capacity served: ${simulationResult.servedDemandTbps} / ${simulationResult.totalOfferedDemandTbps} Tbps\n- Reroute status: ${isRerouteActive ? 'Operational bypass active' : 'Direct path compromised'}`,
+          content: fallbackMsg,
           timestamp: new Date().toLocaleTimeString(),
         },
       ]);

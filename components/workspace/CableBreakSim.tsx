@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useWorkspace } from '@/lib/workspace-context';
 import type * as THREE from 'three';
@@ -17,17 +17,25 @@ import type * as THREE from 'three';
    ========================================================= */
 
 const PHASE_TIMES = {
-  BREAK: 8,
-  AI_DETECT: 14,
-  ALT_ROUTE: 22,
-  SHIP_ARRIVE: 30,
-  ROV_DEPLOY: 38,
-  ROV_REPAIR: 48,
-  RESTORED: 62,
+  BREAK: 4,
+  AI_DETECT: 8,
+  ALT_ROUTE: 13,
+  SHIP_ARRIVE: 19,
+  ROV_DEPLOY: 25,
+  ROV_REPAIR: 31,
+  RESTORED: 39,
 } as const;
 
 export default function CableBreakSim() {
   const mountRef = useRef<HTMLDivElement>(null);
+  const simSpeedRef = useRef<number>(1.5);
+  const [simSpeed, setSimSpeed] = useState<number>(1.5);
+
+  const handleSimSpeed = (spd: number) => {
+    simSpeedRef.current = spd;
+    setSimSpeed(spd);
+  };
+
   const { activeFault, selectedCable } = useWorkspace();
   const faultName = activeFault?.cableName || selectedCable?.name || 'SEA-ME-WE 4';
   const faultStation = activeFault?.nearestLandingStation || 'Zafarana / Suez Transit Corridor';
@@ -570,6 +578,7 @@ export default function CableBreakSim() {
       }
 
       function addAILine(text: string, cls: string, delayMs: number) {
+        const scaledDelay = Math.round(delayMs / simSpeedRef.current);
         setTimeout(() => {
           if (!h.aiLog.current) return;
           const d = document.createElement('div');
@@ -580,7 +589,7 @@ export default function CableBreakSim() {
           h.aiLog.current.appendChild(d);
           h.aiLog.current.scrollTop = 9999;
           setTimeout(() => { d.style.opacity = '1'; }, 30);
-        }, delayMs);
+        }, scaledDelay);
       }
 
       function setPhaseText(txt: string) {
@@ -618,20 +627,20 @@ export default function CableBreakSim() {
         setPhaseText('◈ PHASE 3: AI FAULT DETECTION SYSTEM ACTIVATED');
         if (h.aiPanel.current) h.aiPanel.current.style.opacity = '1';
         if (h.scanLine.current) h.scanLine.current.style.display = 'block';
-        if (h.alertBox.current) setTimeout(() => { if (h.alertBox.current) h.alertBox.current.style.opacity = '0'; }, 3200);
+        if (h.alertBox.current) setTimeout(() => { if (h.alertBox.current) h.alertBox.current.style.opacity = '0'; }, Math.round(2000 / simSpeedRef.current));
 
         addAILine('INITIATING FAULT DETECTION PROTOCOL...', 'info', 0);
-        addAILine('Scanning optical fiber telemetry (OTDR)...', 'info', 900);
-        addAILine('Pulse transmitted across all 8 fibers.', 'info', 1800);
-        addAILine('FAULT CONFIRMED: Complete signal loss.', 'crit', 2700);
-        addAILine('Triangulating fault coordinates...', 'warn', 3600);
-        addAILine('FAULT LOCATION: 12.31°N, 43.49°E', 'ok', 5000);
-        addAILine('DEPTH ESTIMATE: 4,200 ± 80 m', 'info', 5700);
-        addAILine('Break length: ~3.2 km', 'info', 6400);
-        addAILine('Analyzing alternative cable routes...', 'info', 7200);
-        addAILine('SEA-ME-WE 5 — available (rerouting feasible)', 'ok', 8400);
-        addAILine('I-ME-WE — 60% capacity (secondary)', 'warn', 9100);
-        addAILine('AI FAULT DETECTION COMPLETE OK', 'ok', 9900);
+        addAILine('Scanning optical fiber telemetry (OTDR)...', 'info', 400);
+        addAILine('Pulse transmitted across all 8 fibers.', 'info', 800);
+        addAILine('FAULT CONFIRMED: Complete signal loss.', 'crit', 1200);
+        addAILine('Triangulating fault coordinates...', 'warn', 1600);
+        addAILine('FAULT LOCATION: 12.31°N, 43.49°E', 'ok', 2100);
+        addAILine('DEPTH ESTIMATE: 4,200 ± 80 m', 'info', 2500);
+        addAILine('Break length: ~3.2 km', 'info', 2900);
+        addAILine('Analyzing alternative cable routes...', 'info', 3300);
+        addAILine('SEA-ME-WE 5 — available (rerouting feasible)', 'ok', 3700);
+        addAILine('I-ME-WE — 60% capacity (secondary)', 'warn', 4100);
+        addAILine('AI FAULT DETECTION COMPLETE OK', 'ok', 4500);
       }
 
       function triggerAltRoute() {
@@ -650,18 +659,18 @@ export default function CableBreakSim() {
         dot(h.dstDot.current, '#E99A65'); if (h.dstLabel.current) h.dstLabel.current.textContent = 'DESTINATION: REROUTED';
         if (h.dstCardStat.current) { h.dstCardStat.current.textContent = 'ALT ROUTE ACTIVE'; h.dstCardStat.current.style.color = '#E99A65'; }
 
-        addAILine('--- REROUTING INITIATED ---', 'warn', 600);
-        addAILine('Traffic shifted to SEA-ME-WE 5.', 'info', 1500);
-        addAILine('Throughput: 2.1 Tbps (44% nominal).', 'warn', 2400);
-        addAILine('Connectivity RESTORED via alt route. OK', 'ok', 3300);
-        addAILine('Dispatching repair vessel VSS Varunasetu...', 'info', 4200);
+        addAILine('--- REROUTING INITIATED ---', 'warn', 300);
+        addAILine('Traffic shifted to SEA-ME-WE 5.', 'info', 800);
+        addAILine('Throughput: 2.1 Tbps (44% nominal).', 'warn', 1400);
+        addAILine('Connectivity RESTORED via alt route. OK', 'ok', 2000);
+        addAILine('Dispatching repair vessel VSS Varunasetu...', 'info', 2600);
       }
 
       function triggerShip() {
         phase = 4;
         setPhaseText('◈ PHASE 5: REPAIR VESSEL "VSS VARUNASETU" SAILING TO SITE');
-        addAILine('VSS Varunasetu dispatched. (ETA: 14h)', 'info', 400);
-        addAILine('[Simulation accelerated for demo]', 'info', 1200);
+        addAILine('VSS Varunasetu dispatched. (ETA: 14h)', 'info', 300);
+        addAILine('[Simulation accelerated for demo]', 'info', 800);
       }
 
       function triggerROVDeploy() {
@@ -674,9 +683,9 @@ export default function CableBreakSim() {
         bubMat.opacity = 0.65;
         if (h.rovPanel.current) h.rovPanel.current.style.opacity = '1';
         addAILine('--- VESSEL ON STATION AT FAULT SITE ---', 'ok', 0);
-        addAILine('VSS Varunasetu stationed directly above fault.', 'info', 500);
-        addAILine('ROV NEMO-7 released from vessel hull sliding down...', 'ok', 1000);
-        addAILine('Descending at 1.8 m/s towards seabed cable furrow...', 'info', 1800);
+        addAILine('VSS Varunasetu stationed directly above fault.', 'info', 400);
+        addAILine('ROV NEMO-7 released from vessel hull sliding down...', 'ok', 800);
+        addAILine('Descending at 1.8 m/s towards seabed cable furrow...', 'info', 1400);
       }
 
       function triggerROVRepair() {
@@ -686,12 +695,12 @@ export default function CableBreakSim() {
         if (h.rovTask.current) h.rovTask.current.textContent = 'SPLICE REPAIR';
         rovSpot.intensity = 3.5;
         addAILine('ROV reached seabed (4,200m).', 'ok', 0);
-        addAILine('Fault section located visually.', 'ok', 800);
-        addAILine('Mechanical splice repair initiated...', 'info', 1600);
-        addAILine('Fiber alignment: IN PROGRESS...', 'info', 3500);
-        addAILine('Pressure sleeve installed.', 'ok', 6000);
-        addAILine('Signal test: PASS on 8/8 fibers. OK', 'ok', 8000);
-        addAILine('Full capacity restoration imminent.', 'ok', 9500);
+        addAILine('Fault section located visually.', 'ok', 500);
+        addAILine('Mechanical splice repair initiated...', 'info', 1000);
+        addAILine('Fiber alignment: IN PROGRESS...', 'info', 2200);
+        addAILine('Pressure sleeve installed.', 'ok', 3600);
+        addAILine('Signal test: PASS on 8/8 fibers. OK', 'ok', 4800);
+        addAILine('Full capacity restoration imminent.', 'ok', 5600);
       }
 
       function triggerRestored() {
@@ -719,9 +728,9 @@ export default function CableBreakSim() {
         if (h.dstCardStat.current) { h.dstCardStat.current.textContent = 'RECEIVING'; h.dstCardStat.current.style.color = '#10B981'; }
         rovSpot.intensity = 0;
         addAILine('--- REPAIR COMPLETE OK ---', 'ok', 200);
-        addAILine('Cable restored to full capacity.', 'ok', 1000);
-        addAILine('All 8 fibers operational. OK', 'ok', 1800);
-        addAILine('ROV NEMO-7 ascending to surface.', 'info', 2600);
+        addAILine('Cable restored to full capacity.', 'ok', 700);
+        addAILine('All 8 fibers operational. OK', 'ok', 1200);
+        addAILine('ROV NEMO-7 ascending to surface.', 'info', 1800);
       }
 
       /* ─── MAIN ANIMATION LOOP ─── */
@@ -731,7 +740,7 @@ export default function CableBreakSim() {
       function loop() {
         if (disposed) return;
         animId = requestAnimationFrame(loop);
-        const dt = Math.min(clock.getDelta(), 0.05);
+        const dt = Math.min(clock.getDelta(), 0.05) * simSpeedRef.current;
         t += dt;
 
         // Clock for HUD
@@ -1345,32 +1354,72 @@ export default function CableBreakSim() {
         </span>
       </div>
 
-      {/* ── CONTROLS ── */}
-      <div className="absolute z-20 flex gap-2" style={{ bottom: 14, right: 16 }}>
-        {[
-          { label: '↺ RESTART', action: () => window.location.reload() },
-        ].map((btn, i) => (
-          <button
-            key={i}
-            onClick={btn.action}
+      {/* ── CONTROLS & SPEED SELECTOR ── */}
+      <div className="absolute z-20 flex items-center gap-2" style={{ bottom: 14, right: 16 }}>
+        {/* Speed Selector */}
+        <div
+          className="flex items-center gap-1 px-2.5 py-1 rounded-lg"
+          style={{
+            background: 'rgba(0, 0, 0, 0.75)',
+            border: '1px solid rgba(255, 255, 255, 0.16)',
+            backdropFilter: 'blur(8px)',
+          }}
+        >
+          <span
             style={{
-              background: 'rgba(255, 255, 255, 0.08)',
-              border: '1px solid rgba(255, 255, 255, 0.16)',
-              borderRadius: 8,
-              padding: '6px 14px',
-              color: '#FFFFFF',
-              fontWeight: 600,
-              fontSize: 10,
+              fontFamily: "'IBM Plex Mono', monospace",
+              fontSize: 9,
               letterSpacing: 1,
-              cursor: 'pointer',
-              transition: 'all .2s ease',
+              color: 'rgba(255, 255, 255, 0.5)',
+              marginRight: 4,
+              textTransform: 'uppercase',
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255, 255, 255, 0.18)')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)')}
           >
-            {btn.label}
-          </button>
-        ))}
+            Speed
+          </span>
+          {[1, 1.5, 2, 3].map((spd) => (
+            <button
+              key={spd}
+              type="button"
+              onClick={() => handleSimSpeed(spd)}
+              style={{
+                fontFamily: "'IBM Plex Mono', monospace",
+                fontSize: 10,
+                fontWeight: 700,
+                padding: '2px 8px',
+                borderRadius: 6,
+                cursor: 'pointer',
+                transition: 'all .2s ease',
+                background: simSpeed === spd ? '#E06D3B' : 'rgba(255, 255, 255, 0.08)',
+                color: simSpeed === spd ? '#FFFFFF' : 'rgba(255, 255, 255, 0.75)',
+                border: simSpeed === spd ? '1px solid #E06D3B' : '1px solid transparent',
+              }}
+            >
+              {spd}x
+            </button>
+          ))}
+        </div>
+
+        {/* Restart Button */}
+        <button
+          onClick={() => window.location.reload()}
+          style={{
+            background: 'rgba(255, 255, 255, 0.08)',
+            border: '1px solid rgba(255, 255, 255, 0.16)',
+            borderRadius: 8,
+            padding: '6px 14px',
+            color: '#FFFFFF',
+            fontWeight: 600,
+            fontSize: 10,
+            letterSpacing: 1,
+            cursor: 'pointer',
+            transition: 'all .2s ease',
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255, 255, 255, 0.18)')}
+          onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)')}
+        >
+          ↺ RESTART
+        </button>
       </div>
 
       {/* ── KEYFRAMES ── */}
