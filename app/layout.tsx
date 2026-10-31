@@ -5,6 +5,16 @@ export const metadata: Metadata = {
   title: "VARUNASETU — AI-Powered Submarine Cable Digital Twin",
   description:
     "An AI-powered digital twin for global submarine cable infrastructure intelligence, failure simulation, and intelligent network recovery planning.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/icon.png", type: "image/png" }
+    ],
+    apple: [
+      { url: "/icon.png" }
+    ],
+    shortcut: ["/favicon.ico"]
+  }
 };
 
 const HERO_VIDEO_URL =

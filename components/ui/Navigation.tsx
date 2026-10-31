@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Menu, X } from "lucide-react";
 
 const navLinks = [
@@ -32,25 +33,15 @@ export default function Navigation() {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/10 border border-white/20 transition-all duration-300 group-hover:border-white/50 group-hover:bg-white/20 backdrop-blur-md">
-              <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-                <path
-                  d="M2 10 Q5 5, 10 7.5 Q15 10, 18 5"
-                  stroke="#ffffff"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  fill="none"
-                />
-                <path
-                  d="M2 13 Q5 8, 10 10.5 Q15 13, 18 8"
-                  stroke="#ffffff"
-                  strokeWidth="1.2"
-                  strokeLinecap="round"
-                  fill="none"
-                  opacity="0.5"
-                />
-                <circle cx="10" cy="8.75" r="1.8" fill="#ffffff" />
-              </svg>
+            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-white/10 border border-white/20 transition-all duration-300 group-hover:border-white/50 group-hover:bg-white/20 backdrop-blur-md overflow-hidden p-1 shadow-sm">
+              <Image
+                src="/icon.png"
+                alt="VARUNASETU Logo"
+                width={28}
+                height={28}
+                className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110 drop-shadow-md"
+                priority
+              />
             </div>
             <span className="font-display font-bold text-white text-lg tracking-tight">
               VARUNASETU

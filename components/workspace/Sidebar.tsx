@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
 export interface NavItem {
@@ -147,12 +148,14 @@ export function Sidebar() {
       <div className="h-14 flex items-center justify-between px-3.5 border-b border-[#D4C4A8] bg-[#D4C4A8]">
         {!collapsed ? (
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-xl bg-[#F7F3EA] border border-[#D4C4A8] flex items-center justify-center text-[#C87954] shadow-xs transition-transform group-hover:scale-105">
-              <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-                <path d="M2 10 Q5 5, 10 7.5 Q15 10, 18 5" stroke="#C87954" strokeWidth="2" strokeLinecap="round" fill="none" />
-                <path d="M2 13 Q5 8, 10 10.5 Q15 13, 18 8" stroke="#C87954" strokeWidth="1.2" strokeLinecap="round" fill="none" opacity="0.6" />
-                <circle cx="10" cy="8.75" r="1.8" fill="#FFFFFF" />
-              </svg>
+            <div className="w-8 h-8 rounded-xl bg-[#F7F3EA] border border-[#D4C4A8] flex items-center justify-center p-0.5 shadow-xs transition-transform group-hover:scale-105 overflow-hidden">
+              <Image
+                src="/icon.png"
+                alt="VARUNASETU"
+                width={28}
+                height={28}
+                className="w-full h-full object-contain"
+              />
             </div>
             <div>
               <span className="font-grotesk font-bold text-xs tracking-wider text-[#454640]">VARUNASETU</span>
@@ -161,11 +164,14 @@ export function Sidebar() {
           </Link>
         ) : (
           <Link href="/" className="mx-auto" title="VARUNASETU Home">
-            <div className="w-8 h-8 rounded-xl bg-[#F7F3EA] border border-[#D4C4A8] flex items-center justify-center text-[#C87954] shadow-xs">
-              <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-                <path d="M2 10 Q5 5, 10 7.5 Q15 10, 18 5" stroke="#C87954" strokeWidth="2" strokeLinecap="round" fill="none" />
-                <circle cx="10" cy="8.75" r="1.8" fill="#FFFFFF" />
-              </svg>
+            <div className="w-8 h-8 rounded-xl bg-[#F7F3EA] border border-[#D4C4A8] flex items-center justify-center p-0.5 shadow-xs overflow-hidden">
+              <Image
+                src="/icon.png"
+                alt="VARUNASETU"
+                width={28}
+                height={28}
+                className="w-full h-full object-contain"
+              />
             </div>
           </Link>
         )}
