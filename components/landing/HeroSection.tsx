@@ -84,7 +84,7 @@ export default function HeroSection() {
               </p>
             </div>
 
-            {/* Action Buttons: Pure White Primary + Glass Outline Secondary */}
+            {/* Action Buttons: Pure White Primary + Glass Outline Demo Trigger */}
             <div
               className={`flex flex-col sm:flex-row gap-3 pt-1 transition-all duration-700 ${
                 visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
@@ -107,26 +107,19 @@ export default function HeroSection() {
                 </svg>
               </Link>
 
-              {/* Watch Demo Trigger Button */}
+              {/* Replaces Explore Platform with Platform Demo button */}
               <button
                 type="button"
                 onClick={() => setDemoModalOpen(true)}
-                className="btn-white-outline inline-flex items-center justify-center gap-2.5 px-6 py-3 rounded-full font-body text-xs tracking-wider uppercase font-semibold text-white hover:bg-white/10 transition-all group"
+                className="btn-white-outline inline-flex items-center justify-center gap-2.5 px-7 py-3 rounded-full font-body text-xs tracking-wider uppercase font-semibold text-white hover:bg-white/10 transition-all cursor-pointer"
               >
-                <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+                <div className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center">
+                  <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor">
                     <polygon points="5 3 19 12 5 21 5 3" />
                   </svg>
                 </div>
-                <span>Watch System Demo</span>
+                <span>Platform Demo</span>
               </button>
-
-              <a
-                href="#ghost-simulation"
-                className="inline-flex items-center justify-center gap-1.5 px-5 py-3 rounded-full font-body text-xs tracking-wider uppercase text-white/60 hover:text-white transition-colors"
-              >
-                <span>Explore Platform</span>
-              </a>
             </div>
 
             {/* Compact Technical Metrics Strip */}
