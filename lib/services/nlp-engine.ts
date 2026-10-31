@@ -196,15 +196,17 @@ export class NLPEngine {
       return { emotionalTone: 'panicked_urgent', toneConfidence: 0.95 };
     }
 
-    // 4. Casual / Friendly
+    // 4. Casual / Friendly / Bro / Friend
     const casualTriggers = [
       'hey', 'hi', 'hello', 'sup', 'buddy', 'dude', 'bro', 'man', 'pal', 'mate', 'yo',
+      'friend', 'like a friend', 'macha', 'bhai', 'yaar', 'dost', 'chill', 'homie',
       'how are you', 'whats up', 'whatsup', 'wassup', 'how is it going', 'how are things',
       'good morning', 'good afternoon', 'cool', 'haha', 'lol', 'cheers', 'namaskara', 'namaste',
-      'hegiddira', 'kaise ho', 'bol bhai', 'kya haal', 'sun yaar', 'talk to me', 'who are you', 'tell me'
+      'hegiddira', 'kaise ho', 'bol bhai', 'kya haal', 'sun yaar', 'talk to me', 'who are you', 'tell me',
+      'formal', 'colleague', 'too formal', 'stop being formal', 'talk normally', 'be real'
     ];
     if (casualTriggers.some(t => new RegExp(`(^|\\b)${t}(\\b|$)`, 'i').test(lower))) {
-      return { emotionalTone: 'casual_friendly', toneConfidence: 0.92 };
+      return { emotionalTone: 'casual_friendly', toneConfidence: 0.95 };
     }
 
     // 5. Executive / Terse (rapid-fire, concise query under 5 words)
@@ -339,12 +341,12 @@ export class NLPEngine {
       /^(hi|hello|hey|yo|sup|namaste|namaskara|namaskaram|greetings|hola)\b/i,
       /^(how are you|how r u|how is it going|how are things|whats up|what's up|wassup|how do you do)/i,
       /^(who are you|what is varunasetu|what can you do|introduce yourself|tell me about yourself)/i,
-      /^(dude|bro|man|buddy|mate)\b/i,
-      /(respond emotionally|be emotional|talk like a human|be human|talk to me|fix this|not working|not responding|be friendly|reply like)/i,
-      /(devaru olleyadu|bhagwan achha|kaise ho|hegiddira|kya haal)/i,
+      /^(dude|bro|man|buddy|mate|macha|bhai|yaar|dost)\b/i,
+      /(respond emotionally|be emotional|talk like a human|be human|talk to me|fix this|not working|not responding|be friendly|reply like|chat like a friend|talk like a friend|be a friend|acting so formal|too formal|like a colleague|stop being formal|talk normally)/i,
+      /(devaru olleyadu|bhagwan achha|kaise ho|hegiddira|kya haal|en samachara)/i,
     ];
     const isConversational = conversationalPatterns.some(p => p.test(lower)) ||
-      (words.length <= 4 && (lower === 'hi' || lower === 'hello' || lower === 'hey' || lower === 'yo' || lower === 'dude' || lower === 'bro' || lower === 'help'));
+      (words.length <= 4 && (lower === 'hi' || lower === 'hello' || lower === 'hey' || lower === 'yo' || lower === 'dude' || lower === 'bro' || lower === 'help' || lower === 'macha' || lower === 'bhai'));
 
     if (isConversational) {
       return {
