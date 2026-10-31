@@ -1,5 +1,21 @@
 [
   {
+    "alert_number": "WI-7740",
+    "cable_name": "SEA-ME-WE 4",
+    "alert_type": "Physical Anchor Drag",
+    "severity": "Critical",
+    "status": "Active",
+    "detected_at": "2026-10-30T23:24:37.740Z",
+    "resolved_at": "",
+    "rtt_baseline_ms": "42.0",
+    "rtt_current_ms": "188.5",
+    "affected_countries": "Global Transit Corridor",
+    "verdict": "Confirmed What-If Benthic Breakage",
+    "url": "",
+    "data_origin": "What-If Simulation Engine",
+    "record_completeness": "Complete"
+  },
+  {
     "alert_number": "WI-0840",
     "cable_name": "SEA-ME-WE 4",
     "alert_type": "Physical Anchor Drag",

@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: varunasetu-backend
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    healthCheckPath: /api/ai/status
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: GROQ_MODEL
+        value: qwen/qwen3.8-27b
+      - key: GROQ_API_KEY_1
+        sync: false
+      - key: GROQ_API_KEY_2
+        sync: false
+      - key: GROQ_API_KEY_3
+        sync: false
+      - key: GROQ_API_KEY_4
+        sync: false
+      - key: GROQ_API_KEY_5
+        sync: false
