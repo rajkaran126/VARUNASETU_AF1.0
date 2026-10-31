@@ -41,7 +41,7 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
     {
       id: 'copilot-init',
       role: 'copilot',
-      content: `👋 **LLUVIA Online.** I am your AI copilot and friend, synchronized with the active digital twin.\n\nCurrently monitoring **${selectedCable.name}** at fault location **${activeFault.nearestLandingStation}** (Depth: ${activeFault.depthMeters}m).\n\nAsk me in English, ಕನ್ನಡ, or हिंदी about corridor vulnerability, false redundancy, reroute capacity, or chat freely with me!`,
+      content: `**LLUVIA Online.** I am your AI copilot and friend, synchronized with the active digital twin.\n\nCurrently monitoring **${selectedCable.name}** at fault location **${activeFault.nearestLandingStation}** (Depth: ${activeFault.depthMeters}m).\n\nAsk me in English, ಕನ್ನಡ, or हिंदी about corridor vulnerability, false redundancy, reroute capacity, or chat freely with me!`,
       timestamp: new Date().toLocaleTimeString(),
     },
   ]);
@@ -115,7 +115,7 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
 
       if (lower.includes('approve') || lower.includes('fix') || lower.includes('remediate')) {
         action = {
-          label: '⚡ Confirm & Execute Remediation Fix',
+          label: 'Confirm & Execute Remediation Fix',
           actionType: 'approve_fix',
           status: 'pending',
         };
@@ -279,7 +279,7 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
                   {msg.langTag && (
                     <div className="mb-1.5">
                       <span className="px-1.5 py-0.5 rounded text-[8.5px] font-mono font-bold bg-[#F4EFE6] text-[#786955] border border-[#E0D7C6]">
-                        🌐 {msg.langTag}
+                        {msg.langTag}
                       </span>
                     </div>
                   )}
@@ -304,7 +304,7 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
                     <div className="mt-2.5 pt-2 border-t border-[#F0EBE0]">
                       {msg.action.status === 'executed' ? (
                         <span className="inline-flex items-center gap-1 font-mono text-[10px] text-emerald-700 bg-emerald-50 px-2 py-1 rounded">
-                          ✅ Action Executed Successfully
+                          Action Executed Successfully
                         </span>
                       ) : (
                         <button

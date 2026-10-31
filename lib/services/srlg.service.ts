@@ -315,7 +315,7 @@ export function detectHazardExposure(cables: CableRoute[]): SRLGGroup[] {
       datasetVersion: DEFAULT_OPTIONS.datasetVersion,
       createdAt: new Date().toISOString(),
       notes: [
-        `⚠ SYNTHETIC HAZARD DATA — Not for operational use.`,
+        ` SYNTHETIC HAZARD DATA — Not for operational use.`,
         `Hazard zone: ${hazard.name} (${hazard.type}, risk: ${hazard.riskLevel}).`,
         `Affected cables: ${affectedCables.map((c) => c.name).join('; ')}.`,
         hazard.notes,
@@ -440,7 +440,7 @@ export function assessFalseRedundancy(
     classification = 'Shared_Hazard_Exposure';
     confidence = 'Low';
     rationale = [
-      `⚠ Based on SYNTHETIC hazard data only.`,
+      ` Based on SYNTHETIC hazard data only.`,
       `${cableA.name} and ${cableB.name} may share exposure to hazard zones`,
       `but this is based on synthetic data, not real hazard assessment.`,
       `Cannot confirm shared physical risk without real seismic/maritime data.`,

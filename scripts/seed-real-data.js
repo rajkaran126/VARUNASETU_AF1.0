@@ -254,7 +254,7 @@ const output = `/**
  * Group A: TeleGeography-style cable map export (public-source-derived)
  * Group C: GeoCables observed incidents (100 real latency/alert events)
  *
- * ⚠ PROVENANCE NOTICE:
+ *  PROVENANCE NOTICE:
  *   - Cable routes are mapped centrelines, NOT precise seabed engineering coordinates.
  *   - Capacity data is largely UNMEASURED (not publicly disclosed by operators).
  *   - Landing point coordinates are landing-town level precision, not CLS-exact.
@@ -284,6 +284,6 @@ ${incidentLines.join(',\n')}
 `;
 
 fs.writeFileSync('lib/cable-data-real.ts', output);
-console.log(`\n✅ Done! Written lib/cable-data-real.ts`);
+console.log(`\n Done! Written lib/cable-data-real.ts`);
 console.log(`   ${seededCount} cables, ${landingPoints.length} landing points, ${Math.min(incidents.length,50)} incidents`);
 console.log('\nNext step: import REAL_CABLE_ROUTES into workspace-context.tsx and merge with VERIFIED_CABLE_ROUTES');

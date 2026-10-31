@@ -232,7 +232,7 @@ export default function NetworkOperationsPage() {
         <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#E8E1D5]">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-[#FCEFE7] border border-[#C87954]/40 flex items-center justify-center text-[#C87954]">
-              <span className="font-bold text-sm">⚡</span>
+              <span className="font-bold text-sm"></span>
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -287,7 +287,7 @@ export default function NetworkOperationsPage() {
                   type="button"
                   className="w-full mt-2 py-1 px-2 rounded-lg bg-[#C87954] hover:bg-[#B36845] text-white font-mono text-[10px] font-bold transition-colors flex items-center justify-center gap-1 shadow-xs"
                 >
-                  <span>⚡ Simulate Break</span>
+                  <span>Simulate Break</span>
                 </button>
               </div>
             ))}
@@ -369,7 +369,7 @@ export default function NetworkOperationsPage() {
                 type="submit"
                 className="w-full py-2 px-3 rounded-xl bg-[#C87954] hover:bg-[#B36845] text-white font-mono text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5 active:scale-95"
               >
-                <span>⚡ Broadcast Alert</span>
+                <span>Broadcast Alert</span>
               </button>
             </div>
           </div>

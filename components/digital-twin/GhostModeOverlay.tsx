@@ -193,7 +193,7 @@ export function GhostModeOverlay({
                   {currentStage.desc}. Vessel DP2 thrusters counteracting 2.4-knot Red Sea surface current.
                 </p>
                 <p className="text-[#687B59] font-semibold">
-                  {isSpliced ? '✓ Optical circuit closed. Latency restored to nominal baseline.' : '⚡ Optical loss active. Network graph routing over AAE-1 & 2Africa.'}
+                  {isSpliced ? 'OK Optical circuit closed. Latency restored to nominal baseline.' : 'Optical loss active. Network graph routing over AAE-1 & 2Africa.'}
                 </p>
               </div>
             </div>

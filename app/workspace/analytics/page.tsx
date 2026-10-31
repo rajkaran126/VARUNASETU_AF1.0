@@ -158,7 +158,7 @@ export default function AnalyticsReportsPage() {
               False Redundancy Classification Matrix
             </h2>
             <p className="text-[10px] text-[#59738A] font-mono mb-4">
-              ⚠ Route coordinates are approximate centrelines. Confidence annotated per assessment. Dataset: v1.0-phase4a-2026-10-30.
+               Route coordinates are approximate centrelines. Confidence annotated per assessment. Dataset: v1.0-phase4a-2026-10-30.
             </p>
             <div className="space-y-2">
               {[
@@ -217,7 +217,7 @@ export default function AnalyticsReportsPage() {
         <div className="space-y-4">
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
             <p className="text-xs font-mono text-amber-800">
-              ⚠ All SRLG detections are DERIVED from approximate cable route centrelines.
+               All SRLG detections are DERIVED from approximate cable route centrelines.
               Hazard exposure SRLGs use SYNTHETIC data only. Confidence is annotated per group.
               None of these outputs should be used as operational network documentation without independent verification.
             </p>
@@ -268,7 +268,7 @@ export default function AnalyticsReportsPage() {
             </h2>
             <div className="space-y-3">
               {[
-                { label: 'OBSERVED_SOURCE', count: manifestStats.observedCount, c: 'bg-emerald-500', note: '⚠ Pending licence verification for Groups A & C' },
+                { label: 'OBSERVED_SOURCE', count: manifestStats.observedCount, c: 'bg-emerald-500', note: ' Pending licence verification for Groups A & C' },
                 { label: 'DERIVED', count: manifestStats.derivedCount, c: 'bg-[#83B9A9]', note: 'Computed from observed sources. Preserve transformation logic.' },
                 { label: 'SYNTHETIC', count: manifestStats.syntheticCount, c: 'bg-purple-500', note: 'Must be labelled in all UI outputs. Not for operational use.' },
                 { label: 'ASSUMPTION', count: manifestStats.assumptionCount, c: 'bg-amber-500', note: 'Documented parameters. All outputs must be tagged ASSUMED.' },

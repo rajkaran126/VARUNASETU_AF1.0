@@ -61,7 +61,7 @@ function SRLGGroupCard({ group, onClick, selected }: { group: SRLGGroup; onClick
       </div>
       <p className="text-xs font-bold text-[#1C1917] leading-snug">{group.name}</p>
       {isSynthetic && (
-        <p className="text-[9px] text-purple-600 font-mono mt-0.5">⚠ SYNTHETIC DATA</p>
+        <p className="text-[9px] text-purple-600 font-mono mt-0.5"> SYNTHETIC DATA</p>
       )}
       <div className="flex flex-wrap gap-1 mt-2">
         {group.memberCableIds.map((id) => (
@@ -184,7 +184,7 @@ export default function SRLGPage() {
             Identifies dependencies where multiple cables or network components can fail from one common event. Combines geographic corridor proximity, shared landing stations, and hazard exposure analysis.
           </p>
           <p className="text-[10px] text-amber-700 mt-1 font-mono">
-            ⚠ Route coordinates are approximate centreline representations. Proximity does NOT confirm shared physical infrastructure. Hazard zones are SYNTHETIC. Confidence is annotated per group.
+             Route coordinates are approximate centreline representations. Proximity does NOT confirm shared physical infrastructure. Hazard zones are SYNTHETIC. Confidence is annotated per group.
           </p>
         </div>
 

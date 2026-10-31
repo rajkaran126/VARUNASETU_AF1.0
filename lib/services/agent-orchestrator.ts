@@ -473,7 +473,7 @@ Output valid JSON only matching this schema:
       agentRole: 'Chief Orchestrator',
       content: `${report.consensusAssessment.summary}\n\n**Action Plan:**\n${report.consensusAssessment.actionPlan
         .map(p => `${p.step}. **${p.action}** (*${p.owner}*)`)
-        .join('\n')}\n\n👉 **Recommended Next Step:** ${report.consensusAssessment.recommendedNextStep}`,
+        .join('\n')}\n\n**Recommended Next Step:** ${report.consensusAssessment.recommendedNextStep}`,
       timestamp: new Date().toISOString(),
       reasoningChain: [
         `Synthesized findings across ${report.specialistFindings.length} specialist agents.`,

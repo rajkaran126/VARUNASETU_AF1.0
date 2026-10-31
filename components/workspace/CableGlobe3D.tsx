@@ -594,7 +594,7 @@ export function CableGlobe3D({
             <span>Throughput: <strong className="text-[#454640]">{activeReroute.restoredCapacityTbps} Tbps</strong></span>
             <span>Latency Delta: <strong className="text-[#C87954]">+{activeReroute.latencyPenaltyMs} ms</strong></span>
             <span className={isSimulating ? 'text-[#C87954] font-semibold animate-pulse' : 'text-emerald-700 font-semibold'}>
-              {isSimulating ? '⚡ Convergence In-Flight' : '● Protection Live'}
+              {isSimulating ? 'Convergence In-Flight' : '● Protection Live'}
             </span>
           </div>
         </div>

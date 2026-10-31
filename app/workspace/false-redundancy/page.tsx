@@ -64,7 +64,7 @@ function ScenarioCard({
               <p className="font-sans font-bold text-xs text-[#1C1917]">{preset.title}</p>
               {isSynthetic && (
                 <span className="text-[9px] font-mono text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200">
-                  ⚠ SYNTHETIC DATA
+                   SYNTHETIC DATA
                 </span>
               )}
             </div>
@@ -172,7 +172,7 @@ function ComparisonPanel({ results }: { results: Map<string, CorrelatedFailureRe
               <th className="py-2.5 px-3 text-right">Utilisation %</th>
               <th className="py-2.5 px-3 text-right">Recovery (h)</th>
               <th className="py-2.5 px-3 text-right">Congested Routes</th>
-              <th className="py-2.5 px-3 text-center">Conservation ✓</th>
+              <th className="py-2.5 px-3 text-center">Conservation OK</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#F0EBE0]">
@@ -212,9 +212,9 @@ function ComparisonPanel({ results }: { results: Map<string, CorrelatedFailureRe
                   </td>
                   <td className="py-2.5 px-3 text-center">
                     {conserved ? (
-                      <span className="text-emerald-600">✓</span>
+                      <span className="text-emerald-600">OK</span>
                     ) : (
-                      <span className="text-rose-600" title={`Error: ${result.allocationResult.conservationError.toFixed(4)} Tbps`}>✗</span>
+                      <span className="text-rose-600" title={`Error: ${result.allocationResult.conservationError.toFixed(4)} Tbps`}>FAIL</span>
                     )}
                   </td>
                 </tr>
@@ -402,7 +402,7 @@ export default function FalseRedundancyLabPage() {
                 <div className={`mt-3 p-2 rounded-lg text-[10px] font-mono ${activeResult.allocationResult.conservationError <= 0.001 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}`}>
                   Conservation check: served ({activeResult.allocationResult.totalServedTbps.toFixed(3)}) + unserved ({activeResult.allocationResult.totalUnservedTbps.toFixed(3)}) = offered ({activeResult.allocationResult.totalOfferedTbps.toFixed(3)}) ·
                   Error: {activeResult.allocationResult.conservationError.toFixed(6)} Tbps ·
-                  {activeResult.allocationResult.conservationError <= 0.001 ? ' ✓ PASSES' : ' ✗ VIOLATION — check engine'}
+                  {activeResult.allocationResult.conservationError <= 0.001 ? ' OK PASSES' : ' FAIL VIOLATION — check engine'}
                 </div>
               </div>
 
@@ -495,7 +495,7 @@ export default function FalseRedundancyLabPage() {
                   <div className="flex items-center justify-between pb-3 border-b border-[#F0EBE0] mb-4">
                     <h3 className="font-sans font-bold text-sm text-[#1C1917]">Weather Windows</h3>
                     <span className="px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-purple-50 text-purple-700 border border-purple-200">
-                      ⚠ SYNTHETIC WEATHER — Not for operational use
+                       SYNTHETIC WEATHER — Not for operational use
                     </span>
                   </div>
                   <div className="flex gap-1 overflow-x-auto pb-2">
@@ -509,7 +509,7 @@ export default function FalseRedundancyLabPage() {
                         }`}
                       >
                         <div className={`text-xs font-mono font-bold ${w.operationally_feasible ? 'text-emerald-700' : 'text-rose-700'}`}>
-                          {w.operationally_feasible ? '✓' : '✗'}
+                          {w.operationally_feasible ? 'OK' : 'FAIL'}
                         </div>
                         <p className="text-[9px] font-mono text-[#59738A] mt-0.5">{w.startHour}h</p>
                         <p className="text-[9px] text-[#69829A]">{w.averageWaveHeightM.toFixed(1)}m</p>

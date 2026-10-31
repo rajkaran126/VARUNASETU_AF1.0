@@ -631,7 +631,7 @@ export default function CableBreakSim() {
         addAILine('Analyzing alternative cable routes...', 'info', 7200);
         addAILine('SEA-ME-WE 5 — available (rerouting feasible)', 'ok', 8400);
         addAILine('I-ME-WE — 60% capacity (secondary)', 'warn', 9100);
-        addAILine('AI FAULT DETECTION COMPLETE ✓', 'ok', 9900);
+        addAILine('AI FAULT DETECTION COMPLETE OK', 'ok', 9900);
       }
 
       function triggerAltRoute() {
@@ -653,7 +653,7 @@ export default function CableBreakSim() {
         addAILine('--- REROUTING INITIATED ---', 'warn', 600);
         addAILine('Traffic shifted to SEA-ME-WE 5.', 'info', 1500);
         addAILine('Throughput: 2.1 Tbps (44% nominal).', 'warn', 2400);
-        addAILine('Connectivity RESTORED via alt route. ✓', 'ok', 3300);
+        addAILine('Connectivity RESTORED via alt route. OK', 'ok', 3300);
         addAILine('Dispatching repair vessel VSS Varunasetu...', 'info', 4200);
       }
 
@@ -690,7 +690,7 @@ export default function CableBreakSim() {
         addAILine('Mechanical splice repair initiated...', 'info', 1600);
         addAILine('Fiber alignment: IN PROGRESS...', 'info', 3500);
         addAILine('Pressure sleeve installed.', 'ok', 6000);
-        addAILine('Signal test: PASS on 8/8 fibers. ✓', 'ok', 8000);
+        addAILine('Signal test: PASS on 8/8 fibers. OK', 'ok', 8000);
         addAILine('Full capacity restoration imminent.', 'ok', 9500);
       }
 
@@ -718,9 +718,9 @@ export default function CableBreakSim() {
         dot(h.dstDot.current, '#10B981'); if (h.dstLabel.current) h.dstLabel.current.textContent = 'DESTINATION: ONLINE';
         if (h.dstCardStat.current) { h.dstCardStat.current.textContent = 'RECEIVING'; h.dstCardStat.current.style.color = '#10B981'; }
         rovSpot.intensity = 0;
-        addAILine('--- REPAIR COMPLETE ✓ ---', 'ok', 200);
+        addAILine('--- REPAIR COMPLETE OK ---', 'ok', 200);
         addAILine('Cable restored to full capacity.', 'ok', 1000);
-        addAILine('All 8 fibers operational. ✓', 'ok', 1800);
+        addAILine('All 8 fibers operational. OK', 'ok', 1800);
         addAILine('ROV NEMO-7 ascending to surface.', 'info', 2600);
       }
 
@@ -1185,7 +1185,7 @@ export default function CableBreakSim() {
         }}
       >
         <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: 1.5, color: '#C87954' }}>
-          ⚠ CRITICAL ALERT: SUBMARINE CABLE FAILURE DETECTED
+           CRITICAL ALERT: SUBMARINE CABLE FAILURE DETECTED
         </div>
         <div style={{ fontSize: 11, color: '#FFFFFF', fontFamily: "'IBM Plex Mono', monospace", fontWeight: 600, letterSpacing: 1, marginTop: 8 }}>
           FAULT: {faultName.toUpperCase()} &nbsp;|&nbsp; {faultLoc} &nbsp;|&nbsp; DEPTH: {faultDepth}

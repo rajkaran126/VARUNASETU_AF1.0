@@ -226,7 +226,7 @@ export default function HeroSection() {
                 {/* Salient Features List */}
                 <div className="space-y-2.5 pt-1">
                   <div className="p-3 rounded-2xl bg-white/[0.04] border border-white/10 flex items-start gap-3">
-                    <span className="text-lg">🌐</span>
+                    <span className="text-lg"></span>
                     <div>
                       <h4 className="font-display text-xs font-bold text-white">692-Cable Digital Twin</h4>
                       <p className="font-body text-[11px] text-white/60 leading-normal mt-0.5">
@@ -236,7 +236,7 @@ export default function HeroSection() {
                   </div>
 
                   <div className="p-3 rounded-2xl bg-white/[0.04] border border-white/10 flex items-start gap-3">
-                    <span className="text-lg">⚡</span>
+                    <span className="text-lg"></span>
                     <div>
                       <h4 className="font-display text-xs font-bold text-white">False Redundancy (SRLG) Hunter</h4>
                       <p className="font-body text-[11px] text-white/60 leading-normal mt-0.5">
@@ -246,7 +246,7 @@ export default function HeroSection() {
                   </div>
 
                   <div className="p-3 rounded-2xl bg-white/[0.04] border border-white/10 flex items-start gap-3">
-                    <span className="text-lg">🤖</span>
+                    <span className="text-lg"></span>
                     <div>
                       <h4 className="font-display text-xs font-bold text-white">5-Agent Collaborative AI</h4>
                       <p className="font-body text-[11px] text-white/60 leading-normal mt-0.5">
@@ -256,7 +256,7 @@ export default function HeroSection() {
                   </div>
 
                   <div className="p-3 rounded-2xl bg-white/[0.04] border border-white/10 flex items-start gap-3">
-                    <span className="text-lg">🚢</span>
+                    <span className="text-lg"></span>
                     <div>
                       <h4 className="font-display text-xs font-bold text-white">Physics-Grounded 3D ROV Repair Sim</h4>
                       <p className="font-body text-[11px] text-white/60 leading-normal mt-0.5">

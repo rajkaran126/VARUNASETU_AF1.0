@@ -352,7 +352,7 @@ export function CableExplorerMap({
           <div className={`pointer-events-auto backdrop-blur-md px-3.5 py-1.5 rounded-xl flex items-center gap-2.5 text-xs shadow-md border ${isSimulating ? 'bg-amber-950/90 border-amber-500/50 text-amber-200 ring-2 ring-amber-500/20' : 'bg-emerald-950/90 border-emerald-500/40 text-emerald-200'}`}>
             <span className={`w-2.5 h-2.5 rounded-full ${isSimulating ? 'bg-amber-400 animate-ping' : 'bg-emerald-400 animate-pulse'}`} />
             <span className="font-mono text-[10px]">
-              {isSimulating ? '⚡ SIMULATING PATH RE-CONVERGENCE: ' : 'DETERMINED BYPASS: '}
+              {isSimulating ? 'SIMULATING PATH RE-CONVERGENCE: ' : 'DETERMINED BYPASS: '}
               <strong className="text-white">{activeReroute.bypassCorridorName}</strong>
               {isSimulating ? ' (Recalculating optical routes...)' : ` (${activeReroute.restoredCapacityPct}% Restored until Splice)`}
             </span>

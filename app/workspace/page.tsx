@@ -138,7 +138,7 @@ export default function NetworkOverviewPage() {
                 className="px-3 py-1.5 rounded-xl font-bold text-xs bg-[#E8D9BF] text-[#454640] border border-[#D4C4A8] hover:bg-[#D4C4A8] transition-all flex items-center gap-1.5 disabled:opacity-50"
                 title="Re-run deterministic optical convergence simulation"
               >
-                <span className="text-[12px]">⚡</span>
+                <span className="text-[12px]"></span>
                 <span>{isRerouteSimulating ? 'Simulating...' : 'Simulate Path'}</span>
               </button>
 

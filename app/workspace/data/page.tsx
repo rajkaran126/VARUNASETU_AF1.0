@@ -273,7 +273,7 @@ export default function RealTimeDataPage() {
               activeTab === tab ? 'bg-white text-[#C87954] shadow-xs' : 'text-[#69829A] hover:text-[#454640]'
             }`}
           >
-            {tab === 'inject' ? '⚡ Inject Data' :
+            {tab === 'inject' ? 'Inject Data' :
              tab === 'cables' ? `Cables (${cables.length})` :
              tab === 'incidents' ? `Incidents (${incidents.length})` :
              tab === 'vessels' ? `Vessels (${vessels.length})` :
@@ -315,7 +315,7 @@ export default function RealTimeDataPage() {
                 className="p-3 rounded-xl border border-rose-200 bg-rose-50/70 hover:bg-rose-100/80 text-left transition-all group"
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-bold text-xs text-rose-900">💥 Benthic Severance Incident</span>
+                  <span className="font-bold text-xs text-rose-900">Benthic Severance Incident</span>
                   <span className="font-mono text-[9px] bg-rose-200 text-rose-900 px-1.5 py-0.5 rounded">INCIDENT</span>
                 </div>
                 <p className="font-mono text-[10px] text-rose-700">
@@ -330,7 +330,7 @@ export default function RealTimeDataPage() {
                 className="p-3 rounded-xl border border-amber-200 bg-amber-50/70 hover:bg-amber-100/80 text-left transition-all group"
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-bold text-xs text-amber-900">⚡ Optical Telemetry Anomaly</span>
+                  <span className="font-bold text-xs text-amber-900">Optical Telemetry Anomaly</span>
                   <span className="font-mono text-[9px] bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded">TELEMETRY</span>
                 </div>
                 <p className="font-mono text-[10px] text-amber-700">
@@ -345,7 +345,7 @@ export default function RealTimeDataPage() {
                 className="p-3 rounded-xl border border-teal-200 bg-teal-50/70 hover:bg-teal-100/80 text-left transition-all group"
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-bold text-xs text-teal-900">🌊 Marine Weather Advisory</span>
+                  <span className="font-bold text-xs text-teal-900">Marine Weather Advisory</span>
                   <span className="font-mono text-[9px] bg-teal-200 text-teal-900 px-1.5 py-0.5 rounded">WEATHER</span>
                 </div>
                 <p className="font-mono text-[10px] text-teal-700">
@@ -360,7 +360,7 @@ export default function RealTimeDataPage() {
                 className="p-3 rounded-xl border border-purple-200 bg-purple-50/70 hover:bg-purple-100/80 text-left transition-all group"
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-bold text-xs text-purple-900">🚢 Vessel AIS Update</span>
+                  <span className="font-bold text-xs text-purple-900">Vessel AIS Update</span>
                   <span className="font-mono text-[9px] bg-purple-200 text-purple-900 px-1.5 py-0.5 rounded">FLEET</span>
                 </div>
                 <p className="font-mono text-[10px] text-purple-700">
@@ -440,7 +440,7 @@ export default function RealTimeDataPage() {
                     </>
                   ) : (
                     <>
-                      <span>🚀 Inject into Live Stream</span>
+                      <span>Inject into Live Stream</span>
                     </>
                   )}
                 </button>

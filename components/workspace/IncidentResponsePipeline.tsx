@@ -23,42 +23,42 @@ export function IncidentResponsePipeline() {
       name: 'Section 01 // Model 1 Red Dot',
       subtitle: 'Earth Globe Fault Pin',
       href: '/workspace',
-      icon: '📍',
+      icon: '',
     },
     {
       step: 2,
       name: 'Section 02 // 3D Underwater Sim',
       subtitle: 'Daylight Seabed & ROV Splice',
       href: '/workspace/digital-twin',
-      icon: '🌊',
+      icon: '',
     },
     {
       step: 3,
       name: 'Section 03 // Network Operations',
       subtitle: 'OTDR Loss & Optical Bypass',
       href: '/workspace/operations',
-      icon: '⚡',
+      icon: '',
     },
     {
       step: 4,
       name: 'Section 04 // Recovery War Room',
       subtitle: 'CS Sovereign Fleet Dispatch',
       href: '/workspace/war-room',
-      icon: '🚢',
+      icon: '',
     },
     {
       step: 5,
       name: 'Section 05 // False Redundancy',
       subtitle: 'SRLG Terrestrial Ducts',
       href: '/workspace/false-redundancy',
-      icon: '🛡️',
+      icon: '',
     },
     {
       step: 6,
       name: 'Section 06 // Multi-Agent AI',
       subtitle: 'Consensus & Copilot',
       href: '/workspace/mission-control',
-      icon: '🤖',
+      icon: '',
     },
   ];
 
@@ -105,12 +105,12 @@ export function IncidentResponsePipeline() {
               </span>
               {isRerouteActive && (
                 <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-700/80 text-emerald-100">
-                  ⚡ Autonomous Optical Bypass Active
+                  Autonomous Optical Bypass Active
                 </span>
               )}
             </div>
             <h2 className="font-sans font-bold text-base sm:text-lg text-white tracking-tight mt-0.5">
-              🔴 Incident: {activeFault?.cableName || selectedCable.name} — {activeFault?.nearestLandingStation || 'Zafarana / Suez Corridor'}
+              Incident: {activeFault?.cableName || selectedCable.name} — {activeFault?.nearestLandingStation || 'Zafarana / Suez Corridor'}
             </h2>
           </div>
         </div>
@@ -133,7 +133,7 @@ export function IncidentResponsePipeline() {
               className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-mono text-xs font-bold shadow-lg shadow-rose-900/50 transition-all flex items-center gap-2 active:scale-95 animate-pulse"
             >
               <span>Proceed to {nextStep.name}</span>
-              <span>➔</span>
+              <span>&rarr;</span>
             </button>
           ) : (
             <button
@@ -141,7 +141,7 @@ export function IncidentResponsePipeline() {
               className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-bold shadow-lg transition-all flex items-center gap-2"
             >
               <span>Return to Section 01 (Model 1)</span>
-              <span>🔄</span>
+              <span></span>
             </button>
           )}
 
@@ -150,7 +150,7 @@ export function IncidentResponsePipeline() {
             className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white/90 font-mono text-xs transition-colors"
             title="Generate What-If Breakage Scene"
           >
-            ⚡ What-If Scene
+            What-If Scene
           </button>
         </div>
       </div>
@@ -183,7 +183,7 @@ export function IncidentResponsePipeline() {
                     ? 'bg-emerald-500/80 text-white'
                     : 'bg-white/10 text-white/60'
                 }`}>
-                  {isCurrent ? 'ACTIVE' : isCompleted ? 'CONFIRMED ✓' : `PHASE ${st.step}`}
+                  {isCurrent ? 'ACTIVE' : isCompleted ? 'CONFIRMED OK' : `PHASE ${st.step}`}
                 </span>
               </div>
               <p className={`font-mono text-xs font-bold truncate ${isCurrent ? 'text-white' : isCompleted ? 'text-emerald-200' : 'text-white/80'}`}>
