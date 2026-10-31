@@ -357,7 +357,12 @@ export default function SRLGPage() {
                   {cls.replace(/_/g, ' ')} ({items.length})
                 </h3>
                 <div className="space-y-1">
-                  {items.map((a) => <FRARow key={a.id} assessment={a} />)}
+                  {items.slice(0, 40).map((a) => <FRARow key={a.id} assessment={a} />)}
+                  {items.length > 40 && (
+                    <div className="p-2.5 text-center bg-[#FAF7F2] rounded-xl border border-[#E2DBD0] text-[11px] font-mono text-[#59738A]">
+                      Showing top 40 of {items.length.toLocaleString()} verified pairs
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

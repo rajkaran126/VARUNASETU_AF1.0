@@ -15,6 +15,14 @@ export default function AnalyticsReportsPage() {
   const fraMatrix = useMemo(() => buildFalseRedundancyMatrix(cables, srlgGroups), [cables, srlgGroups]);
   const manifestStats = useMemo(() => getManifestStats(), []);
 
+  const fraCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const a of fraMatrix) {
+      counts[a.classification] = (counts[a.classification] || 0) + 1;
+    }
+    return counts;
+  }, [fraMatrix]);
+
   const nonIndependentPairs = fraMatrix.filter(
     (a) => !['Independent_Based_On_Available_Evidence', 'Insufficient_Evidence'].includes(a.classification)
   );
@@ -169,7 +177,7 @@ export default function AnalyticsReportsPage() {
                 { cls: 'Independent_Based_On_Available_Evidence', colour: 'bg-emerald-50 border-emerald-200 text-emerald-800' },
                 { cls: 'Insufficient_Evidence', colour: 'bg-gray-50 border-gray-200 text-gray-600' },
               ].map(({ cls, colour }) => {
-                const count = fraMatrix.filter((a) => a.classification === cls).length;
+                const count = fraCounts[cls] || 0;
                 if (count === 0) return null;
                 const pct = Math.round((count / fraMatrix.length) * 100);
                 return (
