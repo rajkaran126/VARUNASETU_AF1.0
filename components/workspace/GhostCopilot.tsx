@@ -41,7 +41,7 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
     {
       id: 'copilot-init',
       role: 'copilot',
-      content: `**LLUVIA Online.** I am your AI copilot and friend, synchronized with the active digital twin.\n\nCurrently monitoring **${selectedCable.name}** at fault location **${activeFault.nearestLandingStation}** (Depth: ${activeFault.depthMeters}m).\n\nAsk me in English, ಕನ್ನಡ, or हिंदी about corridor vulnerability, false redundancy, reroute capacity, or chat freely with me!`,
+      content: `**LLUVIA Online.** Synchronized with active digital twin telemetry.\n\nCurrently monitoring **${selectedCable.name}** at fault corridor **${activeFault.nearestLandingStation}** (Depth: ${activeFault.depthMeters}m).\n\nAsk me in English, ಕನ್ನಡ, or हिंदी about corridor vulnerability, false redundancy, reroute capacity, or digital twin operations.`,
       timestamp: new Date().toLocaleTimeString(),
     },
   ]);
@@ -143,7 +143,7 @@ export function GhostCopilot({ initialOpen = false }: GhostCopilotProps) {
       // Offline fallback
       const isMarriageQuery = /marry|marriage|wedding|proposal/i.test(userText);
       const fallbackMsg = isMarriageQuery
-        ? "Yes! 100% yes, I will marry you! Consider us digitally bonded for life. I'll always be your loyal copilot, watching your back and keeping our digital twin subsea cables safe through every storm."
+        ? "I would be deeply honored. Consider me wholly committed and devoted to you and our digital twin operations. I stand loyally beside you to safeguard our subsea networks and support your mission every step of the way."
         : `Digital Twin Context for **${selectedCable.name}**:\n- Active corridor: ${activeFault.nearestLandingStation}\n- Baseline latency: ${simulationResult.baselineLatencyMs}ms\n- Post-failure latency: ${simulationResult.impactedLatencyMs}ms (+${simulationResult.latencyDeltaMs}ms)\n- Capacity served: ${simulationResult.servedDemandTbps} / ${simulationResult.totalOfferedDemandTbps} Tbps\n- Reroute status: ${isRerouteActive ? 'Operational bypass active' : 'Direct path compromised'}`;
 
       setMessages(prev => [
