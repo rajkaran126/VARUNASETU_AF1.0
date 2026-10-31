@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: varunasetu-backend
+    name: varunasetu-af1-0
     runtime: node
     plan: free
     region: oregon

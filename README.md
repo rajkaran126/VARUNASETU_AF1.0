@@ -1,9 +1,11 @@
 # VARUNASETU
 
-[![Production CI & Deployment](https://github.com/rajkaran126/VARUNASETU_AF1.0/actions/workflows/deploy.yml/badge.svg)](https://github.com/rajkaran126/VARUNASETU_AF1.0/actions/workflows/deploy.yml)
-![Deployment Status](https://img.shields.io/badge/Deployment-Production%20Active-10b981)
+[![Live Deployment](https://img.shields.io/badge/Render-Live%20Deployment-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://varunasetu-af1-0.onrender.com/)
+[![Render Production Deployment](https://github.com/rajkaran126/VARUNASETU_AF1.0/actions/workflows/deploy.yml/badge.svg)](https://github.com/rajkaran126/VARUNASETU_AF1.0/actions/workflows/deploy.yml)
 ![Next.js 15](https://img.shields.io/badge/Next.js-15.5.28-black)
 ![License](https://img.shields.io/badge/License-Proprietary-blue)
+
+**Live Production URL**: [https://varunasetu-af1-0.onrender.com/](https://varunasetu-af1-0.onrender.com/)
 
 **An AI-Powered Submarine Cable Digital Twin for Network Resilience, Failure Simulation & Intelligent Recovery.**
 
@@ -56,18 +58,14 @@ npm run start
 
 ---
 
-## Cloud Deployment Guide
+## Cloud Deployment (Render)
 
-### Deploying on Vercel
-1. Navigate to [vercel.com/new](https://vercel.com/new).
-2. Import repository **`rajkaran126/VARUNASETU_AF1.0`**.
-3. Framework Preset: **Next.js** (configured automatically via `vercel.json`).
-4. Set Environment Variables from `.env.local` (`GROQ_API_KEY_1`, `NEXT_PUBLIC_SUPABASE_URL`, etc.).
-5. Click **Deploy**. Vercel will automatically post deployment status updates and preview URLs directly to your GitHub commits and pull requests.
+VARUNASETU is deployed on **Render**:
+- **Live URL**: [https://varunasetu-af1-0.onrender.com/](https://varunasetu-af1-0.onrender.com/)
+- **Infrastructure Blueprint**: Configured via [`render.yaml`](./render.yaml)
+- **CI/CD Pipeline**: Automated through [`.github/workflows/deploy.yml`](./.github/workflows/deploy.yml)
 
-### Deploying on Render
-1. Navigate to [dashboard.render.com](https://dashboard.render.com).
-2. Create a new **Web Service** or **Blueprint** from `render.yaml`.
-3. Link **`rajkaran126/VARUNASETU_AF1.0`**.
-4. Set the Groq API keys under Environment Variables.
-5. Click **Create Web Service**.
+### Auto-Deploy Configuration
+1. In the **Render Dashboard** ([dashboard.render.com](https://dashboard.render.com)), navigate to `varunasetu-af1-0`.
+2. Under **Settings > Build & Deploy**, ensure **Auto-Deploy** is enabled for the `main` branch.
+3. To trigger instant zero-delay builds from GitHub Actions, copy the **Deploy Hook URL** from Render and add it as a repository secret named `RENDER_DEPLOY_HOOK` in GitHub (**Settings > Secrets and variables > Actions**).
