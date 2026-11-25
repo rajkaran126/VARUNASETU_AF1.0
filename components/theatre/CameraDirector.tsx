@@ -49,6 +49,8 @@ export function CameraDirector({
     const sun = new T.DirectionalLight(0xffe2af, 3);
     sun.position.set(-4, 6, 4);
     scene.add(sun);
+    const mist = new T.FogExp2(0x285566, 0);
+    const plungeTarget = new T.Vector3();
     let frame = 0,
       dirty = true,
       prior: typeof latest.current | undefined;
@@ -82,7 +84,7 @@ export function CameraDirector({
       renderer.domElement.hidden = mode === "Network";
       if (mode === "Network") return;
       const cutDistance = Math.min(
-        ...[29, 49, 73, 89, 103].map((mark) => Math.abs(mark - t)),
+        ...[73, 89, 103].map((mark) => Math.abs(mark - t)),
       );
       renderer.domElement.style.opacity = String(
         view === "Auto" && !reduced
@@ -138,6 +140,32 @@ export function CameraDirector({
         });
         focus.copy(sub.rov.position);
         camera.position.copy(focus).add(new T.Vector3(3, 1.6, 4.1));
+      }
+      // Match the accelerating exit to a high approach in the incoming scene.
+      // Ocean mist masks the change of scale at the waterline.
+      const boundary = t < 39 ? 29 : 49;
+      const offset = t - boundary;
+      scene.fog = null;
+      scene.background = null;
+      if (view === "Auto" && !reduced && offset >= -1.4 && offset <= 1.6) {
+        const entering = offset >= 0;
+        const progress = entering ? 1 - ramp(offset / 1.6) : ramp(1 + offset / 1.4);
+        const push = progress * progress;
+        if (entering) {
+          camera.position.y += (mode === "Ship" ? 15 : 9) * push;
+          camera.position.z += 2 * push;
+        } else {
+          if (mode === "Globe") plungeTarget.set(0.06, 0.21, 2.59);
+          else plungeTarget.set(-2.55, 0.02, 0.35);
+          focus.lerp(plungeTarget, push);
+          camera.position.lerp(plungeTarget, push * 0.98);
+        }
+        const veil = Math.pow(progress, 5);
+        mist.density = veil * 1.8;
+        scene.fog = mist;
+        renderer.setClearColor(mist.color, veil);
+      } else {
+        renderer.setClearColor(0x000000, 0);
       }
       camera.lookAt(focus);
       renderer.render(scene, camera);
