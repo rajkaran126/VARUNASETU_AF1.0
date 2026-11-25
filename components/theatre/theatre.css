@@ -100,7 +100,7 @@
   cursor: pointer;
 }
 .theatre :focus-visible {
-  outline: 3px solid #ffbf75;
+  outline: 3px solid #666;
   outline-offset: 2px;
 }
 .theatre button:hover,
@@ -274,8 +274,8 @@
 @supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))) {
   .theatre {--glass-fill:linear-gradient(125deg,rgba(255,255,255,.90),rgba(250,250,250,.78))}
   .theatre header,.theatre .transport,.theatre .detailsDrawer,.theatre .caption {
-    -webkit-backdrop-filter:blur(15px) saturate(55%);
-    backdrop-filter:blur(15px) saturate(55%);
+    -webkit-backdrop-filter:blur(15px) grayscale(1);
+    backdrop-filter:blur(15px) grayscale(1);
   }
 }
 @media (prefers-reduced-transparency:reduce) {
@@ -291,4 +291,6 @@
 .theatre .stageTop small {background:var(--glass-fill);color:#333;border:1px solid var(--glass-edge);border-radius:5px}
 .theatre button:hover,.theatre button[aria-pressed=true] {background:#e3e3e3;color:#191919;border-color:#777}
 .theatre .transport input {accent-color:#444}
-.theatre .network .routeMap {background:#11252e;border-radius:8px}
+.theatre .network .routeMap {background:#292929;border-radius:8px}
+
+.theatre .routeMap {filter:grayscale(1)}

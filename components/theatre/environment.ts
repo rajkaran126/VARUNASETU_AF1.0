@@ -68,13 +68,17 @@ export function surfaceSky() {
 export function oceanSurface() {
   // World-space wave trains move both the silhouette and its highlights together.
   const swell = `
+    uniform float hullX;
     float surfaceHeight(vec2 p,float t){
-      return .15*sin(dot(p,vec2(1.28,.47))-1.9*t)
+      vec2 hull=p-vec2(hullX,0.);
+      float radius=length(hull*vec2(.57,1.));
+      float ripple=.09*sin(radius*6.8-t*3.4)*exp(-.72*radius);
+      return ripple+.19*sin(dot(p,vec2(1.28,.47))-1.9*t)
         +.085*sin(dot(p,vec2(-.51,1.82))-1.55*t+.65)
         +.034*sin(dot(p,vec2(2.76,-1.31))-2.7*t);
     }`;
   const material = new T.ShaderMaterial({
-    uniforms: { seconds: { value: 0 } },
+    uniforms: { seconds: { value: 0 }, hullX: {value:0} },
     vertexShader: `uniform float seconds;varying vec3 w; ${swell}
     void main(){w=(modelMatrix*vec4(position,1.)).xyz;w.y+=surfaceHeight(w.xz,seconds);
     gl_Position=projectionMatrix*viewMatrix*vec4(w,1.);}`,

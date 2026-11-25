@@ -304,6 +304,20 @@ export function DeckRepairScene(ship: T.Group) {
       0.006,
       [0xedb745, 0x76acbb, 0xe29473, 0xe1d9bc, 0x82be92][i],
     );
+  // Portable optical test set and a coiled service lead on the aft workbench.
+  box(g, -0.16, 0.31, -0.2, 0.27, 0.1, 0.15, 0x424849);
+  box(g, -0.16, 0.363, -0.2, 0.17, 0.01, 0.095, 0xb5bdba);
+  curvedTube(
+    g,
+    [
+      v(-0.04, 0.32, -0.19),
+      v(0.11, 0.28, -0.22),
+      v(0.28, 0.28, -0.13),
+      v(0.21, 0.32, -0.05),
+    ],
+    0.009,
+    0x25282c,
+  );
   return joint;
 }
 export function ShipScene() {
@@ -311,6 +325,41 @@ export function ShipScene() {
     ship = new T.Group();
   group.add(ship);
   platedHull(ship);
+  for (const side of [-1, 1]) {
+    const raft = mesh(
+      ship,
+      new T.CapsuleGeometry(0.07, 0.24, 4, 12),
+      0xe6e5da,
+      0.03,
+      0.49,
+      side * 0.48,
+    );
+    raft.rotation.z = Math.PI / 2;
+    for (const x of [-0.065, 0.125])
+      pipe(
+        ship,
+        v(x, 0.49, side * 0.48),
+        v(x + 0.018, 0.49, side * 0.48),
+        0.074,
+        0x5a6163,
+      );
+    for (const x of [-1.85, 1.62]) {
+      pipe(
+        ship,
+        v(x, 0.42, side * 0.35),
+        v(x, 0.5, side * 0.35),
+        0.031,
+        0x384147,
+      );
+      pipe(
+        ship,
+        v(x, 0.49, side * 0.35),
+        v(x, 0.51, side * 0.35),
+        0.045,
+        0x495054,
+      );
+    }
+  }
   const lettering = document.createElement("canvas");
   lettering.width = 512;
   lettering.height = 96;
@@ -431,33 +480,10 @@ export function ShipScene() {
   );
   const water = oceanSurface();
   group.add(water, surfaceSky());
-  const aircraft = new T.Group();
-  ship.add(aircraft);
-  box(aircraft, 0, 0, 0, 0.18, 0.079, 0.12, 0x667680);
-  mesh(
-    aircraft,
-    new T.SphereGeometry(0.035, 12, 8),
-    0x14212a,
-    0.057,
-    -0.056,
-    0,
-  );
-  const rotors: T.Group[] = [];
-  for (const x of [-0.14, 0.14])
-    for (const z of [-0.14, 0.14]) {
-      pipe(aircraft, v(0, 0, 0), v(x, 0.035, z), 0.014, 0x445055);
-      const rotor = new T.Group();
-      rotor.position.set(x, 0.058, z);
-      aircraft.add(rotor);
-      box(rotor, 0, 0, 0, 0.19, 0.009, 0.025, 0x19272d);
-      rotors.push(rotor);
-    }
   return {
     group,
     ship,
     water,
-    aircraft,
-    rotors,
     joint,
     winch,
     sling,
@@ -472,63 +498,89 @@ export function ROVScene() {
   const steel = 0x3f5059,
     rubber = 0x1a2428,
     yellow = 0xecad22;
-  // Twin buoyancy pods surround an open equipment bay and pressure cylinder.
-  pipe(rov, v(-0.51, 0, 0), v(0.51, 0, 0), 0.17, steel);
+  const shell = mesh(rov, new T.CapsuleGeometry(0.245, 0.72, 10, 40), yellow);
+  shell.rotation.z = Math.PI / 2;
+  for (const x of [-0.37, -0.25, 0.16, 0.36]) {
+    pipe(rov, v(x - 0.021, 0, 0), v(x + 0.021, 0, 0), 0.251, rubber);
+  }
+  // Forward-facing optical port, inner camera barrel and transparent hemispherical dome.
+  pipe(rov, v(0.37, 0, 0), v(0.52, 0, 0), 0.236, rubber);
+  pipe(rov, v(0.515, 0, 0), v(0.542, 0, 0), 0.231, steel);
+  pipe(rov, v(0.535, 0, 0), v(0.59, 0, 0), 0.142, 0x162329);
+  const lens = mesh(
+    rov,
+    new T.SphereGeometry(0.098, 32, 18),
+    0x102c39,
+    0.586,
+    0,
+    0,
+  );
+  lens.scale.x = 0.42;
+  lens.material.roughness = 0.09;
+  lens.material.metalness = 0.85;
+  const dome = mesh(
+    rov,
+    new T.SphereGeometry(0.218, 40, 24, 0, Math.PI * 2, 0, Math.PI / 2),
+    0x96cedd,
+    0.542,
+    0,
+    0,
+  );
+  dome.rotation.z = -Math.PI / 2;
+  dome.material.transparent = true;
+  dome.material.opacity = 0.25;
+  dome.material.depthWrite = false;
+  dome.material.roughness = 0.085;
+  dome.material.metalness = 0.5;
+  pipe(rov, v(-0.12, 0.21, 0), v(-0.12, 0.34, 0), 0.037, steel);
   for (const side of [-1, 1]) {
-    const z = side * 0.34;
-    const pod = mesh(
-      rov,
-      new T.CapsuleGeometry(0.15, 0.74, 6, 16),
-      yellow,
-      0,
-      0.23,
-      z * 0.76,
-    );
-    pod.rotation.z = Math.PI / 2;
-    pod.scale.z = 1.22;
-    for (const x of [-0.28, 0.28])
-      pipe(
+    const z = side * 0.32;
+    for (const y of [-0.17, 0.17]) {
+      const duct = mesh(
         rov,
-        v(x - 0.018, 0.23, z * 0.76),
-        v(x + 0.018, 0.23, z * 0.76),
-        0.158,
-        rubber,
+        new T.CylinderGeometry(0.103, 0.103, 0.56, 24, 1, true),
+        steel,
+        -0.02,
+        y,
+        z,
       );
-    for (const y of [-0.32, 0.12])
-      pipe(rov, v(-0.62, y, z), v(0.62, y, z), 0.034, steel);
-    for (const x of [-0.51, 0, 0.51])
-      pipe(rov, v(x, -0.32, z), v(x, 0.16, z), 0.029, steel);
-    for (const x of [-0.33, 0.34]) {
+      duct.rotation.z = Math.PI / 2;
+      duct.material.side = T.DoubleSide;
       const ring = mesh(
         rov,
-        new T.TorusGeometry(0.135, 0.036, 10, 24),
+        new T.TorusGeometry(0.098, 0.017, 10, 28),
         rubber,
-        x,
-        -0.047,
-        z * 1.12,
+        0.269,
+        y,
+        z,
       );
-      for (let n = 0; n < 3; n++) {
-        const a = (n * Math.PI * 2) / 3;
+      ring.rotation.y = Math.PI / 2;
+      for (let n = 0; n < 4; n++) {
+        const a = (n * Math.PI) / 2;
         box(
           ring,
-          0.065 * Math.cos(a),
-          0.065 * Math.sin(a),
-          0,
-          0.113,
-          0.042,
-          0.018,
-          0x7c8a85,
-        ).rotation.z = a + 0.26;
+          0.048 * Math.cos(a),
+          0.048 * Math.sin(a),
+          -0.025,
+          0.085,
+          0.025,
+          0.014,
+          0x60696b,
+        ).rotation.z = a + 0.23;
       }
-      mesh(ring, new T.SphereGeometry(0.037, 8, 8), steel);
+      mesh(ring, new T.SphereGeometry(0.025, 12, 8), steel, 0, 0, -0.018);
+      pipe(rov, v(-0.2, 0, side * 0.18), v(-0.2, y, z), 0.029, steel);
     }
-    const lamp = mesh(
+    const housing = box(rov, 0.37, 0, side * 0.34, 0.19, 0.145, 0.15, rubber);
+    const lamp = box(
       rov,
-      new T.SphereGeometry(0.071, 16, 10),
-      0xe3ffff,
-      0.57,
-      0.035,
-      z * 0.86,
+      housing.position.x + 0.1,
+      0,
+      side * 0.34,
+      0.015,
+      0.101,
+      0.109,
+      0xf6f7ee,
     );
     lamp.material.emissive.setHex(0xaaffff);
     lamp.material.emissiveIntensity = 2.4;
@@ -550,34 +602,18 @@ export function ROVScene() {
     beam.position.copy(lamp.position).addScaledVector(dir, 0.8);
     beam.quaternion.setFromUnitVectors(v(0, -1, 0), dir);
     rov.add(beam);
-    pipe(rov, v(-0.57, -0.32, z), v(-0.57, -0.32, -z), 0.03, steel);
   }
-  for (const [a, b] of [
-    [v(0.32, -0.16, 0.14), v(0.65, -0.35, 0.23)],
-    [v(0.65, -0.35, 0.23), v(0.87, -0.31, 0.27)],
-  ]) {
-    pipe(rov, a, b, 0.05, yellow);
-    mesh(rov, new T.SphereGeometry(0.068, 12, 8), steel, b.x, b.y, b.z);
-  }
-  for (const sign of [-1, 1])
-    pipe(
-      rov,
-      v(0.87, -0.31, 0.27),
-      v(1, -0.35, 0.27 + sign * 0.058),
-      0.018,
-      steel,
-    );
   const tether = curvedTube(
     rov,
     [
-      v(-0.26, 0.28, 0),
+      v(-0.12, 0.34, 0),
       v(-0.76, 1, -0.16),
       v(-0.38, 2.3, -0.36),
       v(-1.5, 5.4, -0.65),
       v(-1.9, 11, -0.9),
     ],
     0.025,
-    0xb18c45,
+    0x252b2c,
   );
   const floor = mesh(group, new T.PlaneGeometry(55, 55, 60, 60), 0x365652);
   floor.rotation.x = -Math.PI / 2;
@@ -603,9 +639,11 @@ export function ROVScene() {
       diffuseColor.rgb*=.74+.20*ripple+.32*grain;`,
       );
   };
+  const cable = new T.Group();
+  group.add(cable);
   const ends = [-1, 1].map((sign) =>
     pipe(
-      group,
+      cable,
       v(sign * 0.22, -1.84, 0.4),
       v(sign * 7, -1.84, 0.4),
       0.08,
@@ -647,5 +685,31 @@ export function ROVScene() {
     stones.setMatrixAt(i, pose.matrix);
   }
   group.add(stones);
-  return { group, rov, tether, ends };
+  // One uninterrupted jacket spans the entire run after jointing. Its moulded
+  // sleeve overlaps the jacket on both sides and travels with it during re-lay.
+  const intact = pipe(
+    cable,
+    v(-7, -1.84, 0.4),
+    v(7, -1.84, 0.4),
+    0.08,
+    0x292e30,
+  );
+  const sleeve = pipe(
+    cable,
+    v(-0.31, -1.84, 0.4),
+    v(0.31, -1.84, 0.4),
+    0.121,
+    0xa4adae,
+  );
+  for (const y of [-0.27, -0.21, 0.21, 0.27]) {
+    mesh(
+      sleeve,
+      new T.CylinderGeometry(0.134, 0.134, 0.027, 24),
+      0x4a5356,
+      0,
+      y,
+      0,
+    );
+  }
+  return { group, rov, tether, ends, cable, intact, sleeve };
 }

@@ -55,14 +55,6 @@ export function CameraDirector({
     const orbit = orbitInput(el, () => {
       dirty = true;
     });
-    const deckRov = sub.rov.clone(true);
-    sea.ship.add(deckRov);
-    // The deck copy shares the underwater model geometry; the crane carries it at ship scale.
-    deckRov.scale.setScalar(0.28);
-    sub.rov.children.forEach((child, i) => {
-      if (child === sub.tether || child instanceof T.Light)
-        deckRov.children[i].visible = false;
-    });
     scene.add(
       globe.group,
       sea.group,
@@ -89,8 +81,11 @@ export function CameraDirector({
     function draw() {
       frame = requestAnimationFrame(draw);
       const data = latest.current;
-      const now=performance.now();
-      const animateSea=sea.group.visible && !data.reduced && now-lastSurfaceFrame>=1000/30;
+      const now = performance.now();
+      const animateSea =
+        sea.group.visible &&
+        !data.reduced &&
+        now - lastSurfaceFrame >= 1000 / 30;
       if (!dirty && prior === data && !animateSea) return;
       dirty = false;
       prior = data;
@@ -118,9 +113,9 @@ export function CameraDirector({
           ? 0.12 + 0.88 * ramp(cutDistance / 0.65)
           : 1,
       );
-      if (mode==="Ship") lastSurfaceFrame=now;
-      const oceanSeconds=reduced?0:(now-oceanStart)/1000;
-      sea.water.material.uniforms.seconds.value=oceanSeconds;
+      if (mode === "Ship") lastSurfaceFrame = now;
+      const oceanSeconds = reduced ? 0 : (now - oceanStart) / 1000;
+      sea.water.material.uniforms.seconds.value = oceanSeconds;
       sun.color.setHex(mode === "ROV" ? 0x95dced : 0xffdfa8);
       sun.intensity = mode === "ROV" ? 1.35 : 2.4;
       const focus = new T.Vector3();
@@ -149,29 +144,19 @@ export function CameraDirector({
         );
       } else if (mode === "Ship") {
         sea.ship.position.x = reduced ? 0 : -1.7 * (1 - ramp((t - 29) / 10));
-        sea.ship.rotation.z = reduced ? 0 : 0.018 * Math.sin(t * 2);
-        const launch = ramp((t - 40) / 3);
-        sea.aircraft.visible = t >= 38 && t < 49;
-        sea.aircraft.position.set(
-          -0.55 - 0.65 * launch,
-          0.43 + 1.48 * launch,
-          0.3 + 0.58 * launch,
-        );
-        sea.rotors.forEach((rotor) => {
-          rotor.rotation.y = reduced ? 0 : t * 42;
-        });
-        const swing = ramp((t - 46) / 1.4),
-          lower = ramp((t - 47.4) / 1.6);
-        deckRov.visible = t >= 39 && t < 49;
-        deckRov.position.set(
-          -1.66 - 0.68 * swing,
-          0.47 + 0.27 * swing - 1.05 * lower,
-          0.38,
-        );
-        sea.joint.visible = t >= 83 && t < 89;
+        sea.water.material.uniforms.hullX.value = sea.ship.position.x;
+        const wavePhase = 1.28 * sea.ship.position.x - 1.9 * oceanSeconds;
+        sea.ship.position.y = reduced ? 0 : 0.085 * Math.sin(wavePhase);
+        sea.ship.rotation.z = reduced ? 0 : 0.038 * Math.cos(wavePhase);
+        sea.ship.rotation.x = reduced
+          ? 0
+          : 0.026 * Math.sin(oceanSeconds * 1.55);
+        sea.joint.parent!.visible = t >= 73 && t < 89;
+        sea.joint.visible = t >= 83;
         sea.winch.visible = t >= 73 && t < 89;
         const hookY = -0.75 + 1.42 * ramp((t - 73) / 6);
         sea.recovered.forEach((end) => {
+          end.visible = t < 83;
           end.position.y = hookY;
           end.position.x = 0.85 * ramp((t - 78) / 3);
         });
@@ -186,22 +171,33 @@ export function CameraDirector({
           4.45 - 3.52 * close,
         );
         focus.set(-0.7 * close, 0.68, 0);
-        if (t >= 39 && t < 49) {
-          const track = ramp((t - 39) / 1.4) * (1 - ramp((t - 44.7) / 1.3));
-          focus.lerp(sea.aircraft.position, track * 0.82);
-          camera.position.lerp(new T.Vector3(-2.6, 1.85, 2.5), track * 0.76);
-          focus.lerp(deckRov.position, ramp((t - 46) / 2) * 0.86);
-        }
       } else {
         const descent = ramp((t - 49) / 13);
         sub.rov.position.set(-0.7, 3.8 - 4.7 * descent, 0);
-        const lift = ramp((t - 73) / 6) * (1 - ramp((t - 89) / 7));
-        sub.ends.forEach((m, i) => {
-          m.position.y = -1.84 + lift * 2;
-          m.position.x = (i ? 1 : -1) * (3.61 - (t >= 96 ? 0.22 : 0));
+        const relaying = s.events.some((e) => e.phase === "Cable re-lay");
+        const joined = !s.physicalFault || relaying;
+        sub.intact.visible = joined;
+        sub.sleeve.visible = relaying;
+        sub.ends.forEach((end) => {
+          end.visible = !joined;
         });
+        sub.cable.position.y = s.events.some(
+          (e) => e.phase === "Cable recovery",
+        )
+          ? 2 * ramp((t - 73) / 6) * (relaying ? 1 - ramp((t - 89) / 7) : 1)
+          : 0;
         focus.copy(sub.rov.position);
-        camera.position.copy(focus).add(new T.Vector3(1.9, 0.95, 2.6));
+        if (s.physicalFault && !relaying)
+          focus.lerp(
+            new T.Vector3(0, -1.84 + sub.cable.position.y, 0.4),
+            0.56 * ramp((t - 62) / 4),
+          );
+        if (relaying)
+          focus.lerp(
+            new T.Vector3(0, -1.84 + sub.cable.position.y, 0.4),
+            0.7 * ramp((t - 89) / 4),
+          );
+        camera.position.copy(focus).add(new T.Vector3(2.9, 0.75, 1.15));
       }
       // Match the accelerating exit to a high approach in the incoming scene.
       // Ocean mist masks the change of scale at the waterline.
