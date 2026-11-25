@@ -182,7 +182,7 @@ function ScenarioSummary({ state }: Props) {
           All positions, capacities, delays, vessel ratings and timings are
           synthetic or assumed. The fictional links carry zero background load.
           Delay represents fixed one-way propagation. Weather is held constant.
-          Permissions, optical tests and survey results are scenario inputs.
+          Permissions, optical tests and survey results are scenario inputs. The Milky Way panorama is by Axel Mellinger, University of Potsdam, via Stellarium.
         </p>
       </details>
       <button onClick={download}>Download decision JSON ↓</button>

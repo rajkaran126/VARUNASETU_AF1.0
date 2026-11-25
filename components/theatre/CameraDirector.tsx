@@ -4,6 +4,7 @@ import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment
 import { useEffect, useRef, useState } from "react";
 import type { SimulationSnapshot } from "@/lib/theatre/engine";
 import { GlobeScene, ShipScene, ROVScene } from "./scenes";
+import { floatHull, starSky } from "./environment";
 import { orbitInput } from "./orbit";
 export type View = "Auto" | "Globe" | "Ship" | "ROV" | "Network";
 const ramp = (n: number) => Math.max(0, Math.min(1, n));
@@ -52,6 +53,8 @@ export function CameraDirector({
       }),
       sea = ShipScene(),
       sub = ROVScene();
+    const stars=starSky(()=>{dirty=true;});
+    scene.add(stars);
     const orbit = orbitInput(el, () => {
       dirty = true;
     });
@@ -145,12 +148,7 @@ export function CameraDirector({
       } else if (mode === "Ship") {
         sea.ship.position.x = reduced ? 0 : -1.7 * (1 - ramp((t - 29) / 10));
         sea.water.material.uniforms.hullX.value = sea.ship.position.x;
-        const wavePhase = 1.28 * sea.ship.position.x - 1.9 * oceanSeconds;
-        sea.ship.position.y = reduced ? 0 : 0.085 * Math.sin(wavePhase);
-        sea.ship.rotation.z = reduced ? 0 : 0.038 * Math.cos(wavePhase);
-        sea.ship.rotation.x = reduced
-          ? 0
-          : 0.026 * Math.sin(oceanSeconds * 1.55);
+        floatHull(sea.ship,oceanSeconds);
         sea.joint.parent!.visible = t >= 73 && t < 89;
         sea.joint.visible = t >= 83;
         sea.winch.visible = t >= 73 && t < 89;
@@ -171,6 +169,11 @@ export function CameraDirector({
           4.45 - 3.52 * close,
         );
         focus.set(-0.7 * close, 0.68, 0);
+        if(deck){
+          // A deck-mounted close-up rides with the workbench.
+          sea.ship.localToWorld(focus);
+          sea.ship.localToWorld(camera.position);
+        }
       } else {
         const descent = ramp((t - 49) / 13);
         sub.rov.position.set(-0.7, 3.8 - 4.7 * descent, 0);
@@ -248,6 +251,8 @@ export function CameraDirector({
           mode === "ROV" ? 1 : 0,
         );
       }
+      stars.visible=mode==="Globe" && !(view==="Auto" && t>28.7 && t<29);
+      stars.position.copy(camera.position);
       camera.lookAt(focus);
       renderer.render(scene, camera);
     }

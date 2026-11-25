@@ -58,3 +58,5 @@ The existing checkout matched GitHub main at `3c2ed7f`. Baseline install succeed
 | Existing multilingual checks | 4/4 passed |
 
 Browser coverage includes start/pause, seek and reverse seek, keyboard range control, route selection, changing the camera, mobile viewport, reduced-motion setting, JSON download, read-only API behavior and WebGL failure. A 2.5-second headless Chromium sample counted about 20 rendered frames per second on the globe, matching the 50 ms playback update interval. Hardware device profiling and a screen-reader audit remain unverified. The camera moves from the ship on station directly to a tethered inspection ROV already underwater. All repair work uses procedural geometry and the optical test and cutback permission are scripted scenario inputs.
+
+The globe's all-sky Milky Way panorama is by Axel Mellinger, University of Potsdam, Germany, distributed with permission to modify and redistribute with credit. The theatre adds illustrative foreground stars. [Original texture](https://github.com/Stellarium/stellarium/blob/master/textures/milkyway.png) · [Stellarium credits](https://github.com/Stellarium/stellarium/blob/master/CREDITS.md)

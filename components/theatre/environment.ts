@@ -65,20 +65,39 @@ export function surfaceSky() {
     }),
   );
 }
+// (x and z wave numbers, angular speed, amplitude), in scene units.
+const waveTrains = [
+  new T.Vector4(.63,.31,1.62,.34),
+  new T.Vector4(-.28,1.08,1.38,.14),
+  new T.Vector4(1.91,-1.22,2.48,.045),
+];
+function swellHeight(x:number,z:number,t:number){
+  return waveTrains.reduce((height,w)=>height+w.w*Math.sin(w.x*x+w.y*z-w.z*t),0);
+}
+export function floatHull(ship:T.Group,seconds:number){
+  // Sample the waterplane at four stations. Long swells lift the hull;
+  // shorter crests travel past it without forcing the whole deck to tilt.
+  const x=ship.position.x,z=ship.position.z,halfLength=1.6,halfBeam=.49;
+  const bow=swellHeight(x+halfLength,z,seconds), stern=swellHeight(x-halfLength,z,seconds);
+  const port=swellHeight(x,z-halfBeam,seconds), starboard=swellHeight(x,z+halfBeam,seconds);
+  ship.position.y=(bow+stern+port+starboard)/4;
+  ship.rotation.z=Math.atan2(bow-stern,2*halfLength);
+  ship.rotation.x=-Math.atan2(starboard-port,2*halfBeam);
+}
 export function oceanSurface() {
   // World-space wave trains move both the silhouette and its highlights together.
   const swell = `
-    uniform float hullX;
+    uniform float hullX; uniform vec4 waveTrains[3];
     float surfaceHeight(vec2 p,float t){
       vec2 hull=p-vec2(hullX,0.);
       float radius=length(hull*vec2(.57,1.));
       float ripple=.09*sin(radius*6.8-t*3.4)*exp(-.72*radius);
-      return ripple+.19*sin(dot(p,vec2(1.28,.47))-1.9*t)
-        +.085*sin(dot(p,vec2(-.51,1.82))-1.55*t+.65)
-        +.034*sin(dot(p,vec2(2.76,-1.31))-2.7*t);
+      float h=ripple;
+      for(int i=0;i<3;i++){vec4 w=waveTrains[i];h+=w.w*sin(dot(p,w.xy)-w.z*t);}
+      return h;
     }`;
   const material = new T.ShaderMaterial({
-    uniforms: { seconds: { value: 0 }, hullX: {value:0} },
+    uniforms: { seconds: { value: 0 }, hullX: {value:0}, waveTrains:{value:waveTrains} },
     vertexShader: `uniform float seconds;varying vec3 w; ${swell}
     void main(){w=(modelMatrix*vec4(position,1.)).xyz;w.y+=surfaceHeight(w.xz,seconds);
     gl_Position=projectionMatrix*viewMatrix*vec4(w,1.);}`,
@@ -91,13 +110,45 @@ export function oceanSurface() {
     vec3 col=mix(vec3(.008,.054,.073),vec3(.26,.41,.46),.14+.74*fres);
     float spec=pow(max(dot(r,normalize(vec3(.6,.15,-.67))),0.),45.);
     col+=vec3(1.,.59,.30)*spec*1.8;
-    float crest=smoothstep(.115,.23,surfaceHeight(p,seconds));
+    float crest=smoothstep(.23,.43,surfaceHeight(p,seconds));
     float foam=crest*smoothstep(.36,.70,noise2(p*vec2(4.,8.)-vec2(2.,.7)*seconds));
     col=mix(col,vec3(.61,.81,.81),foam*.75);
     gl_FragColor=vec4(col,1.);${colorOutput}}`,
   });
-  const surface = new T.Mesh(new T.PlaneGeometry(115, 115, 140, 140), material);
+  const geometry=new T.PlaneGeometry(115,115,144,144);
+  const positions=geometry.attributes.position;
+  // Concentrate the grid around the ship while retaining the distant horizon.
+  const spread=(v:number)=>v*(.18+.82*Math.abs(v)/57.5);
+  for(let i=0;i<positions.count;i++)positions.setXY(i,spread(positions.getX(i)),spread(positions.getY(i)));
+  const surface = new T.Mesh(geometry,material);
   surface.rotation.x = -Math.PI / 2;
   surface.position.y = -0.115;
   return surface;
+}
+
+// The Mellinger all-sky photograph supplies the diffuse light and dust lanes.
+// Sparse foreground points preserve distinct stars at small viewport sizes.
+export function starSky(invalidate:()=>void){
+  const sky=new T.Group();
+  const texture=new T.TextureLoader().load("/theatre/milky-way.png",invalidate);
+  texture.colorSpace=T.SRGBColorSpace;
+  const material=new T.MeshBasicMaterial({map:texture,side:T.BackSide,depthWrite:false,fog:false});
+  material.color.multiplyScalar(1.6);
+  material.addEventListener("dispose",()=>texture.dispose());
+  const sphere=new T.Mesh(new T.SphereGeometry(75,64,32),material);
+  sphere.rotation.set(.07,1.24,-.34);sphere.renderOrder=-2;sky.add(sphere);
+  let seed=271828;
+  const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
+  const locations=[],colors=[];
+  for(let i=0;i<9900;i++){
+    const y=random()*2-1,angle=random()*Math.PI*2,r=Math.sqrt(1-y*y);
+    locations.push(74*r*Math.cos(angle),74*y,74*r*Math.sin(angle));
+    const light=.09+.85*random()**4,warm=random();
+    colors.push(light*(.82+.18*warm),light*.9,light*(1-.25*warm));
+  }
+  const points=new T.BufferGeometry();
+  points.setAttribute("position",new T.Float32BufferAttribute(locations,3));
+  points.setAttribute("color",new T.Float32BufferAttribute(colors,3));
+  const stars=new T.Points(points,new T.PointsMaterial({vertexColors:true,size:1.2,sizeAttenuation:false,depthWrite:false,fog:false}));
+  stars.renderOrder=-1;sky.add(stars);return sky;
 }
