@@ -9,7 +9,7 @@ Open **Resilience Theatre** in the workspace sidebar. Start Scenario plays a 115
 - `repair-planner.ts` checks permit, weather height, assumed work window and depth ratings. `machine.ts` generates guarded transitions. Physical repair, alternative service, and cutback are distinct. The optical-test and post-lay survey outcomes and simulated human permission are explicit inputs.
 - `clock.ts` maps presentation seconds to engineering time. `engine.ts` reconstructs events and allocations from the fixture and selected instant. The seed identifies the scenario; this fixture has no random draws.
 - `components/theatre` owns the procedural globe, vessel, tethered ROV, deck workbench, camera director, route map, controls and export. The persistent renderer updates when the snapshot or viewport changes. Reduced motion suppresses secondary movement. The SVG network and controls remain available without WebGL.
-- The simulation reads only the bundled fictional fixture. It uses no operator data, third-party models, writable dataset endpoints or network control interfaces.
+- The 3D globe loads the same Model 1 glTF and coloured cable ribbons used on Network Overview. The fault beacon and service overlay come from the fictional fixture. Drag or use the arrow keys to orbit; scroll or use +/− to zoom, and Home to reset. It uses no operator data, writable dataset endpoints or network control interfaces.
 
 ## Synthetic example
 
@@ -57,4 +57,4 @@ The existing checkout matched GitHub main at `3c2ed7f`. Baseline install succeed
 | Existing operational checks with tsx | 30/30 passed |
 | Existing multilingual checks | 4/4 passed |
 
-Browser coverage includes start/pause, seek and reverse seek, keyboard range control, route selection, changing the camera, mobile viewport, reduced-motion setting, JSON download, read-only API behavior and WebGL failure. A 2.5-second headless Chromium sample counted about 20 rendered frames per second on the globe, matching the 50 ms playback update interval. Hardware device profiling and a screen-reader audit remain unverified. The optional aerial survey is omitted. All repair work uses procedural geometry and the optical test and cutback permission are scripted scenario inputs.
+Browser coverage includes start/pause, seek and reverse seek, keyboard range control, route selection, changing the camera, mobile viewport, reduced-motion setting, JSON download, read-only API behavior and WebGL failure. A 2.5-second headless Chromium sample counted about 20 rendered frames per second on the globe, matching the 50 ms playback update interval. Hardware device profiling and a screen-reader audit remain unverified. The ship launches an aerial UAV for surface reconnaissance before lowering its tethered ROV. All repair work uses procedural geometry and the optical test and cutback permission are scripted scenario inputs.

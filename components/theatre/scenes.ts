@@ -1,4 +1,5 @@
 import * as T from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { scenario } from "@/lib/theatre/scenario";
 import { earthSurface, oceanSurface, surfaceSky } from "./environment";
 const teal = 0x78efdf,
@@ -57,7 +58,43 @@ function globePoint([lon, lat]: number[], r: number) {
 }
 export function GlobeScene(onLoad: () => void) {
   const group = new T.Group();
-  group.add(earthSurface(onLoad));
+  const fallback = earthSurface(onLoad);
+  group.add(fallback);
+  let disposed = false;
+  const releaseTexture = (mat: T.Material) => {
+    if (mat instanceof T.MeshStandardMaterial) mat.map?.dispose();
+  };
+  // Same Z-up Earth mesh, embedded map and coloured cable ribbons as Network Overview.
+  new GLTFLoader().load(
+    "/models/model1/globe_ribbons.gltf",
+    ({ scene: model }) => {
+      model.traverse((obj) => {
+        if (!(obj instanceof T.Mesh)) return;
+        for (const mat of [obj.material].flat()) {
+          if (disposed) {
+            releaseTexture(mat);
+            mat.dispose();
+            continue;
+          }
+          if (mat instanceof T.MeshStandardMaterial) {
+            mat.side = T.DoubleSide;
+            mat.roughness = obj.geometry.attributes.color ? 0.25 : 0.72;
+            mat.metalness = obj.geometry.attributes.color ? 0.45 : 0.06;
+          }
+        }
+        if (disposed) obj.geometry.dispose();
+      });
+      if (disposed) return;
+      model.rotation.order = "YXZ";
+      model.rotation.set(-Math.PI / 2, -Math.PI / 2, 0, "YXZ");
+      model.scale.setScalar(2.5 / 2950);
+      group.add(model);
+      fallback.visible = false;
+      onLoad();
+    },
+    undefined,
+    () => onLoad(),
+  );
   const links = scenario.edges.map((e) => {
     const a = globePoint(e.polyline[0], 2.55),
       b = globePoint(e.polyline[1], 2.55);
@@ -82,7 +119,30 @@ export function GlobeScene(onLoad: () => void) {
     const p = globePoint(n.point, 2.57);
     mesh(group, new T.SphereGeometry(0.065, 12, 12), amber, p.x, p.y, p.z);
   });
-  return { group, links };
+  const broken = links.find((l) => l.id === scenario.broken)!;
+  const beacon = new T.Group();
+  beacon.position.copy(broken.curve.getPointAt(0.24));
+  beacon.quaternion.setFromUnitVectors(
+    v(0, 0, 1),
+    beacon.position.clone().normalize(),
+  );
+  const core = mesh(beacon, new T.SphereGeometry(0.048, 16, 10), 0xff532b);
+  core.material.emissive.setHex(0xff3311);
+  const ring = mesh(beacon, new T.TorusGeometry(0.096, 0.009, 8, 36), 0xff9b4e);
+  group.add(beacon);
+  return {
+    group,
+    links,
+    beacon,
+    ring,
+    dispose() {
+      disposed = true;
+      group.traverse((o) => {
+        if (o instanceof T.Mesh)
+          for (const m of [o.material].flat()) releaseTexture(m);
+      });
+    },
+  };
 }
 // Transverse sections narrow below the waterline and rise into the bow.
 function platedHull(ship: T.Group) {
@@ -371,7 +431,39 @@ export function ShipScene() {
   );
   const water = oceanSurface();
   group.add(water, surfaceSky());
-  return { group, ship, water, joint, winch, sling, recovered, testLamp };
+  const aircraft = new T.Group();
+  ship.add(aircraft);
+  box(aircraft, 0, 0, 0, 0.18, 0.079, 0.12, 0x667680);
+  mesh(
+    aircraft,
+    new T.SphereGeometry(0.035, 12, 8),
+    0x14212a,
+    0.057,
+    -0.056,
+    0,
+  );
+  const rotors: T.Group[] = [];
+  for (const x of [-0.14, 0.14])
+    for (const z of [-0.14, 0.14]) {
+      pipe(aircraft, v(0, 0, 0), v(x, 0.035, z), 0.014, 0x445055);
+      const rotor = new T.Group();
+      rotor.position.set(x, 0.058, z);
+      aircraft.add(rotor);
+      box(rotor, 0, 0, 0, 0.19, 0.009, 0.025, 0x19272d);
+      rotors.push(rotor);
+    }
+  return {
+    group,
+    ship,
+    water,
+    aircraft,
+    rotors,
+    joint,
+    winch,
+    sling,
+    recovered,
+    testLamp,
+  };
 }
 export function ROVScene() {
   const group = new T.Group(),

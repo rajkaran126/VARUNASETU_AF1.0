@@ -318,6 +318,11 @@ export default function Theatre() {
               </select>
             </div>
             <div className="caption">
+              {view !== "Network" && (
+                <small className="orbitTip">
+                  Drag to orbit · Scroll to zoom
+                </small>
+              )}
               <small>
                 ENGINEERING CLOCK · {state.engineeringHours.toFixed(1)} h
                 ASSUMED

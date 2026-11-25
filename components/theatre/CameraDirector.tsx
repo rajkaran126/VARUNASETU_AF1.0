@@ -4,6 +4,7 @@ import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment
 import { useEffect, useRef, useState } from "react";
 import type { SimulationSnapshot } from "@/lib/theatre/engine";
 import { GlobeScene, ShipScene, ROVScene } from "./scenes";
+import { orbitInput } from "./orbit";
 export type View = "Auto" | "Globe" | "Ship" | "ROV" | "Network";
 const ramp = (n: number) => Math.max(0, Math.min(1, n));
 export function CameraDirector({
@@ -51,6 +52,17 @@ export function CameraDirector({
       }),
       sea = ShipScene(),
       sub = ROVScene();
+    const orbit = orbitInput(el, () => {
+      dirty = true;
+    });
+    const deckRov = sub.rov.clone(true);
+    sea.ship.add(deckRov);
+    // The deck copy shares the underwater model geometry; the crane carries it at ship scale.
+    deckRov.scale.setScalar(0.28);
+    sub.rov.children.forEach((child, i) => {
+      if (child === sub.tether || child instanceof T.Light)
+        deckRov.children[i].visible = false;
+    });
     scene.add(
       globe.group,
       sea.group,
@@ -108,6 +120,8 @@ export function CameraDirector({
       const focus = new T.Vector3();
       if (mode === "Globe") {
         globe.group.rotation.y = reduced ? 0 : -0.32 + 0.35 * ramp(t / 12);
+        globe.beacon.visible = s.physicalFault;
+        globe.ring.scale.setScalar(reduced ? 1 : 1 + 0.22 * Math.sin(t * 5));
         globe.links.forEach((l) => {
           l.line.material.color.setHex(
             l.id === "AD" && s.physicalFault
@@ -130,6 +144,24 @@ export function CameraDirector({
       } else if (mode === "Ship") {
         sea.ship.position.x = reduced ? 0 : -1.7 * (1 - ramp((t - 29) / 10));
         sea.ship.rotation.z = reduced ? 0 : 0.018 * Math.sin(t * 2);
+        const launch = ramp((t - 40) / 3);
+        sea.aircraft.visible = t >= 38 && t < 49;
+        sea.aircraft.position.set(
+          -0.55 - 0.65 * launch,
+          0.43 + 1.48 * launch,
+          0.3 + 0.58 * launch,
+        );
+        sea.rotors.forEach((rotor) => {
+          rotor.rotation.y = reduced ? 0 : t * 42;
+        });
+        const swing = ramp((t - 46) / 1.4),
+          lower = ramp((t - 47.4) / 1.6);
+        deckRov.visible = t >= 39 && t < 49;
+        deckRov.position.set(
+          -1.66 - 0.68 * swing,
+          0.47 + 0.27 * swing - 1.05 * lower,
+          0.38,
+        );
         sea.joint.visible = t >= 83 && t < 89;
         sea.winch.visible = t >= 73 && t < 89;
         const hookY = -0.75 + 1.42 * ramp((t - 73) / 6);
@@ -148,6 +180,12 @@ export function CameraDirector({
           4.45 - 3.52 * close,
         );
         focus.set(-0.7 * close, 0.68, 0);
+        if (t >= 39 && t < 49) {
+          const track = ramp((t - 39) / 1.4) * (1 - ramp((t - 44.7) / 1.3));
+          focus.lerp(sea.aircraft.position, track * 0.82);
+          camera.position.lerp(new T.Vector3(-2.6, 1.85, 2.5), track * 0.76);
+          focus.lerp(deckRov.position, ramp((t - 46) / 2) * 0.86);
+        }
       } else {
         const descent = ramp((t - 49) / 13);
         sub.rov.position.set(-0.7, 3.8 - 4.7 * descent, 0);
@@ -163,6 +201,24 @@ export function CameraDirector({
       // Ocean mist masks the change of scale at the waterline.
       const boundary = t < 39 ? 29 : 49;
       const offset = t - boundary;
+      const handoff =
+        view === "Auto" && !reduced
+          ? 1 - ramp((t - 26) / 2.6) * (1 - ramp((t - 29) / 2))
+          : 1;
+      orbit.apply(camera, focus, mode === "Globe" ? 2.9 : 0.4, handoff);
+      if (mode === "Globe" && view === "Auto" && !reduced && t >= 9 && t < 29) {
+        const spot = globe.beacon.getWorldPosition(plungeTarget);
+        const lock = ramp((t - 9) / 5) * (0.58 + 0.42 * ramp((t - 25) / 2.5));
+        const heading = camera.position.clone().normalize();
+        const rotation = new T.Quaternion().setFromUnitVectors(
+          heading,
+          spot.clone().normalize(),
+        );
+        camera.position.applyQuaternion(
+          new T.Quaternion().slerp(rotation, lock),
+        );
+        focus.lerp(spot, lock);
+      }
       scene.fog = mode === "ROV" ? deepWater : null;
       scene.background = null;
       if (view === "Auto" && !reduced && offset >= -1.4 && offset <= 1.6) {
@@ -175,7 +231,7 @@ export function CameraDirector({
           camera.position.y += (mode === "Ship" ? 15 : 9) * push;
           camera.position.z += 2 * push;
         } else {
-          if (mode === "Globe") plungeTarget.set(0.06, 0.21, 2.59);
+          if (mode === "Globe") globe.beacon.getWorldPosition(plungeTarget);
           else plungeTarget.set(-2.55, 0.02, 0.35);
           focus.lerp(plungeTarget, push);
           camera.position.lerp(plungeTarget, push * 0.98);
@@ -203,6 +259,8 @@ export function CameraDirector({
     return () => {
       cancelAnimationFrame(frame);
       resize.disconnect();
+      orbit.dispose();
+      globe.dispose();
       renderer.domElement.removeEventListener("webglcontextlost", lost);
       scene.traverse((o) => {
         if (o instanceof T.Mesh || o instanceof T.Points) {
@@ -216,7 +274,13 @@ export function CameraDirector({
     };
   }, []);
   return (
-    <div ref={host} className="camera" aria-hidden="true">
+    <div
+      ref={host}
+      className="camera"
+      tabIndex={view === "Network" ? -1 : 0}
+      role="group"
+      aria-label="Interactive 3D scene. Drag or use arrow keys to orbit, scroll or use plus and minus to zoom. Home resets the view."
+    >
       {failed && <span>3D unavailable · Follow the network map below</span>}
     </div>
   );

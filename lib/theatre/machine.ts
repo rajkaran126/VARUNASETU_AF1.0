@@ -13,6 +13,9 @@ export function timeline(s: Scenario) {
   add(29, hold ?? "Vessel mobilization");
   if (hold) return events;
   add(39, "On station");
+  add(40, "Aerial UAV launch");
+  add(43, "Surface reconnaissance");
+  add(46, "ROV overboarding");
   add(49, "Tethered descent");
   add(62, "Fault inspection");
   add(73, "Cable recovery");

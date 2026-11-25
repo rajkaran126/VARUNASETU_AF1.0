@@ -133,3 +133,21 @@ test("software fallback keeps route analysis accessible", async ({ page }) => {
     }),
   ).toBeVisible();
 });
+
+test("overview globe responds to orbit and zoom while the clock is paused",async({page})=>{
+  const model=page.waitForResponse(r=>r.url().endsWith("/models/model1/globe_ribbons.gltf"));
+  await page.goto(base+"/workspace/resilience-theatre",{waitUntil:"domcontentloaded"});
+  expect((await model).ok()).toBe(true);
+  const camera=page.locator(".camera canvas");
+  await camera.waitFor();
+  const bounds=(await camera.boundingBox())!;
+  const x=bounds.x+bounds.width/2,y=bounds.y+bounds.height/2;
+  await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(x+80,y+25,{steps:8});await page.mouse.up();
+  const rotated=await camera.screenshot();
+  await page.mouse.wheel(0,-140);
+  await expect.poll(async()=>!(await camera.screenshot()).equals(rotated)).toBe(true);
+  const zoomed=await camera.screenshot();
+  await page.keyboard.press("Home");
+  await expect.poll(async()=>!(await camera.screenshot()).equals(zoomed)).toBe(true);
+  await expect(page.getByRole("slider")).toHaveValue("0");
+});

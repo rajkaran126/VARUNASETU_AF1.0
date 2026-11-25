@@ -207,3 +207,8 @@
     padding: 12px;
   }
 }
+.camera {touch-action:none;cursor:grab}
+.camera:active {cursor:grabbing}
+.stageTop,.caption {pointer-events:none}
+.stageTop select {pointer-events:auto}
+.caption .orbitTip {display:block;width:fit-content;margin-bottom:4px;letter-spacing:.02em}
