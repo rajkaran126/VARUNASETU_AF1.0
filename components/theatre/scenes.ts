@@ -1,5 +1,6 @@
 import * as T from "three";
 import { scenario } from "@/lib/theatre/scenario";
+import { earthSurface, oceanSurface, surfaceSky } from "./environment";
 const teal = 0x78efdf,
   white = 0xd4e0dc,
   amber = 0xf4ad55;
@@ -54,85 +55,9 @@ function globePoint([lon, lat]: number[], r: number) {
     r * Math.cos(a) * Math.cos(b),
   );
 }
-export function GlobeScene() {
+export function GlobeScene(onLoad: () => void) {
   const group = new T.Group();
-  mesh(group, new T.SphereGeometry(2.5, 64, 48), 0x17445a);
-  const grid = new T.Mesh(
-    new T.SphereGeometry(2.504, 36, 18),
-    new T.MeshBasicMaterial({
-      color: 0x397287,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.22,
-    }),
-  );
-  group.add(grid);
-  // Original coarse continental silhouettes, decorative and independent of topology.
-  const lands = [
-    [
-      [-165, 60],
-      [-130, 70],
-      [-58, 56],
-      [-76, 27],
-      [-98, 18],
-      [-117, 33],
-    ],
-    [
-      [-81, 11],
-      [-48, 1],
-      [-36, -12],
-      [-68, -56],
-      [-76, -16],
-    ],
-    [
-      [-17, 32],
-      [9, 37],
-      [34, 30],
-      [49, 11],
-      [32, -28],
-      [18, -35],
-      [6, 1],
-      [-15, 14],
-    ],
-    [
-      [-10, 38],
-      [3, 60],
-      [55, 70],
-      [143, 57],
-      [130, 24],
-      [97, 10],
-      [79, 8],
-      [54, 27],
-      [31, 39],
-    ],
-    [
-      [113, -23],
-      [134, -12],
-      [153, -27],
-      [140, -39],
-      [116, -34],
-    ],
-  ];
-  function inside(x: number, y: number, poly: number[][]) {
-    let hit = false;
-    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
-      const [a, b] = poly[i],
-        [c, d] = poly[j];
-      if (b > y !== d > y && x < ((c - a) * (y - b)) / (d - b) + a) hit = !hit;
-    }
-    return hit;
-  }
-  const dots = [];
-  for (let lat = -60; lat < 74; lat += 2.3)
-    for (let lon = -178; lon < 179; lon += 2.6)
-      if (lands.some((p) => inside(lon, lat, p)))
-        dots.push(globePoint([lon, lat], 2.515));
-  group.add(
-    new T.Points(
-      new T.BufferGeometry().setFromPoints(dots),
-      new T.PointsMaterial({ color: 0x83acaa, size: 0.055 }),
-    ),
-  );
+  group.add(earthSurface(onLoad));
   const links = scenario.edges.map((e) => {
     const a = globePoint(e.polyline[0], 2.55),
       b = globePoint(e.polyline[1], 2.55);
@@ -159,13 +84,102 @@ export function GlobeScene() {
   });
   return { group, links };
 }
+// Transverse sections narrow below the waterline and rise into the bow.
+function platedHull(ship: T.Group) {
+  const stations = [
+    [-2.08, 0.47, 0.31],
+    [-1.88, 0.58, 0.32],
+    [-1.2, 0.63, 0.32],
+    [0.35, 0.64, 0.34],
+    [1.25, 0.59, 0.4],
+    [1.85, 0.39, 0.48],
+    [2.24, 0.17, 0.56],
+    [2.48, 0.012, 0.61],
+  ];
+  const rings = stations.map(([x, w, h]) => [
+    v(x, h, -w),
+    v(x - 0.025, -0.03, -w * 0.97),
+    v(x - 0.06, -0.18, -w * 0.86),
+    v(x - 0.19, -0.37, -w * 0.42),
+    v(x - 0.19, -0.37, w * 0.42),
+    v(x - 0.06, -0.18, w * 0.86),
+    v(x - 0.025, -0.03, w * 0.97),
+    v(x, h, w),
+  ]);
+  const geometry = new T.BufferGeometry(),
+    vertices: number[] = [],
+    colors: number[] = [];
+  function tri(a: T.Vector3, b: T.Vector3, c: T.Vector3, color: number) {
+    const paint = new T.Color(color);
+    for (const p of [a, b, c]) {
+      vertices.push(p.x, p.y, p.z);
+      colors.push(paint.r, paint.g, paint.b);
+    }
+  }
+  for (let i = 1; i < rings.length; i++)
+    for (let k = 0; k < 8; k++) {
+      const j = (k + 1) % 8,
+        paint =
+          k === 7
+            ? 0x58646a
+            : k === 1 || k === 5
+              ? 0x982f24
+              : k >= 2 && k <= 4
+                ? 0x622b25
+                : 0x192f41;
+      tri(rings[i - 1][k], rings[i][k], rings[i][j], paint);
+      tri(rings[i - 1][k], rings[i][j], rings[i - 1][j], paint);
+    }
+  for (const ring of [rings[0], rings[rings.length - 1]])
+    for (let j = 1; j < 7; j++) tri(ring[0], ring[j], ring[j + 1], 0x243b47);
+  geometry.setAttribute("position", new T.Float32BufferAttribute(vertices, 3));
+  geometry.setAttribute("color", new T.Float32BufferAttribute(colors, 3));
+  geometry.computeVertexNormals();
+  ship.add(
+    new T.Mesh(
+      geometry,
+      new T.MeshStandardMaterial({
+        vertexColors: true,
+        side: T.DoubleSide,
+        roughness: 0.67,
+      }),
+    ),
+  );
+  for (const sign of [-1, 1]) {
+    for (let i = 1; i < stations.length; i++) {
+      const [x, w, h] = stations[i],
+        [px, pw, ph] = stations[i - 1];
+      for (const level of [0.09, 0.17])
+        pipe(
+          ship,
+          v(px, ph + level, sign * pw),
+          v(x, h + level, sign * w),
+          0.009,
+          white,
+        );
+      pipe(ship, v(x, h, sign * w), v(x, h + 0.17, sign * w), 0.012, white);
+    }
+  }
+}
+function curvedTube(
+  parent: T.Object3D,
+  points: T.Vector3[],
+  radius: number,
+  color: number,
+) {
+  return mesh(
+    parent,
+    new T.TubeGeometry(new T.CatmullRomCurve3(points), 32, radius, 8, false),
+    color,
+  );
+}
 export function DeckRepairScene(ship: T.Group) {
   const g = new T.Group();
   ship.add(g);
   g.position.set(-0.7, 0.36, 0);
   box(g, 0, 0.14, 0, 1, 0.25, 0.56, 0x23414a);
   for (const sign of [-1, 1])
-    pipe(g, v(sign * 0.65, 0.32, 0), v(sign * 0.12, 0.32, 0), 0.057, amber);
+    pipe(g, v(sign * 0.65, 0.32, 0), v(sign * 0.12, 0.32, 0), 0.057, 0x252c2c);
   const joint = mesh(
     g,
     new T.CylinderGeometry(0.092, 0.092, 0.31, 16),
@@ -175,37 +189,136 @@ export function DeckRepairScene(ship: T.Group) {
     0,
   );
   joint.rotation.z = Math.PI / 2;
+  joint.material.color.setHex(0x71818a);
+  joint.material.metalness = 0.72;
+  for (const side of [-1, 1]) {
+    const clamp = pipe(
+      g,
+      v(side * 0.13, 0.32, 0),
+      v(side * 0.17, 0.32, 0),
+      0.1,
+      0x81888a,
+    );
+    clamp.material.metalness = 0.78;
+    clamp.material.roughness = 0.27;
+    for (let i = 0; i < 8; i++) {
+      const a = (i * Math.PI) / 4;
+      pipe(
+        g,
+        v(side * 0.17, 0.32 + 0.082 * Math.cos(a), 0.082 * Math.sin(a)),
+        v(side * 0.18, 0.32 + 0.082 * Math.cos(a), 0.082 * Math.sin(a)),
+        0.012,
+        0x333c40,
+      );
+    }
+  }
+  // Armoured sleeves, clamping flanges and exposed fibre tray on deck.
+  for (const sign of [-1, 1]) {
+    for (let i = 0; i < 6; i++)
+      pipe(
+        g,
+        v(sign * (0.2 + i * 0.057), 0.32, 0),
+        v(sign * (0.22 + i * 0.057), 0.32, 0),
+        0.068,
+        0x2a3132,
+      );
+    for (const x of [0.15, 0.19])
+      pipe(
+        g,
+        v(sign * x, 0.32, 0),
+        v(sign * (x + 0.016), 0.32, 0),
+        0.095,
+        0xb1bab5,
+      );
+    box(g, sign * 0.33, 0.25, 0, 0.07, 0.16, 0.18, 0x697785);
+  }
+  for (let i = 0; i < 5; i++)
+    curvedTube(
+      g,
+      [
+        v(-0.19, 0.32, (i - 2) * 0.015),
+        v(-0.07, 0.355, (i - 2) * 0.018),
+        v(0.12, 0.34, (i - 2) * 0.014),
+        v(0.19, 0.32, 0),
+      ],
+      0.006,
+      [0xedb745, 0x76acbb, 0xe29473, 0xe1d9bc, 0x82be92][i],
+    );
   return joint;
 }
 export function ShipScene() {
   const group = new T.Group(),
     ship = new T.Group();
   group.add(ship);
-  const hull = new T.Shape();
-  hull.moveTo(-2, -0.55);
-  hull.lineTo(1.45, -0.55);
-  hull.quadraticCurveTo(2.1, -0.4, 2.45, 0);
-  hull.quadraticCurveTo(1.95, 0.5, 1.45, 0.55);
-  hull.lineTo(-2, 0.55);
-  hull.closePath();
-  const body = mesh(
-    ship,
-    new T.ExtrudeGeometry(hull, {
-      depth: 0.42,
-      bevelEnabled: true,
-      bevelSegments: 2,
-      steps: 1,
-      bevelSize: 0.08,
-      bevelThickness: 0.07,
-    }),
-    0x266071,
-  );
-  body.rotation.x = -Math.PI / 2;
-  body.position.y = -0.18;
-  box(ship, 1, 0.52, 0, 1.15, 0.55, 0.85, white);
-  box(ship, 0.98, 0.87, 0, 1.04, 0.25, 0.91, 0x264451);
-  box(ship, 1, 1.04, 0, 1.15, 0.08, 0.98, white);
-  pipe(ship, v(1, 1.06, 0), v(1, 1.7, 0), 0.035, amber);
+  platedHull(ship);
+  const lettering = document.createElement("canvas");
+  lettering.width = 512;
+  lettering.height = 96;
+  const ink = lettering.getContext("2d")!;
+  ink.fillStyle = "#d2d9cf";
+  ink.font = "500 51px sans-serif";
+  ink.textAlign = "center";
+  ink.fillText("RV PELAGIA", 256, 66);
+  const decal = new T.CanvasTexture(lettering);
+  decal.colorSpace = T.SRGBColorSpace;
+  const marking = new T.MeshBasicMaterial({
+    map: decal,
+    transparent: true,
+    depthWrite: false,
+    polygonOffset: true,
+    polygonOffsetFactor: -2,
+  });
+  marking.addEventListener("dispose", () => decal.dispose());
+  for (const side of [-1, 1]) {
+    const label = new T.Mesh(new T.PlaneGeometry(0.68, 0.129), marking);
+    label.position.set(0.58, 0.16, side * 0.64);
+    label.rotation.y = side === 1 ? 0.055 : Math.PI - 0.055;
+    ship.add(label);
+    for (let i = 0; i < 5; i++) {
+      const port = mesh(
+        ship,
+        new T.CylinderGeometry(0.029, 0.029, 0.016, 12),
+        0x111f29,
+        -0.91 + i * 0.22,
+        0.21,
+        side * 0.635,
+      );
+      port.rotation.x = Math.PI / 2;
+    }
+  }
+  // Stacked accommodation decks, divided bridge glazing and navigation fittings.
+  box(ship, 0.73, 0.53, 0, 1.6, 0.4, 0.94, 0xd6d6ca);
+  box(ship, 0.76, 0.76, 0, 1.7, 0.06, 1.05, 0x657780);
+  box(ship, 0.83, 0.88, 0, 1.32, 0.22, 0.84, white);
+  box(ship, 0.9, 1.03, 0, 1.38, 0.09, 0.98, 0xe3ded1);
+  box(ship, 0.91, 1.15, 0, 1.27, 0.18, 0.93, 0x234355);
+  box(ship, 0.9, 1.27, 0, 1.43, 0.07, 1.05, 0xd7d5c9);
+  for (const sign of [-1, 1]) {
+    for (let i = 0; i < 8; i++) {
+      const x = 0.02 + i * 0.19;
+      box(ship, x, 0.56, sign * 0.473, 0.096, 0.09, 0.012, 0x203b49);
+      if (i < 7)
+        box(
+          ship,
+          0.31 + i * 0.2,
+          1.15,
+          sign * 0.468,
+          0.022,
+          0.18,
+          0.012,
+          white,
+        );
+    }
+    for (let j = 0; j < 4; j++)
+      box(ship, 1.55, 1.15, (j - 1.5) * 0.22, 0.018, 0.18, 0.02, white);
+    pipe(ship, v(0.24, 1.28, sign * 0.37), v(0.6, 1.86, 0), 0.015, 0x8b9799);
+  }
+  pipe(ship, v(0.6, 1.28, 0), v(0.6, 2.03, 0), 0.029, white);
+  pipe(ship, v(0.59, 1.73, -0.36), v(0.59, 1.73, 0.36), 0.018, white);
+  box(ship, 0.6, 1.98, 0, 0.07, 0.045, 0.57, 0xd3d8cf);
+  mesh(ship, new T.SphereGeometry(0.116, 16, 12), white, 1.27, 1.4, 0.18);
+  box(ship, 0.01, 0.99, -0.25, 0.26, 0.38, 0.27, 0xe2a147);
+  box(ship, 0.01, 1.18, -0.25, 0.28, 0.09, 0.29, 0x313b3e);
   for (const sign of [-1, 1])
     pipe(
       ship,
@@ -238,6 +351,16 @@ export function ShipScene() {
     0,
   );
   drum.rotation.x = Math.PI / 2;
+  for (let i = 0; i < 14; i++)
+    pipe(
+      ship,
+      v(-1.48, 0.55, -0.29 + i * 0.043),
+      v(-1.48, 0.55, -0.27 + i * 0.043),
+      0.245,
+      0x343b3e,
+    );
+  for (const z of [-0.34, 0.34])
+    pipe(ship, v(-1.48, 0.55, z), v(-1.48, 0.55, z + 0.028), 0.29, 0xcb842c);
   const testLamp = mesh(
     ship,
     new T.SphereGeometry(0.075, 12, 8),
@@ -246,33 +369,124 @@ export function ShipScene() {
     0.76,
     -0.17,
   );
-  const water = mesh(group, new T.PlaneGeometry(70, 70, 100, 100), 0x155362);
-  water.rotation.x = -Math.PI / 2;
-  water.position.y = -0.12;
-  const pos = water.geometry.attributes.position;
-  for (let i = 0; i < pos.count; i++)
-    pos.setZ(
-      i,
-      0.09 * Math.sin(pos.getX(i) * 2 + pos.getY(i)) +
-        0.04 * Math.cos(pos.getY(i) * 3),
-    );
-  water.geometry.computeVertexNormals();
-  return { group, ship, joint, winch, sling, recovered, testLamp };
+  const water = oceanSurface();
+  group.add(water, surfaceSky());
+  return { group, ship, water, joint, winch, sling, recovered, testLamp };
 }
 export function ROVScene() {
   const group = new T.Group(),
     rov = new T.Group();
   group.add(rov);
-  box(rov, 0, 0, 0, 1.15, 0.48, 0.66, amber);
-  for (const z of [-0.39, 0.39]) {
-    pipe(rov, v(-0.66, -0.37, z), v(0.67, -0.37, z), 0.052, white);
-    for (const x of [-0.44, 0.44])
-      pipe(rov, v(x, -0.36, z), v(x, 0.22, z), 0.04, white);
-    mesh(rov, new T.SphereGeometry(0.11, 12, 8), teal, 0.57, 0, z * 0.7);
+  const steel = 0x3f5059,
+    rubber = 0x1a2428,
+    yellow = 0xecad22;
+  // Twin buoyancy pods surround an open equipment bay and pressure cylinder.
+  pipe(rov, v(-0.51, 0, 0), v(0.51, 0, 0), 0.17, steel);
+  for (const side of [-1, 1]) {
+    const z = side * 0.34;
+    const pod = mesh(
+      rov,
+      new T.CapsuleGeometry(0.15, 0.74, 6, 16),
+      yellow,
+      0,
+      0.23,
+      z * 0.76,
+    );
+    pod.rotation.z = Math.PI / 2;
+    pod.scale.z = 1.22;
+    for (const x of [-0.28, 0.28])
+      pipe(
+        rov,
+        v(x - 0.018, 0.23, z * 0.76),
+        v(x + 0.018, 0.23, z * 0.76),
+        0.158,
+        rubber,
+      );
+    for (const y of [-0.32, 0.12])
+      pipe(rov, v(-0.62, y, z), v(0.62, y, z), 0.034, steel);
+    for (const x of [-0.51, 0, 0.51])
+      pipe(rov, v(x, -0.32, z), v(x, 0.16, z), 0.029, steel);
+    for (const x of [-0.33, 0.34]) {
+      const ring = mesh(
+        rov,
+        new T.TorusGeometry(0.135, 0.036, 10, 24),
+        rubber,
+        x,
+        -0.047,
+        z * 1.12,
+      );
+      for (let n = 0; n < 3; n++) {
+        const a = (n * Math.PI * 2) / 3;
+        box(
+          ring,
+          0.065 * Math.cos(a),
+          0.065 * Math.sin(a),
+          0,
+          0.113,
+          0.042,
+          0.018,
+          0x7c8a85,
+        ).rotation.z = a + 0.26;
+      }
+      mesh(ring, new T.SphereGeometry(0.037, 8, 8), steel);
+    }
+    const lamp = mesh(
+      rov,
+      new T.SphereGeometry(0.071, 16, 10),
+      0xe3ffff,
+      0.57,
+      0.035,
+      z * 0.86,
+    );
+    lamp.material.emissive.setHex(0xaaffff);
+    lamp.material.emissiveIntensity = 2.4;
+    const light = new T.SpotLight(0xafffff, 9, 6, 0.36, 0.7, 1);
+    light.position.copy(lamp.position);
+    light.target.position.set(2, -1, z);
+    rov.add(light, light.target);
+    const beam = new T.Mesh(
+      new T.ConeGeometry(0.34, 1.6, 20, 1, true),
+      new T.MeshBasicMaterial({
+        color: 0x98e9fb,
+        transparent: true,
+        opacity: 0.042,
+        depthWrite: false,
+        blending: T.AdditiveBlending,
+      }),
+    );
+    const dir = v(1, -0.47, side * 0.07).normalize();
+    beam.position.copy(lamp.position).addScaledVector(dir, 0.8);
+    beam.quaternion.setFromUnitVectors(v(0, -1, 0), dir);
+    rov.add(beam);
+    pipe(rov, v(-0.57, -0.32, z), v(-0.57, -0.32, -z), 0.03, steel);
   }
-  pipe(rov, v(0.5, -0.1, 0), v(0.83, -0.4, 0), 0.04, white);
-  pipe(rov, v(0.83, -0.4, 0), v(1, -0.4, 0.12), 0.035, amber);
-  const tether = pipe(rov, v(-0.2, 0.2, 0), v(-0.7, 10, 0), 0.024, amber);
+  for (const [a, b] of [
+    [v(0.32, -0.16, 0.14), v(0.65, -0.35, 0.23)],
+    [v(0.65, -0.35, 0.23), v(0.87, -0.31, 0.27)],
+  ]) {
+    pipe(rov, a, b, 0.05, yellow);
+    mesh(rov, new T.SphereGeometry(0.068, 12, 8), steel, b.x, b.y, b.z);
+  }
+  for (const sign of [-1, 1])
+    pipe(
+      rov,
+      v(0.87, -0.31, 0.27),
+      v(1, -0.35, 0.27 + sign * 0.058),
+      0.018,
+      steel,
+    );
+  const tether = curvedTube(
+    rov,
+    [
+      v(-0.26, 0.28, 0),
+      v(-0.76, 1, -0.16),
+      v(-0.38, 2.3, -0.36),
+      v(-1.5, 5.4, -0.65),
+      v(-1.9, 11, -0.9),
+    ],
+    0.025,
+    0xb18c45,
+  );
   const floor = mesh(group, new T.PlaneGeometry(55, 55, 60, 60), 0x365652);
   floor.rotation.x = -Math.PI / 2;
   floor.position.y = -2;
@@ -280,6 +494,23 @@ export function ROVScene() {
   for (let i = 0; i < pos.count; i++)
     pos.setZ(i, 0.12 * Math.cos(pos.getX(i)) * 0.8 * Math.sin(pos.getY(i)));
   floor.geometry.computeVertexNormals();
+  floor.material.onBeforeCompile = (shader) => {
+    shader.vertexShader =
+      "varying vec2 sediment;\n" +
+      shader.vertexShader.replace(
+        "#include <begin_vertex>",
+        "#include <begin_vertex>\nsediment=position.xy;",
+      );
+    shader.fragmentShader =
+      "varying vec2 sediment;\n" +
+      shader.fragmentShader.replace(
+        "#include <color_fragment>",
+        `#include <color_fragment>
+      float grain=fract(sin(dot(floor(sediment*81.),vec2(12.9898,78.233)))*43758.5453);
+      float ripple=sin(sediment.x*19.+2.8*sin(sediment.y*1.4)+sin(sediment.x*.9));
+      diffuseColor.rgb*=.74+.20*ripple+.32*grain;`,
+      );
+  };
   const ends = [-1, 1].map((sign) =>
     pipe(
       group,
@@ -289,5 +520,40 @@ export function ROVScene() {
       amber,
     ),
   );
+  for (const end of ends) {
+    end.material.color.setHex(0x242d2f);
+    for (let i = -16; i <= 16; i++) {
+      const collar = mesh(
+        end,
+        new T.CylinderGeometry(0.086, 0.086, 0.023, 12),
+        i % 5 === 0 ? 0x988056 : 0x434e4d,
+        0,
+        i * 0.198,
+        0,
+      );
+      collar.material.roughness = 0.83;
+    }
+  }
+  const stones = new T.InstancedMesh(
+    new T.IcosahedronGeometry(1, 0),
+    new T.MeshStandardMaterial({ color: 0x66756d, roughness: 1 }),
+    260,
+  );
+  const pose = new T.Object3D();
+  const rand = (n: number) =>
+    T.MathUtils.euclideanModulo(Math.sin(n * 78.233 + 2.7) * 43758.54, 1);
+  for (let i = 0; i < stones.count; i++) {
+    pose.position.set(
+      (rand(i * 4) - 0.5) * 17,
+      -1.96,
+      (rand(i * 4 + 1) - 0.5) * 16,
+    );
+    const r = 0.035 + 0.24 * Math.pow(rand(i * 4 + 2), 2);
+    pose.scale.set(r * 1.8, r * 0.65, r);
+    pose.rotation.y = rand(i * 4 + 3) * 6.28;
+    pose.updateMatrix();
+    stones.setMatrixAt(i, pose.matrix);
+  }
+  group.add(stones);
   return { group, rov, tether, ends };
 }

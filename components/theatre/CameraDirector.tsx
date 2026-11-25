@@ -1,5 +1,6 @@
 "use client";
 import * as T from "three";
+import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { useEffect, useRef, useState } from "react";
 import type { SimulationSnapshot } from "@/lib/theatre/engine";
 import { GlobeScene, ShipScene, ROVScene } from "./scenes";
@@ -37,7 +38,17 @@ export function CameraDirector({
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     const scene = new T.Scene(),
       camera = new T.PerspectiveCamera(41, 1, 0.05, 100);
-    const globe = GlobeScene(),
+    let dirty = true;
+    const studio = new RoomEnvironment();
+    const pmrem = new T.PMREMGenerator(renderer);
+    const reflection = pmrem.fromScene(studio, 0.03);
+    scene.environment = reflection.texture;
+    scene.environmentIntensity = 0.55;
+    studio.dispose();
+    pmrem.dispose();
+    const globe = GlobeScene(() => {
+        dirty = true;
+      }),
       sea = ShipScene(),
       sub = ROVScene();
     scene.add(
@@ -50,9 +61,9 @@ export function CameraDirector({
     sun.position.set(-4, 6, 4);
     scene.add(sun);
     const mist = new T.FogExp2(0x285566, 0);
+    const deepWater = new T.FogExp2(0x073447, 0.093);
     const plungeTarget = new T.Vector3();
     let frame = 0,
-      dirty = true,
       prior: typeof latest.current | undefined;
     const resize = new ResizeObserver(() => {
       renderer.setSize(el.clientWidth, el.clientHeight);
@@ -91,6 +102,9 @@ export function CameraDirector({
           ? 0.12 + 0.88 * ramp(cutDistance / 0.65)
           : 1,
       );
+      sea.water.material.uniforms.seconds.value = reduced ? 0 : t * 0.6;
+      sun.color.setHex(mode === "ROV" ? 0x95dced : 0xffdfa8);
+      sun.intensity = mode === "ROV" ? 1.35 : 2.4;
       const focus = new T.Vector3();
       if (mode === "Globe") {
         globe.group.rotation.y = reduced ? 0 : -0.32 + 0.35 * ramp(t / 12);
@@ -128,8 +142,12 @@ export function CameraDirector({
         sea.testLamp.visible = t >= 86 && t < 89;
         sea.testLamp.material.emissive.setHex(0x55ffaa);
         const close = deck ? ramp((t - 73) / 5) : 0;
-        camera.position.set(-4 + 2.5 * close, 2.2 - close, 4.6 - 3.1 * close);
-        focus.set(-0.65 * close, 0.4, 0);
+        camera.position.set(
+          3.35 - 4.3 * close,
+          1.38 - 0.28 * close,
+          4.45 - 3.52 * close,
+        );
+        focus.set(-0.7 * close, 0.68, 0);
       } else {
         const descent = ramp((t - 49) / 13);
         sub.rov.position.set(-0.7, 3.8 - 4.7 * descent, 0);
@@ -139,17 +157,19 @@ export function CameraDirector({
           m.position.x = (i ? 1 : -1) * (3.61 - (t >= 96 ? 0.22 : 0));
         });
         focus.copy(sub.rov.position);
-        camera.position.copy(focus).add(new T.Vector3(3, 1.6, 4.1));
+        camera.position.copy(focus).add(new T.Vector3(1.9, 0.95, 2.6));
       }
       // Match the accelerating exit to a high approach in the incoming scene.
       // Ocean mist masks the change of scale at the waterline.
       const boundary = t < 39 ? 29 : 49;
       const offset = t - boundary;
-      scene.fog = null;
+      scene.fog = mode === "ROV" ? deepWater : null;
       scene.background = null;
       if (view === "Auto" && !reduced && offset >= -1.4 && offset <= 1.6) {
         const entering = offset >= 0;
-        const progress = entering ? 1 - ramp(offset / 1.6) : ramp(1 + offset / 1.4);
+        const progress = entering
+          ? 1 - ramp(offset / 1.6)
+          : ramp(1 + offset / 1.4);
         const push = progress * progress;
         if (entering) {
           camera.position.y += (mode === "Ship" ? 15 : 9) * push;
@@ -165,7 +185,10 @@ export function CameraDirector({
         scene.fog = mist;
         renderer.setClearColor(mist.color, veil);
       } else {
-        renderer.setClearColor(0x000000, 0);
+        renderer.setClearColor(
+          mode === "ROV" ? deepWater.color : 0x000000,
+          mode === "ROV" ? 1 : 0,
+        );
       }
       camera.lookAt(focus);
       renderer.render(scene, camera);
@@ -187,6 +210,7 @@ export function CameraDirector({
           for (const m of [o.material].flat()) m.dispose();
         }
       });
+      reflection.dispose();
       renderer.dispose();
       renderer.domElement.remove();
     };
