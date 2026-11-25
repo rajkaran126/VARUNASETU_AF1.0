@@ -66,19 +66,30 @@ export function surfaceSky() {
   );
 }
 export function oceanSurface() {
+  // World-space wave trains move both the silhouette and its highlights together.
+  const swell = `
+    float surfaceHeight(vec2 p,float t){
+      return .15*sin(dot(p,vec2(1.28,.47))-1.9*t)
+        +.085*sin(dot(p,vec2(-.51,1.82))-1.55*t+.65)
+        +.034*sin(dot(p,vec2(2.76,-1.31))-2.7*t);
+    }`;
   const material = new T.ShaderMaterial({
     uniforms: { seconds: { value: 0 } },
-    vertexShader: `uniform float seconds;varying vec3 w;
-    void main(){w=(modelMatrix*vec4(position,1.)).xyz;w.y+=.055*sin(w.x*2.+w.z*1.4+seconds)+.032*sin(w.z*3.1-seconds*.8);
+    vertexShader: `uniform float seconds;varying vec3 w; ${swell}
+    void main(){w=(modelMatrix*vec4(position,1.)).xyz;w.y+=surfaceHeight(w.xz,seconds);
     gl_Position=projectionMatrix*viewMatrix*vec4(w,1.);}`,
     fragmentShader: `uniform float seconds;varying vec3 w;${noise}
-    float wave(vec2 p){return .12*sin(p.x*2.+p.y*1.4+seconds)+.08*sin(p.y*3.1-seconds*.8)+.14*fbm(p*6.+seconds*.31);}
+    ${swell}
+    float wave(vec2 p){return surfaceHeight(p,seconds)+.035*noise2(p*8.-vec2(1.6,.6)*seconds);}
     void main(){vec2 p=w.xz;float a=wave(p);vec3 n=normalize(vec3((a-wave(p+vec2(.035,0.)))/.035,1.,(a-wave(p+vec2(0.,.035)))/.035));
     vec3 eye=normalize(cameraPosition-w),r=reflect(-eye,n);
     float fres=pow(1.-max(dot(eye,n),0.),3.);
     vec3 col=mix(vec3(.008,.054,.073),vec3(.26,.41,.46),.14+.74*fres);
     float spec=pow(max(dot(r,normalize(vec3(.6,.15,-.67))),0.),45.);
     col+=vec3(1.,.59,.30)*spec*1.8;
+    float crest=smoothstep(.115,.23,surfaceHeight(p,seconds));
+    float foam=crest*smoothstep(.36,.70,noise2(p*vec2(4.,8.)-vec2(2.,.7)*seconds));
+    col=mix(col,vec3(.61,.81,.81),foam*.75);
     gl_FragColor=vec4(col,1.);${colorOutput}}`,
   });
   const surface = new T.Mesh(new T.PlaneGeometry(115, 115, 140, 140), material);

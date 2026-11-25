@@ -151,3 +151,20 @@ test("overview globe responds to orbit and zoom while the clock is paused",async
   await expect.poll(async()=>!(await camera.screenshot()).equals(zoomed)).toBe(true);
   await expect(page.getByRole("slider")).toHaveValue("0");
 });
+
+test("surface waves move independently of a paused scenario and respect reduced motion", async ({page})=>{
+  await page.goto(base+"/workspace/resilience-theatre",{waitUntil:"domcontentloaded"});
+  await page.getByLabel("Camera view").selectOption("Ship");
+  const canvas=page.locator(".camera canvas");
+  const bounds=(await canvas.boundingBox())!;
+  const clip={x:bounds.x+bounds.width*.08,y:bounds.y+bounds.height*.71,width:70,height:28};
+  const sample=()=>page.screenshot({clip});
+  const initial=await sample();
+  await expect.poll(async()=>!(await sample()).equals(initial)).toBe(true);
+  await expect(page.getByRole("slider")).toHaveValue("0");
+  await page.emulateMedia({reducedMotion:"reduce"});
+  await page.waitForTimeout(300);
+  const still=await sample();
+  await page.waitForTimeout(250);
+  expect((await sample()).equals(still)).toBe(true);
+});

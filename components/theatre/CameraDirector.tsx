@@ -84,10 +84,14 @@ export function CameraDirector({
       dirty = true;
     });
     resize.observe(el);
+    let lastSurfaceFrame = -Infinity;
+    const oceanStart = performance.now();
     function draw() {
       frame = requestAnimationFrame(draw);
       const data = latest.current;
-      if (!dirty && prior === data) return;
+      const now=performance.now();
+      const animateSea=sea.group.visible && !data.reduced && now-lastSurfaceFrame>=1000/30;
+      if (!dirty && prior === data && !animateSea) return;
       dirty = false;
       prior = data;
       const { state: s, view, reduced } = data,
@@ -114,7 +118,9 @@ export function CameraDirector({
           ? 0.12 + 0.88 * ramp(cutDistance / 0.65)
           : 1,
       );
-      sea.water.material.uniforms.seconds.value = reduced ? 0 : t * 0.6;
+      if (mode==="Ship") lastSurfaceFrame=now;
+      const oceanSeconds=reduced?0:(now-oceanStart)/1000;
+      sea.water.material.uniforms.seconds.value=oceanSeconds;
       sun.color.setHex(mode === "ROV" ? 0x95dced : 0xffdfa8);
       sun.intensity = mode === "ROV" ? 1.35 : 2.4;
       const focus = new T.Vector3();
