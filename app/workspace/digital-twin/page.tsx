@@ -1,7 +1,1 @@
-'use client';
-
-import CableBreakSim from '@/components/workspace/CableBreakSim';
-
-export default function UnderwaterDigitalTwinPage() {
-  return <CableBreakSim />;
-}
+export { default } from "../resilience-theatre/page";

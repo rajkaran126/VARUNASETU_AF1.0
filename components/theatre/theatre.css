@@ -212,3 +212,26 @@
 .stageTop,.caption {pointer-events:none}
 .stageTop select {pointer-events:auto}
 .caption .orbitTip {display:block;width:fit-content;margin-bottom:4px;letter-spacing:.02em}
+
+.theatre {
+  position:fixed; inset:0; display:grid; grid-template-rows:auto minmax(0,1fr) auto;
+  border-radius:0; isolation:isolate;
+}
+.theatre header {
+  display:flex; align-items:center; gap:12px; padding:8px clamp(10px,2vw,24px);
+}
+.theatre header h1 {font-size:clamp(18px,2.5vw,30px);flex:1;margin:0}
+.workspaceReturn {font-size:14px;color:#a3e1d2;text-decoration:none}
+.sceneArea {position:relative;min-height:0}
+.sceneArea .stage {width:100%;height:100%}
+.detailsDrawer {
+  position:absolute;top:0;right:0;bottom:0;width:min(330px,100%);overflow:auto;
+  background:#10232e;box-shadow:-8px 0 28px #03101980;
+}
+.detailsDrawer .theatreFoot details {max-width:100%}
+.theatre .transport {padding:8px clamp(12px,2vw,28px) max(8px,env(safe-area-inset-bottom))}
+@media(max-width:520px){
+  .theatre header {gap:6px;flex-wrap:wrap}
+  .theatre header h1 {font-size:18px}
+  .workspaceReturn {font-size:12px}
+}

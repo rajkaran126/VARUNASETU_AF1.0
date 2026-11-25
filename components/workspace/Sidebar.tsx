@@ -35,12 +35,8 @@ export function Sidebar() {
       )
     },
     {
-      id: 'theatre', name: 'Resilience Theatre', path: '/workspace/resilience-theatre',
-      icon: () => <span aria-hidden="true">▷</span>,
-    },
-    {
       id: 'digital-twin',
-      name: 'Cable Break Simulation',
+      name: 'Simulation',
       path: '/workspace/digital-twin',
       badge: 'SIM',
       icon: (active) => (

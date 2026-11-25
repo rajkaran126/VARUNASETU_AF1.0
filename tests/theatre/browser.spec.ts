@@ -38,8 +38,10 @@ test("playback, scene selection, network state and reproducible export", async (
       .locator(".caption")
       .getByText("Alternate service active", { exact: true }),
   ).toBeVisible();
+  await stage.getByRole("button",{name:"Details",exact:true}).click();
   await expect(stage.getByText("69.4 ms", { exact: true })).toBeVisible();
   await stage.getByRole("button", { name: /AX\/XD/ }).click();
+  await stage.getByRole("button",{name:"Details",exact:true}).click();
   await stage.getByLabel("Camera view").selectOption("ROV");
   for (const [t, phase] of [
     [52, "Tethered descent"],
@@ -52,6 +54,7 @@ test("playback, scene selection, network state and reproducible export", async (
       stage.locator(".caption").getByRole("heading", { name: phase }),
     ).toBeVisible();
   }
+  await stage.getByRole("button",{name:"Details",exact:true}).click();
   const pending = page.waitForEvent("download");
   await stage.getByText("Download decision JSON").click();
   const record = JSON.parse(
@@ -127,6 +130,7 @@ test("software fallback keeps route analysis accessible", async ({ page }) => {
     waitUntil: "domcontentloaded",
   });
   await expect(page.getByText(/3D unavailable/)).toBeVisible();
+  await page.getByRole("button",{name:"Details",exact:true}).click();
   await expect(
     page.getByRole("img", {
       name: "Synthetic network with direct and alternate routes",
@@ -167,4 +171,24 @@ test("surface waves move independently of a paused scenario and respect reduced 
   const still=await sample();
   await page.waitForTimeout(250);
   expect((await sample()).equals(still)).toBe(true);
+});
+
+test("second workspace link opens a viewport-filling simulation",async({page})=>{
+  await page.goto(base+"/workspace",{waitUntil:"domcontentloaded"});
+  const simulation=page.locator('nav a[href="/workspace/digital-twin"]');
+  await expect(simulation).toHaveCount(1);
+  await expect(simulation.locator('xpath=preceding-sibling::a')).toHaveCount(1);
+  await simulation.click();
+  await expect(page).toHaveURL(/\/workspace\/digital-twin$/);
+  const shell=page.locator('.theatre');
+  for(const viewport of [{width:1280,height:800},{width:390,height:844}]){
+    await page.setViewportSize(viewport);
+    expect(await shell.boundingBox()).toEqual({x:0,y:0,...viewport});
+    await expect(page.getByRole('button',{name:'Start Scenario'})).toBeInViewport();
+    await page.getByRole('button',{name:'Details',exact:true}).click();
+    await expect(page.getByRole('heading',{name:'Service continuity'})).toBeVisible();
+    await page.getByRole('button',{name:'Details',exact:true}).click();
+  }
+  await page.getByRole('link',{name:'Workspace'}).click();
+  await expect(page).toHaveURL(/\/workspace$/);
 });

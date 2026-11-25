@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CameraDirector, type View } from "./CameraDirector";
 import {
   buildDecisionRecord,
@@ -250,7 +250,15 @@ function TimelineControls({
     </div>
   );
 }
-export default function Theatre() {
+export default function Theatre({workspaceHref}:{workspaceHref?:string}) {
+  const shell=useRef<HTMLElement>(null);
+  const [panel,setPanel]=useState(false),[fullscreen,setFullscreen]=useState(false),[canFullscreen,setCanFullscreen]=useState(false);
+  useEffect(()=>{
+    setCanFullscreen(!!document.fullscreenEnabled);
+    const sync=()=>setFullscreen(document.fullscreenElement===shell.current);
+    document.addEventListener("fullscreenchange",sync);
+    return ()=>document.removeEventListener("fullscreenchange",sync);
+  },[]);
   const [t, setT] = useState(0),
     [playing, play] = useState(false),
     [speed, rate] = useState(1),
@@ -287,17 +295,17 @@ export default function Theatre() {
     setT(seek(n));
   };
   return (
-    <section className="theatre" aria-label="Synthetic resilience simulation">
+    <section ref={shell} className="theatre" aria-label="Synthetic resilience simulation">
       <header>
-        <small>RESILIENCE THEATRE</small>
+        {workspaceHref && <a href={workspaceHref} className="workspaceReturn">← Workspace</a>}
         <h1>Pelagic Passage</h1>
-        <p>
-          Follow a cable fault from traffic diversion to deck repair and service
-          recovery.
-        </p>
+        <button aria-controls="simulation-details" aria-expanded={panel} onClick={()=>setPanel(!panel)}>Details</button>
+        {canFullscreen && <button onClick={async()=>{
+          try {if(document.fullscreenElement) await document.exitFullscreen();else await shell.current?.requestFullscreen();}
+          catch {setCanFullscreen(false);}
+        }}>{fullscreen?"Exit fullscreen":"Fullscreen"}</button>}
       </header>
-      <div className="theatreGrid">
-        <div>
+      <div className="sceneArea">
           <div className="stage">
             <CameraDirector state={state} view={view} reduced={reduced} />
             {view === "Network" && (
@@ -339,6 +347,15 @@ export default function Theatre() {
               )}
             </div>
           </div>
+          <div id="simulation-details" className="detailsDrawer" hidden={!panel}>
+            <OperationsHUD {...{ state, selected, select }} />
+            <details open className="network">
+              <summary>Logical routes &amp; physical links</summary>
+              <RouteOverlay {...{ state, selected, reduced }} />
+            </details>
+            <ScenarioSummary state={state} />
+          </div>
+      </div>
           <TimelineControls
             {...{ t, playing, speed, rate }}
             set={move}
@@ -347,14 +364,6 @@ export default function Theatre() {
               play(!playing);
             }}
           />
-          <details open className="network">
-            <summary>Logical routes &amp; physical links</summary>
-            <RouteOverlay {...{ state, selected, reduced }} />
-          </details>
-        </div>
-        <OperationsHUD {...{ state, selected, select }} />
-      </div>
-      <ScenarioSummary state={state} />
     </section>
   );
 }

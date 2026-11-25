@@ -1,4 +1,4 @@
 import Theatre from "@/components/theatre/Theatre";
 export default function Page() {
-  return <Theatre />;
+  return <Theatre workspaceHref="/workspace" />;
 }

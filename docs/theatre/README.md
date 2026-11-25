@@ -1,6 +1,6 @@
 # Resilience Theatre
 
-Open **Resilience Theatre** in the workspace sidebar. Start Scenario plays a 115-second fictional incident. The speed control changes presentation time. The engineering clock independently maps transit and work to assumed hours. Seeking or changing the camera preserves the analytical state. The JSON button exports the decision record at the selected time.
+Open **Simulation**, the second item in the workspace sidebar. The simulation fills the viewport. **Details** opens the route analysis and report, and **Workspace** returns to navigation. Start Scenario plays a 115-second fictional incident. The speed control changes presentation time. The engineering clock independently maps transit and work to assumed hours. Seeking or changing the camera preserves the analytical state. The JSON button exports the decision record at the selected time.
 
 ## Architecture
 
