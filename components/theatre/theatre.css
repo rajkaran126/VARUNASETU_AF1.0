@@ -1,0 +1,209 @@
+.theatre {
+  --border: #30505b;
+  color: #e0eeed;
+  background: #0a1a22;
+  border-radius: 12px;
+  overflow: hidden;
+  font:
+    15px/1.5 "Inter",
+    system-ui,
+    sans-serif;
+  color-scheme: dark;
+}
+.theatre header,
+.theatreFoot {
+  padding: 22px clamp(16px, 3vw, 38px);
+}
+.theatre header {
+  background: linear-gradient(105deg, #102b37, #0a1921);
+}
+.theatre h1,
+.theatre h2 {
+  font-family: Georgia, serif;
+  font-weight: 400;
+  line-height: 1.1;
+  color: #eff7f4;
+}
+.theatre h1 {
+  font-size: clamp(36px, 4vw, 62px);
+  margin: 6px 0;
+}
+.theatre h2 {
+  font-size: 29px;
+  margin: 7px 0;
+}
+.theatre p {
+  margin: 8px 0;
+  color: #bfd0d1;
+}
+.theatre small {
+  font:
+    11px/1.6 ui-monospace,
+    monospace;
+  color: #a5d6ce;
+  letter-spacing: 0.08em;
+}
+.theatreGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(230px, 0.43fr);
+}
+.stage {
+  height: clamp(310px, 37vw, 520px);
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 50%, #183c47, #07131d 73%);
+}
+.camera,
+.mapStage {
+  position: absolute;
+  inset: 0;
+}
+.camera span {
+  position: absolute;
+  top: 45%;
+  text-align: center;
+  width: 100%;
+}
+.stageTop,
+.caption {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+}
+.stageTop {
+  top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.stageTop small,
+.caption small {
+  background: #0a1923db;
+  padding: 3px 7px;
+}
+.caption {
+  bottom: 14px;
+  text-shadow: 0 2px 8px #000;
+}
+.mapStage {
+  display: grid;
+  align-items: center;
+}
+.theatre button,
+.theatre select {
+  border: 1px solid #486270;
+  border-radius: 5px;
+  color: #e1eeed;
+  background: #152e39;
+  padding: 5px 10px;
+  font: inherit;
+  cursor: pointer;
+}
+.theatre :focus-visible {
+  outline: 3px solid #ffbf75;
+  outline-offset: 2px;
+}
+.theatre button:hover,
+.theatre button[aria-pressed="true"] {
+  border-color: #90daca;
+  background: #24454d;
+}
+.transport,
+.network,
+.theatrePanel {
+  padding: 16px 20px;
+  border: 1px solid var(--border);
+}
+.transport label {
+  display: block;
+}
+.transport b {
+  float: right;
+}
+.transport input {
+  display: block;
+  width: 100%;
+  margin: 10px 0 15px;
+  accent-color: #88dec9;
+}
+.transport > div,
+.theatreFoot {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.transport button:first-child {
+  background: #a3e1d2;
+  color: #0c282b;
+}
+.theatre summary {
+  cursor: pointer;
+}
+.routeMap {
+  width: 100%;
+  height: auto;
+  max-height: 230px;
+}
+.theatrePanel {
+  background: #0f232d;
+}
+.theatre h3 {
+  font-size: 14px;
+  margin: 18px 0 6px;
+}
+.metrics {
+  display: flex;
+  gap: 24px;
+  color: #b9d4d1;
+}
+.metrics strong {
+  font-size: 32px;
+  color: #effbf7;
+}
+.theatrePanel small {
+  display: block;
+}
+.theatre .routeButton {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  text-align: left;
+  width: 100%;
+  margin: 5px 0;
+}
+.routeButton small {
+  grid-column: 1/-1;
+  letter-spacing: 0;
+}
+.theatreFoot {
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.theatreFoot details {
+  max-width: 65%;
+}
+@media (max-width: 950px) {
+  .theatreGrid {
+    grid-template-columns: 1fr;
+  }
+  .theatreFoot details {
+    max-width: 100%;
+  }
+}
+@media (max-width: 600px) {
+  main:has(.theatre) {
+    padding: 6px;
+  }
+  .theatre header,
+  .transport,
+  .network,
+  .theatrePanel {
+    padding: 12px;
+  }
+  .theatre button,
+  .theatre select {
+    font-size: 13px;
+  }
+  .theatreFoot {
+    padding: 12px;
+  }
+}

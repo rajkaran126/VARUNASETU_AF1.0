@@ -1,0 +1,175 @@
+{
+  "id": "Pelagic Passage",
+  "seed": 1600,
+  "source": "SYNTHETIC",
+  "units": "Tbps, one-way ms, m, h",
+  "nodes": [
+    {
+      "id": "A",
+      "point": [
+        -52,
+        6
+      ]
+    },
+    {
+      "id": "D",
+      "point": [
+        49,
+        4
+      ]
+    },
+    {
+      "id": "X",
+      "point": [
+        -4,
+        43
+      ]
+    },
+    {
+      "id": "Y",
+      "point": [
+        6,
+        -31
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "AD",
+      "from": "A",
+      "to": "D",
+      "bidirectional": true,
+      "allowed": true,
+      "capacityTbps": 6,
+      "existingTbps": 0,
+      "delayMs": 42,
+      "srlg": "central",
+      "polyline": [
+        [
+          -52,
+          6
+        ],
+        [
+          49,
+          4
+        ]
+      ],
+      "delayUncertaintyMs": 2
+    },
+    {
+      "id": "AX",
+      "from": "A",
+      "to": "X",
+      "bidirectional": true,
+      "allowed": true,
+      "capacityTbps": 3,
+      "existingTbps": 0,
+      "delayMs": 31,
+      "srlg": "north",
+      "polyline": [
+        [
+          -52,
+          6
+        ],
+        [
+          -4,
+          43
+        ]
+      ],
+      "delayUncertaintyMs": 2
+    },
+    {
+      "id": "XD",
+      "from": "X",
+      "to": "D",
+      "bidirectional": true,
+      "allowed": true,
+      "capacityTbps": 3,
+      "existingTbps": 0,
+      "delayMs": 32,
+      "srlg": "north",
+      "polyline": [
+        [
+          -4,
+          43
+        ],
+        [
+          49,
+          4
+        ]
+      ],
+      "delayUncertaintyMs": 2
+    },
+    {
+      "id": "AY",
+      "from": "A",
+      "to": "Y",
+      "bidirectional": true,
+      "allowed": true,
+      "capacityTbps": 2,
+      "existingTbps": 0,
+      "delayMs": 38,
+      "srlg": "south",
+      "polyline": [
+        [
+          -52,
+          6
+        ],
+        [
+          6,
+          -31
+        ]
+      ],
+      "delayUncertaintyMs": 2
+    },
+    {
+      "id": "YD",
+      "from": "Y",
+      "to": "D",
+      "bidirectional": true,
+      "allowed": true,
+      "capacityTbps": 2,
+      "existingTbps": 0,
+      "delayMs": 41,
+      "srlg": "south",
+      "polyline": [
+        [
+          6,
+          -31
+        ],
+        [
+          49,
+          4
+        ]
+      ],
+      "delayUncertaintyMs": 2
+    }
+  ],
+  "broken": "AD",
+  "demands": [
+    {
+      "id": "OD-1",
+      "from": "A",
+      "to": "D",
+      "offered": 6,
+      "priority": 1
+    }
+  ],
+  "repair": {
+    "vessel": "RV Pelagia",
+    "depthM": 1600,
+    "rovRatingM": 2200,
+    "winchRatingM": 2400,
+    "distanceNm": 180,
+    "speedKn": 12,
+    "workHours": 48,
+    "wavesM": 1.4,
+    "waveLimitM": 2.5,
+    "permit": true,
+    "opticalPass": true,
+    "surveyPass": true,
+    "cutbackApproval": true,
+    "rerouteApproval": true,
+    "weatherWindowHours": 72
+  }
+}
