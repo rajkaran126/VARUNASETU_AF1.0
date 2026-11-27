@@ -24,6 +24,7 @@ const localInvestigationsStore: Record<string, unknown>[] = [
 ];
 
 export async function GET() {
+  if (!supabaseServer) return NextResponse.json(localInvestigationsStore);
   try {
     const { data, error } = await supabaseServer
       .from('investigations')
@@ -55,12 +56,14 @@ export async function POST(req: NextRequest) {
     };
 
     try {
-      const { error } = await supabaseServer
-        .from('investigations')
-        .insert(newInvestigation);
+      if (supabaseServer) {
+        const { error } = await supabaseServer
+          .from('investigations')
+          .insert(newInvestigation);
 
-      if (error) {
-        console.warn('[API /api/investigations] Supabase insert note:', error.message);
+        if (error) {
+          console.warn('[API /api/investigations] Supabase insert note:', error.message);
+        }
       }
     } catch {}
 

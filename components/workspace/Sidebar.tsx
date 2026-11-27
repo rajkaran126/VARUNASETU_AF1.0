@@ -36,7 +36,7 @@ export function Sidebar() {
     },
     {
       id: 'digital-twin',
-      name: 'Cable Break Simulation',
+      name: 'Simulation',
       path: '/workspace/digital-twin',
       badge: 'SIM',
       icon: (active) => (

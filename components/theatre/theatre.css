@@ -1,0 +1,296 @@
+.theatre {
+  --border: #30505b;
+  color: #e0eeed;
+  background: #0a1a22;
+  border-radius: 12px;
+  overflow: hidden;
+  font:
+    15px/1.5 "Inter",
+    system-ui,
+    sans-serif;
+  color-scheme: dark;
+}
+.theatre header,
+.theatreFoot {
+  padding: 22px clamp(16px, 3vw, 38px);
+}
+.theatre header {
+  background: linear-gradient(105deg, #102b37, #0a1921);
+}
+.theatre h1,
+.theatre h2 {
+  font-family: Georgia, serif;
+  font-weight: 400;
+  line-height: 1.1;
+  color: #eff7f4;
+}
+.theatre h1 {
+  font-size: clamp(36px, 4vw, 62px);
+  margin: 6px 0;
+}
+.theatre h2 {
+  font-size: 29px;
+  margin: 7px 0;
+}
+.theatre p {
+  margin: 8px 0;
+  color: #bfd0d1;
+}
+.theatre small {
+  font:
+    11px/1.6 ui-monospace,
+    monospace;
+  color: #a5d6ce;
+  letter-spacing: 0.08em;
+}
+.theatreGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(230px, 0.43fr);
+}
+.stage {
+  height: clamp(310px, 37vw, 520px);
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 50%, #183c47, #07131d 73%);
+}
+.camera,
+.mapStage {
+  position: absolute;
+  inset: 0;
+}
+.camera span {
+  position: absolute;
+  top: 45%;
+  text-align: center;
+  width: 100%;
+}
+.stageTop,
+.caption {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+}
+.stageTop {
+  top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.stageTop small,
+.caption small {
+  background: #0a1923db;
+  padding: 3px 7px;
+}
+.caption {
+  bottom: 14px;
+  text-shadow: 0 2px 8px #000;
+}
+.mapStage {
+  display: grid;
+  align-items: center;
+}
+.theatre button,
+.theatre select {
+  border: 1px solid #486270;
+  border-radius: 5px;
+  color: #e1eeed;
+  background: #152e39;
+  padding: 5px 10px;
+  font: inherit;
+  cursor: pointer;
+}
+.theatre :focus-visible {
+  outline: 3px solid #666;
+  outline-offset: 2px;
+}
+.theatre button:hover,
+.theatre button[aria-pressed="true"] {
+  border-color: #90daca;
+  background: #24454d;
+}
+.transport,
+.network,
+.theatrePanel {
+  padding: 16px 20px;
+  border: 1px solid var(--border);
+}
+.transport label {
+  display: block;
+}
+.transport b {
+  float: right;
+}
+.transport input {
+  display: block;
+  width: 100%;
+  margin: 10px 0 15px;
+  accent-color: #88dec9;
+}
+.transport > div,
+.theatreFoot {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.transport button:first-child {
+  background: #a3e1d2;
+  color: #0c282b;
+}
+.theatre summary {
+  cursor: pointer;
+}
+.routeMap {
+  width: 100%;
+  height: auto;
+  max-height: 230px;
+}
+.theatrePanel {
+  background: #0f232d;
+}
+.theatre h3 {
+  font-size: 14px;
+  margin: 18px 0 6px;
+}
+.metrics {
+  display: flex;
+  gap: 24px;
+  color: #b9d4d1;
+}
+.metrics strong {
+  font-size: 32px;
+  color: #effbf7;
+}
+.theatrePanel small {
+  display: block;
+}
+.theatre .routeButton {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  text-align: left;
+  width: 100%;
+  margin: 5px 0;
+}
+.routeButton small {
+  grid-column: 1/-1;
+  letter-spacing: 0;
+}
+.theatreFoot {
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.theatreFoot details {
+  max-width: 65%;
+}
+@media (max-width: 950px) {
+  .theatreGrid {
+    grid-template-columns: 1fr;
+  }
+  .theatreFoot details {
+    max-width: 100%;
+  }
+}
+@media (max-width: 600px) {
+  main:has(.theatre) {
+    padding: 6px;
+  }
+  .theatre header,
+  .transport,
+  .network,
+  .theatrePanel {
+    padding: 12px;
+  }
+  .theatre button,
+  .theatre select {
+    font-size: 13px;
+  }
+  .theatreFoot {
+    padding: 12px;
+  }
+}
+.camera {touch-action:none;cursor:grab}
+.camera:active {cursor:grabbing}
+.stageTop,.caption {pointer-events:none}
+.stageTop select {pointer-events:auto}
+.caption .orbitTip {display:block;width:fit-content;margin-bottom:4px;letter-spacing:.02em}
+
+.theatre {
+  position:fixed; inset:0; display:grid; grid-template-rows:auto minmax(0,1fr) auto;
+  border-radius:0; isolation:isolate;
+}
+.theatre header {
+  display:flex; align-items:center; gap:12px; padding:8px clamp(10px,2vw,24px);
+}
+.theatre header h1 {font-size:clamp(18px,2.5vw,30px);flex:1;margin:0}
+.workspaceReturn {font-size:14px;color:#a3e1d2;text-decoration:none}
+.sceneArea {position:relative;min-height:0}
+.sceneArea .stage {width:100%;height:100%}
+.detailsDrawer {
+  position:absolute;top:0;right:0;bottom:0;width:min(330px,100%);overflow:auto;
+  background:#10232e;box-shadow:-8px 0 28px #03101980;
+}
+.detailsDrawer .theatreFoot details {max-width:100%}
+.theatre .transport {padding:8px clamp(12px,2vw,28px) max(8px,env(safe-area-inset-bottom))}
+@media(max-width:520px){
+  .theatre header {gap:6px;flex-wrap:wrap}
+  .theatre header h1 {font-size:18px}
+  .workspaceReturn {font-size:12px}
+}
+
+/* Extend the live scene behind the controls so the glass picks up its colours. */
+.sceneArea .camera {position:fixed;inset:0}
+.theatre {
+  --glass-fill: #fafafa;
+  --glass-edge: rgba(255,255,255,.84);
+  --glass-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 8px 28px rgba(0,0,0,.16);
+}
+.theatre header, .theatre .transport, .theatre .detailsDrawer, .theatre .caption {
+  background:var(--glass-fill);
+  border:1px solid var(--glass-edge);
+  border-radius:14px;
+  box-shadow:var(--glass-shadow);
+}
+.theatre header, .theatre .transport {
+  position:relative;z-index:2;margin:8px clamp(6px,1.3vw,20px);
+}
+.theatre header {padding-block:8px}
+.theatre .detailsDrawer {margin:4px 12px;width:min(340px,calc(100% - 24px));z-index:1}
+.theatre .detailsDrawer :is(.theatrePanel,.network,.theatreFoot) {
+  background:transparent;border:0;border-bottom:1px solid rgba(0,0,0,.12);
+}
+.theatre .caption {
+  width:fit-content;max-width:calc(100% - 36px);padding:9px 14px;
+  text-shadow:none;
+}
+.theatre .caption small {background:none;padding:0}
+.theatre .caption h2 {margin-bottom:0}
+.theatre button,.theatre select {
+  color:#242424; background:linear-gradient(155deg,rgba(255,255,255,.96),rgba(245,245,245,.75));
+  border-color:rgba(40,40,40,.24);
+}
+.theatre select option {background:white;color:#242424}
+.theatre .transport button:first-child {
+  background:linear-gradient(155deg,#484848,#202020);color:white;
+}
+@supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))) {
+  .theatre {--glass-fill:linear-gradient(125deg,rgba(255,255,255,.90),rgba(250,250,250,.78))}
+  .theatre header,.theatre .transport,.theatre .detailsDrawer,.theatre .caption {
+    -webkit-backdrop-filter:blur(15px) grayscale(1);
+    backdrop-filter:blur(15px) grayscale(1);
+  }
+}
+@media (prefers-reduced-transparency:reduce) {
+  .theatre {--glass-fill:#fafafa}
+  .theatre header,.theatre .transport,.theatre .detailsDrawer,.theatre .caption {
+    -webkit-backdrop-filter:none;backdrop-filter:none;
+  }
+}
+
+.theatre :is(header,.transport,.detailsDrawer,.caption) {color:#262626;color-scheme:light}
+.theatre :is(header,.transport,.detailsDrawer,.caption) :is(h1,h2,h3,b,strong,.workspaceReturn,.metrics) {color:#202020}
+.theatre :is(.detailsDrawer,.caption) :is(small,p) {color:#404040}
+.theatre .stageTop small {background:var(--glass-fill);color:#333;border:1px solid var(--glass-edge);border-radius:5px}
+.theatre button:hover,.theatre button[aria-pressed=true] {background:#e3e3e3;color:#191919;border-color:#777}
+.theatre .transport input {accent-color:#444}
+.theatre .network .routeMap {background:#292929;border-radius:8px}
+
+.theatre .routeMap {filter:grayscale(1)}
