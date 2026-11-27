@@ -27,7 +27,7 @@ export function IncidentResponsePipeline() {
     },
     {
       step: 2,
-      name: 'Section 02 // 3D Underwater Sim',
+      name: 'Section 02 // Resilience Theatre',
       subtitle: 'Daylight Seabed & ROV Splice',
       href: '/workspace/digital-twin',
       icon: '',
@@ -148,7 +148,7 @@ export function IncidentResponsePipeline() {
           <button
             onClick={handleTriggerNewScene}
             className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white/90 font-mono text-xs transition-colors"
-            title="Generate What-If Breakage Scene"
+            title="Launch Resilience Theatre Scene"
           >
             What-If Scene
           </button>

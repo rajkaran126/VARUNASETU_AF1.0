@@ -6,7 +6,7 @@ import { useWorkspace } from '@/lib/workspace-context';
 import type * as THREE from 'three';
 
 /* =========================================================
-   VARUNASETU — Submarine Cable Break & Recovery Simulation
+   VARUNASETU — Submarine Cable Resilience Theatre
    Refined Dark Theme: Pure Black (#000000 / #080808)
    Zero dark-blue palette.
    Accents: Terracotta (#C87954), Coral Orange (#E99A65),
@@ -988,7 +988,7 @@ export default function CableBreakSim() {
             VARUNASETU
           </span>
           <span style={{ fontSize: 10, color: '#8A8A8A', fontWeight: 500, letterSpacing: 1.5 }}>
-            / SUBMARINE CABLE DIGITAL TWIN
+            / RESILIENCE THEATRE
           </span>
         </div>
 
@@ -1350,7 +1350,7 @@ export default function CableBreakSim() {
             fontFamily: "'IBM Plex Mono', monospace",
           }}
         >
-          ◈ PHASE 1: NORMAL OPERATION — DATA FLOWING AT 4.8 TBPS
+          ◈ PHASE 1: NORMAL OPERATION — RESILIENCE THEATRE READY (4.8 TBPS)
         </span>
       </div>
 

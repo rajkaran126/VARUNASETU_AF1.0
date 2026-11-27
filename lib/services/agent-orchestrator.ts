@@ -263,7 +263,7 @@ Output valid JSON matching this schema:
             disagreements: [],
             actionPlan: [],
             overallConfidence: 1.0,
-            recommendedNextStep: 'Ask about cable redundancy or click Simulate Breakage.',
+            recommendedNextStep: 'Ask about cable redundancy or launch Resilience Theatre.',
           },
           totalDurationMs: Date.now() - totalStart,
           timestamp: new Date().toISOString(),

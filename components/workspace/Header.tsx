@@ -76,14 +76,14 @@ export function Header() {
 
         {/* Right: What-If Trigger, Notification Bell, Current Date/Time, User Profile */}
         <div className="flex items-center gap-3 sm:gap-4">
-          {/* Quick What-If Breakage Trigger Button */}
+          {/* Quick Resilience Theatre Trigger Button */}
           <button
             onClick={() => generateWhatIfBreakage()}
             className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#C87954] hover:bg-[#B36845] text-white text-[11px] font-mono font-semibold flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 border border-[#B36845]"
-            title="Simulate subsea cable breakage and test automated alert & remediation workflow"
+            title="Launch Resilience Theatre: real-time failure injection, optical bypass & ROV recovery"
           >
             <span className="text-amber-200"></span>
-            <span>Simulate Breakage</span>
+            <span>Resilience Theatre</span>
           </button>
 
           {/* 1. Notification Icon Button & Anchored Pop-up Box */}
